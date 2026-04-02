@@ -1,0 +1,46 @@
+/**
+ * 示例子应用内：菜单与按钮统一字体、字号（与主系统 design token 一致）。
+ */
+.sample-app-scope {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: 1.5715;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sample-app-scope .app-sidebar,
+.sample-app-scope .app-content {
+  font-family: inherit;
+}
+
+/* 个人中心等：与 Arco Pro 一致的居中内容宽 */
+.sample-app-scope .page-narrow {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.sample-app-scope .page-setting {
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 表单类卡片页不需要悬浮抬起，避免误触干扰阅读 */
+.sample-app-scope .arco-page .panel.ds-card:hover {
+  transform: none;
+  box-shadow: var(--shadow-card);
+}
+
+.sample-app-scope a.btn-primary,
+.sample-app-scope a.btn-secondary,
+.sample-app-scope a.btn-text,
+.sample-app-scope button.btn-primary,
+.sample-app-scope button.btn-secondary {
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  text-decoration: none;
+  box-sizing: border-box;
+}

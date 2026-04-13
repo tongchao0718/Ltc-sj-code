@@ -1,0 +1,40 @@
+{
+  "name": "ltc-demo",
+  "private": true,
+  "version": "1.2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:sample-app": "vite build --config build/vite.sample-app.config.js",
+    "dev:sample-app": "vite --config build/vite.sample-app.config.js",
+    "update": "node scripts/update.js",
+    "rollback": "node scripts/rollback.js",
+    "create-update-package": "node scripts/create-update-package.js",
+    "version:echo": "node -e \"console.log('Current version:', process.env.npm_package_version)\"",
+    "install-deps": "node install-deps.js",
+    "test": "vitest run --config vite.config.test.js",
+    "test:watch": "vitest watch --config vite.config.test.js",
+    "test:coverage": "vitest run --config vite.config.test.js --coverage"
+  },
+  "dependencies": {
+    "@arco-design/web-vue": "^2.57.0",
+    "@vitejs/plugin-vue-jsx": "^5.1.5",
+    "axios": "^1.14.0",
+    "echarts": "^5.6.0",
+    "less": "^4.6.4",
+    "pinia": "^3.0.4",
+    "pinia-plugin-persistedstate": "^4.7.1",
+    "vitest": "^4.1.4",
+    "vue": "^3.5.13",
+    "vue-i18n": "^9.14.5",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "jsdom": "^29.0.2",
+    "terser": "^5.46.1",
+    "vite": "^6.0.3"
+  }
+}

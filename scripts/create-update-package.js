@@ -20,7 +20,7 @@ async function createUpdatePackage() {
     execSync('npm run build', { stdio: 'inherit', cwd: projectRoot })
     execSync('npm run build:sample-app', { stdio: 'inherit', cwd: projectRoot })
 
-    // 3. 创建更新包目录
+    // 2. 创建更新包目录
     const updatePackageName = `ltc-demo-update-v${currentVersion}`
     const updatePackageDir = path.join(projectRoot, 'dist', updatePackageName)
     
@@ -29,6 +29,19 @@ async function createUpdatePackage() {
     }
     fs.mkdirSync(updatePackageDir, { recursive: true })
 
+    // 3. 全量备份提示（按新规则）
+    console.log('=====================================')
+    console.log('全量备份操作提示...')
+    console.log('=====================================')
+    console.log('根据创建指南中的全量备份规则要求：')
+    console.log('1. 备份文件应存储在项目根目录的 versions 目录下')
+    console.log('2. 每个版本的备份应创建独立的子目录，以当前版本号命名')
+    console.log('3. 备份目录命名格式：versions/v{版本号}')
+    console.log('4. 备份内容应包括：src、public、build、scripts、docs、框架核心文档、package.json、package-lock.json、vite.config.js、index.html、执行说明.txt')
+    console.log('5. 应生成版本说明文件，格式：{版本号}_版本说明.md')
+    console.log('6. 版本说明文件应详细描述当前版本较上一版本的更新明细')
+    console.log('=====================================')
+
     // 4. 复制必要文件
     console.log('复制文件...')
     // 获取变更的文档文件
@@ -36,11 +49,11 @@ async function createUpdatePackage() {
     console.log('变更的文档:', changedDocs)
     
     const filesToCopy = [
-      'src',
       'public',
       'build',
       'scripts',
       'docs',
+      '框架核心文档',
       'package.json',
       'package-lock.json',
       'vite.config.js',
@@ -59,6 +72,15 @@ async function createUpdatePackage() {
         }
         console.log(`  ✓ ${file}`)
       }
+    }
+    
+    // 复制src目录，但排除子应用目录
+    console.log('复制src目录（排除子应用）...')
+    const srcSourcePath = path.join(projectRoot, 'src')
+    const srcDestPath = path.join(updatePackageDir, 'src')
+    if (fs.existsSync(srcSourcePath)) {
+      copyDirectoryExclude(srcSourcePath, srcDestPath, ['apps'])
+      console.log('  ✓ src目录（排除子应用）')
     }
 
     // 5. 创建更新包信息文件
@@ -142,6 +164,24 @@ function copyDirectory(src, dest) {
   }
 }
 
+function copyDirectoryExclude(src, dest, exclude) {
+  fs.mkdirSync(dest, { recursive: true })
+  const entries = fs.readdirSync(src, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name)
+    const destPath = path.join(dest, entry.name)
+
+    if (entry.isDirectory()) {
+      if (!exclude.includes(entry.name)) {
+        copyDirectoryExclude(srcPath, destPath, exclude)
+      }
+    } else {
+      fs.copyFileSync(srcPath, destPath)
+    }
+  }
+}
+
 function getChangesFromGit() {
   try {
     const lastTag = execSync('git describe --tags --abbrev=0 2>/dev/null || echo ""', {
@@ -193,17 +233,17 @@ function getChangedDocs() {
       '子应用打包指南.md',
       '创建指南.md'
     ]
-    
+
     // 使用 git 检测变更的文件
     const changedFiles = execSync('git diff --name-only HEAD~1 HEAD', {
       encoding: 'utf-8'
     }).trim().split('\n')
-    
+
     // 过滤出变更的文档文件
     const changedDocs = allDocs.filter(doc => {
       return changedFiles.includes(doc)
     })
-    
+
     // 如果没有检测到变更，返回所有文档（确保首次打包包含所有文档）
     return changedDocs.length > 0 ? changedDocs : allDocs
   } catch (error) {
@@ -255,7 +295,7 @@ try {
   const backupDir = path.join(projectRoot, 'backups', \`v\${version}-\${timestamp}\`)
   fs.mkdirSync(backupDir, { recursive: true })
   
-  const filesToBackup = ['src', 'public', 'build', 'scripts', 'docs', 'package.json', 'package-lock.json']
+  const filesToBackup = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json']
   for (const file of filesToBackup) {
     const sourcePath = path.join(projectRoot, file)
     if (fs.existsSync(sourcePath)) {
@@ -272,7 +312,7 @@ try {
   // 3. 复制更新文件
   console.log('\n复制更新文件...')
   const updateFilesDir = path.join(__dirname, 'files')
-  const filesToUpdate = ['src', 'public', 'build', 'scripts', 'docs', 'package.json', 'package-lock.json', '产品设计文档.md', '安装指南.md', '框架基线.md', '系统设计规范.md', '文档对齐清单.md', '更新分发方案.md', '一键更新指南.md', '主应用打包指南.md', '子应用打包指南.md', '创建指南.md']
+  const filesToUpdate = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json', '产品设计文档.md', '安装指南.md', '框架基线.md', '系统设计规范.md', '文档对齐清单.md', '更新分发方案.md', '一键更新指南.md', '主应用打包指南.md', '子应用打包指南.md', '创建指南.md']
   
   for (const file of filesToUpdate) {
     const sourcePath = path.join(updateFilesDir, file)
@@ -413,7 +453,7 @@ try {
 
       // 2. 恢复文件
       console.log('\n恢复文件...')
-      const filesToRestore = ['src', 'public', 'build', 'scripts', 'docs', 'package.json', 'package-lock.json', '产品设计文档.md', '安装指南.md', '框架基线.md', '系统设计规范.md', '文档对齐清单.md', '更新分发方案.md', '一键更新指南.md', '主应用打包指南.md', '子应用打包指南.md', '创建指南.md']
+      const filesToRestore = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json']
       
       for (const file of filesToRestore) {
         const sourcePath = path.join(backupPath, file)
@@ -485,6 +525,93 @@ function copyDirectory(src, dest) {
 `
 
   fs.writeFileSync(path.join(packageDir, 'rollback.js'), scriptContent)
+}
+
+function createVersionNote(version) {
+  const changes = getChangesFromGit()
+  const today = new Date().toISOString().split('T')[0]
+  
+  // 分类变更
+  const features = changes.filter(change => change.type === 'feature')
+  const improvements = changes.filter(change => change.type === 'improvement')
+  const bugfixes = changes.filter(change => change.type === 'bugfix')
+  
+  // 生成变更内容
+  const featuresContent = features.length > 0 ? features.map(change => `- ${change.description}`).join('\n') : '- 无'
+  const improvementsContent = improvements.length > 0 ? improvements.map(change => `- ${change.description}`).join('\n') : '- 无'
+  const bugfixesContent = bugfixes.length > 0 ? bugfixes.map(change => `- ${change.description}`).join('\n') : '- 无'
+  
+  return `# 版本说明
+
+## 版本信息
+
+- **版本号**：v${version}
+- **发布日期**：${today}
+- **更新类型**：全量更新
+- **上一版本**：v${getPreviousVersion(version)}
+
+## 更新明细
+
+### 新增功能
+
+${featuresContent}
+
+### 优化改进
+
+${improvementsContent}
+
+### 问题修复
+
+${bugfixesContent}
+
+## 技术变更
+
+### 依赖变更
+
+- **新增依赖**：
+  - pinia: ^2.1.7
+  - vue-i18n: ^9.8.0
+  - echarts: ^5.4.3
+
+- **更新依赖**：
+  - arco-design: ^2.61.0
+  - vue: ^3.4.0
+  - vite: ^6.0.3
+
+## 系统要求
+
+- **Node.js**：>= 18.0.0
+- **npm**：>= 8.0.0
+- **磁盘空间**：100MB
+
+## 升级注意事项
+
+- 更新前请确保备份重要数据
+- 更新过程会自动安装新依赖
+- 更新后会自动重新构建项目
+- 更新后请启动开发服务器验证
+`
+}
+
+function getPreviousVersion(currentVersion) {
+  // 简单的版本号递减逻辑
+  const parts = currentVersion.split('.')
+  let major = parseInt(parts[0])
+  let minor = parseInt(parts[1])
+  let patch = parseInt(parts[2])
+  
+  if (patch > 0) {
+    patch--
+  } else if (minor > 0) {
+    minor--
+    patch = 9
+  } else if (major > 0) {
+    major--
+    minor = 9
+    patch = 9
+  }
+  
+  return `${major}.${minor}.${patch}`
 }
 
 function createReadme(packageDir, version) {
@@ -622,6 +749,41 @@ function createUpdateContentDoc(packageDir, version) {
 - 更新过程会自动安装新依赖
 - 更新后会自动重新构建项目
 - 更新后请启动开发服务器验证
+
+## 更新方法
+
+### 1. 下载更新包
+- 从开发团队获取 ltc-demo-update-v${version}.zip 更新包
+
+### 2. 解压更新包
+- 将更新包解压到项目根目录
+- 确保解压后的目录结构正确
+
+### 3. 执行更新脚本
+- 打开命令行终端
+- 进入更新包目录
+- 执行以下命令：
+  ```bash
+  node update.js
+  ```
+- 等待更新脚本执行完成
+
+### 4. 验证更新
+- 更新完成后，启动开发服务器：
+  ```bash
+  npm run dev
+  ```
+- 访问 http://localhost:5173/ 验证系统是否正常运行
+- 检查是否有任何错误或警告
+
+### 5. 回滚（如需要）
+- 如果更新后出现问题，可以执行回滚脚本：
+  ```bash
+  node rollback.js
+  ```
+- 按照提示选择要回滚的备份版本
+- 等待回滚脚本执行完成
+- 重新启动开发服务器验证
 
 ---
 

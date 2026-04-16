@@ -8,7 +8,7 @@ import App from './App.vue'
 import router from './router'
 import { initTheme } from './utils/theme'
 import i18n from './apps/sample-app/i18n.js'
-import pinia from './apps/sample-app/store/index.js'
+import pinia from './store/index.js'
 
 initTheme()
 

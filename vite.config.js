@@ -11,5 +11,18 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src')
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'pinia'],
+          'arco-design': ['@arco-design/web-vue'],
+          'echarts': ['echarts'],
+          'i18n': ['vue-i18n']
+        }
+      }
+    }
   }
 })

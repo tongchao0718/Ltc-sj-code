@@ -61,82 +61,86 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'App',
-  data() {
-    return {
-      userMenuOpen: false,
-      isScrolled: false,
-      menuCloseTimer: null,
-      userDisplayName: ''
-    }
-  },
-  computed: {
-    isSubAppEmbed() {
-      return this.$route.path.startsWith('/sample-app')
-    },
-    userInitial() {
-      const n = (this.userDisplayName || '').trim()
-      if (!n) return 'L'
-      return n.slice(0, 1).toUpperCase()
-    }
-  },
-  watch: {
-    $route() {
-      this.closeUserMenu()
-    }
-  },
-  mounted() {
-    this.syncUserDisplayName()
-    window.addEventListener('scroll', this.handleScroll, { passive: true })
-    document.addEventListener('click', this.onDocClick)
-    window.addEventListener('storage', this.onStorage)
-    window.addEventListener('ltc-profile-updated', this.syncUserDisplayName)
-  },
-  beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll)
-    document.removeEventListener('click', this.onDocClick)
-    window.removeEventListener('storage', this.onStorage)
-    window.removeEventListener('ltc-profile-updated', this.syncUserDisplayName)
-    if (this.menuCloseTimer) clearTimeout(this.menuCloseTimer)
-  },
-  methods: {
-    toggleUserMenu() {
-      this.userMenuOpen = !this.userMenuOpen
-    },
-    closeUserMenu() {
-      this.userMenuOpen = false
-    },
-    onUserMenuEnter() {
-      if (this.menuCloseTimer) {
-        clearTimeout(this.menuCloseTimer)
-        this.menuCloseTimer = null
-      }
-    },
-    onUserMenuLeave() {
-      this.menuCloseTimer = setTimeout(() => {
-        this.userMenuOpen = false
-      }, 200)
-    },
-    onDocClick() {
-      this.userMenuOpen = false
-    },
-    handleScroll() {
-      this.isScrolled = window.scrollY > 8
-    },
-    syncUserDisplayName() {
-      try {
-        this.userDisplayName = localStorage.getItem('ltc-demo-display-name') || 'LTC'
-      } catch {
-        this.userDisplayName = 'LTC'
-      }
-    },
-    onStorage(e) {
-      if (e.key === 'ltc-demo-display-name') this.syncUserDisplayName()
-    }
+<script setup>
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const userMenuOpen = ref(false)
+const isScrolled = ref(false)
+const menuCloseTimer = ref(null)
+const userDisplayName = ref('')
+
+const isSubAppEmbed = computed(() => {
+  return route.path.startsWith('/sample-app')
+})
+
+const userInitial = computed(() => {
+  const n = (userDisplayName.value || '').trim()
+  if (!n) return 'L'
+  return n.slice(0, 1).toUpperCase()
+})
+
+watch(route, () => {
+  closeUserMenu()
+})
+
+const toggleUserMenu = () => {
+  userMenuOpen.value = !userMenuOpen.value
+}
+
+const closeUserMenu = () => {
+  userMenuOpen.value = false
+}
+
+const onUserMenuEnter = () => {
+  if (menuCloseTimer.value) {
+    clearTimeout(menuCloseTimer.value)
+    menuCloseTimer.value = null
   }
 }
+
+const onUserMenuLeave = () => {
+  menuCloseTimer.value = setTimeout(() => {
+    userMenuOpen.value = false
+  }, 200)
+}
+
+const onDocClick = () => {
+  userMenuOpen.value = false
+}
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 8
+}
+
+const syncUserDisplayName = () => {
+  try {
+    userDisplayName.value = localStorage.getItem('ltc-demo-display-name') || 'LTC'
+  } catch {
+    userDisplayName.value = 'LTC'
+  }
+}
+
+const onStorage = (e) => {
+  if (e.key === 'ltc-demo-display-name') syncUserDisplayName()
+}
+
+onMounted(() => {
+  syncUserDisplayName()
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  document.addEventListener('click', onDocClick)
+  window.addEventListener('storage', onStorage)
+  window.addEventListener('ltc-profile-updated', syncUserDisplayName)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('click', onDocClick)
+  window.removeEventListener('storage', onStorage)
+  window.removeEventListener('ltc-profile-updated', syncUserDisplayName)
+  if (menuCloseTimer.value) clearTimeout(menuCloseTimer.value)
+})
 </script>
 
 <style scoped>

@@ -264,265 +264,229 @@ function getChangedDocs() {
 }
 
 function createUpdateScript(packageDir, version) {
-  const scriptContent = `#!/usr/bin/env node
-
-import fs from 'fs'
-import path from 'path'
-import { execSync } from 'child_process'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const projectRoot = path.join(__dirname, '..')
-
-console.log('开始系统更新...')
-console.log(\`更新版本: v\${version}\`)
-
-try {
-  // 1. 检查环境
-  console.log('\\n检查环境...')
-  const nodeVersion = process.version
-  console.log(\`  Node.js 版本: \${nodeVersion}\`)
-  
-  if (nodeVersion < 'v18.0.0') {
-    console.error('❌ Node.js 版本过低，需要 18.0 或更高版本')
-    process.exit(1)
-  }
-
-  // 2. 创建备份
-  console.log('\\n创建备份...')
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-  const backupDir = path.join(projectRoot, 'backups', \`v\${version}-\${timestamp}\`)
-  fs.mkdirSync(backupDir, { recursive: true })
-  
-  const filesToBackup = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json']
-  for (const file of filesToBackup) {
-    const sourcePath = path.join(projectRoot, file)
-    if (fs.existsSync(sourcePath)) {
-      const destPath = path.join(backupDir, file)
-      if (fs.statSync(sourcePath).isDirectory()) {
-        copyDirectory(sourcePath, destPath)
-      } else {
-        fs.copyFileSync(sourcePath, destPath)
-      }
-      console.log(\`  ✓ 备份 \${file}\`)
-    }
-  }
-
-  // 3. 复制更新文件
-  console.log('\n复制更新文件...')
-  const updateFilesDir = path.join(__dirname, 'files')
-  const filesToUpdate = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json', '产品设计文档.md', '安装指南.md', '框架基线.md', '系统设计规范.md', '文档对齐清单.md', '更新分发方案.md', '一键更新指南.md', '主应用打包指南.md', '子应用打包指南.md', '创建指南.md']
-  
-  for (const file of filesToUpdate) {
-    const sourcePath = path.join(updateFilesDir, file)
-    const destPath = path.join(projectRoot, file)
-    
-    if (fs.existsSync(sourcePath)) {
-      if (fs.existsSync(destPath)) {
-        if (fs.statSync(destPath).isDirectory()) {
-          fs.rmSync(destPath, { recursive: true, force: true })
-        } else {
-          fs.unlinkSync(destPath)
-        }
-      }
-      
-      if (fs.statSync(sourcePath).isDirectory()) {
-        copyDirectory(sourcePath, destPath)
-      } else {
-        fs.copyFileSync(sourcePath, destPath)
-      }
-      console.log(\`  ✓ 更新 \${file}\`)
-    }
-  }
-
-  // 4. 安装依赖
-  console.log('\\n安装依赖...')
-  execSync('npm install', { stdio: 'inherit', cwd: projectRoot })
-
-  // 5. 构建项目
-  console.log('\\n构建项目...')
-  execSync('npm run build', { stdio: 'inherit', cwd: projectRoot })
-  execSync('npm run build:sample-app', { stdio: 'inherit', cwd: projectRoot })
-
-  // 6. 清理更新包
-  console.log('\\n清理更新包...')
-  const updatePackageDir = path.join(projectRoot, 'ltc-demo-update')
-  if (fs.existsSync(updatePackageDir)) {
-    fs.rmSync(updatePackageDir, { recursive: true, force: true })
-  }
-
-  console.log('\\n✅ 系统更新完成！')
-  console.log('\\n📝 更新内容：')
-  console.log(\`  - 更新到版本 v\${version}\`)
-  console.log('  - 已创建更新备份')
-  console.log('  - 已安装最新依赖')
-  console.log('  - 已重新构建项目')
-  console.log('\\n💡 提示：')
-  console.log(\`  - 备份位置: \${backupDir}\`)
-  console.log('  - 如果更新后出现问题，可以使用 rollback.js 回滚')
-  console.log('  - 建议重启开发服务器: npm run dev')
-
-} catch (error) {
-  console.error('\\n❌ 更新失败:', error.message)
-  console.error('\\n💡 提示：')
-  console.error('  - 请检查错误信息并重试')
-  console.error('  - 如果问题持续，请联系技术支持')
-  process.exit(1)
-}
-
-function copyDirectory(src, dest) {
-  fs.mkdirSync(dest, { recursive: true })
-  const entries = fs.readdirSync(src, { withFileTypes: true })
-
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name)
-    const destPath = path.join(dest, entry.name)
-
-    if (entry.isDirectory()) {
-      copyDirectory(srcPath, destPath)
-    } else {
-      fs.copyFileSync(srcPath, destPath)
-    }
-  }
-}
-`
+  const scriptContent = "#!/usr/bin/env node\n\n" +
+    "import fs from 'fs'\n" +
+    "import path from 'path'\n" +
+    "import { execSync } from 'child_process'\n" +
+    "import { fileURLToPath } from 'url'\n\n" +
+    "const __filename = fileURLToPath(import.meta.url)\n" +
+    "const __dirname = path.dirname(__filename)\n" +
+    "const projectRoot = path.join(__dirname, '..')\n\n" +
+    "console.log('开始系统更新...')\n" +
+    "console.log('更新版本: v" + version + "')\n\n" +
+    "try {\n" +
+    "  // 1. 检查环境\n" +
+    "  console.log('\\n检查环境...')\n" +
+    "  const nodeVersion = process.version\n" +
+    "  console.log('  Node.js 版本: ' + nodeVersion)\n" +
+    "  \n" +
+    "  if (nodeVersion < 'v18.0.0') {\n" +
+    "    console.error('❌ Node.js 版本过低，需要 18.0 或更高版本')\n" +
+    "    process.exit(1)\n" +
+    "  }\n\n" +
+    "  // 2. 创建备份\n" +
+    "  console.log('\\n创建备份...')\n" +
+    "  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')\n" +
+    "  const backupDir = path.join(projectRoot, 'backups', 'v" + version + "-' + timestamp)\n" +
+    "  fs.mkdirSync(backupDir, { recursive: true })\n" +
+    "  \n" +
+    "  const filesToBackup = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json']\n" +
+    "  for (const file of filesToBackup) {\n" +
+    "    const sourcePath = path.join(projectRoot, file)\n" +
+    "    if (fs.existsSync(sourcePath)) {\n" +
+    "      const destPath = path.join(backupDir, file)\n" +
+    "      if (fs.statSync(sourcePath).isDirectory()) {\n" +
+    "        copyDirectory(sourcePath, destPath)\n" +
+    "      } else {\n" +
+    "        fs.copyFileSync(sourcePath, destPath)\n" +
+    "      }\n" +
+    "      console.log('  ✓ 备份 ' + file)\n" +
+    "    }\n" +
+    "  }\n\n" +
+    "  // 3. 复制更新文件\n" +
+    "  console.log('\\n复制更新文件...')\n" +
+    "  const updateFilesDir = path.join(__dirname, 'files')\n" +
+    "  const filesToUpdate = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json', '产品设计文档.md', '安装指南.md', '框架基线.md', '系统设计规范.md', '文档对齐清单.md', '更新分发方案.md', '一键更新指南.md', '主应用打包指南.md', '子应用打包指南.md', '创建指南.md']\n" +
+    "  \n" +
+    "  for (const file of filesToUpdate) {\n" +
+    "    const sourcePath = path.join(updateFilesDir, file)\n" +
+    "    const destPath = path.join(projectRoot, file)\n" +
+    "    \n" +
+    "    if (fs.existsSync(sourcePath)) {\n" +
+    "      if (fs.existsSync(destPath)) {\n" +
+    "        if (fs.statSync(destPath).isDirectory()) {\n" +
+    "          fs.rmSync(destPath, { recursive: true, force: true })\n" +
+    "        } else {\n" +
+    "          fs.unlinkSync(destPath)\n" +
+    "        }\n" +
+    "      }\n" +
+    "      \n" +
+    "      if (fs.statSync(sourcePath).isDirectory()) {\n" +
+    "        copyDirectory(sourcePath, destPath)\n" +
+    "      } else {\n" +
+    "        fs.copyFileSync(sourcePath, destPath)\n" +
+    "      }\n" +
+    "      console.log('  ✓ 更新 ' + file)\n" +
+    "    }\n" +
+    "  }\n\n" +
+    "  // 4. 安装依赖\n" +
+    "  console.log('\\n安装依赖...')\n" +
+    "  execSync('npm install', { stdio: 'inherit', cwd: projectRoot })\n\n" +
+    "  // 5. 构建项目\n" +
+    "  console.log('\\n构建项目...')\n" +
+    "  execSync('npm run build', { stdio: 'inherit', cwd: projectRoot })\n" +
+    "  execSync('npm run build:sample-app', { stdio: 'inherit', cwd: projectRoot })\n\n" +
+    "  // 6. 清理更新包\n" +
+    "  console.log('\\n清理更新包...')\n" +
+    "  const updatePackageDir = path.join(projectRoot, 'ltc-demo-update')\n" +
+    "  if (fs.existsSync(updatePackageDir)) {\n" +
+    "    fs.rmSync(updatePackageDir, { recursive: true, force: true })\n" +
+    "  }\n\n" +
+    "  console.log('\\n✅ 系统更新完成！')\n" +
+    "  console.log('\\n📝 更新内容：')\n" +
+    "  console.log('  - 更新到版本 v" + version + "')\n" +
+    "  console.log('  - 已创建更新备份')\n" +
+    "  console.log('  - 已安装最新依赖')\n" +
+    "  console.log('  - 已重新构建项目')\n" +
+    "  console.log('\\n💡 提示：')\n" +
+    "  console.log('  - 备份位置: ' + backupDir)\n" +
+    "  console.log('  - 如果更新后出现问题，可以使用 rollback.js 回滚')\n" +
+    "  console.log('  - 建议重启开发服务器: npm run dev')\n\n" +
+    "} catch (error) {\n" +
+    "  console.error('\\n❌ 更新失败:', error.message)\n" +
+    "  console.error('\\n💡 提示：')\n" +
+    "  console.error('  - 请检查错误信息并重试')\n" +
+    "  console.error('  - 如果问题持续，请联系技术支持')\n" +
+    "  process.exit(1)\n" +
+    "}\n\n" +
+    "function copyDirectory(src, dest) {\n" +
+    "  fs.mkdirSync(dest, { recursive: true })\n" +
+    "  const entries = fs.readdirSync(src, { withFileTypes: true })\n\n" +
+    "  for (const entry of entries) {\n" +
+    "    const srcPath = path.join(src, entry.name)\n" +
+    "    const destPath = path.join(dest, entry.name)\n\n" +
+    "    if (entry.isDirectory()) {\n" +
+    "      copyDirectory(srcPath, destPath)\n" +
+    "    } else {\n" +
+    "      fs.copyFileSync(srcPath, destPath)\n" +
+    "    }\n" +
+    "  }\n" +
+    "}\n";
 
   fs.writeFileSync(path.join(packageDir, 'update.js'), scriptContent)
 }
 
 function createRollbackScript(packageDir, version) {
-  const scriptContent = `#!/usr/bin/env node
-
-import fs from 'fs'
-import path from 'path'
-import { execSync } from 'child_process'
-import readline from 'readline'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const projectRoot = path.join(__dirname, '..')
-
-console.log('开始版本回滚...')
-
-try {
-  // 1. 查找备份
-  console.log('\\n查找备份...')
-  const backupsDir = path.join(projectRoot, 'backups')
-  
-  if (!fs.existsSync(backupsDir)) {
-    console.error('❌ 未找到备份目录')
-    process.exit(1)
-  }
-
-  const backups = fs.readdirSync(backupsDir)
-    .filter(dir => dir.startsWith(\`v\${version}-\`))
-    .sort()
-    .reverse()
-
-  if (backups.length === 0) {
-    console.error(\`❌ 未找到版本 v\${version} 的备份\`)
-    process.exit(1)
-  }
-
-  console.log('\\n可用的备份：')
-  backups.forEach((backup, index) => {
-    console.log(\`  \${index + 1}. \${backup}\`)
-  })
-
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  })
-
-  rl.question(\`\\n请选择要回滚的备份 (1-\${backups.length}): \`, (answer) => {
-    try {
-      const choice = parseInt(answer.trim()) - 1
-      if (choice < 0 || choice >= backups.length) {
-        console.error('❌ 无效的选择')
-        rl.close()
-        process.exit(1)
-        return
-      }
-
-      const selectedBackup = backups[choice]
-      const backupPath = path.join(backupsDir, selectedBackup)
-
-      console.log(\`\\n回滚到备份: \${selectedBackup}\`)
-
-      // 2. 恢复文件
-      console.log('\n恢复文件...')
-      const filesToRestore = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json']
-      
-      for (const file of filesToRestore) {
-        const sourcePath = path.join(backupPath, file)
-        const destPath = path.join(projectRoot, file)
-        
-        if (fs.existsSync(sourcePath)) {
-          if (fs.existsSync(destPath)) {
-            if (fs.statSync(destPath).isDirectory()) {
-              fs.rmSync(destPath, { recursive: true, force: true })
-            } else {
-              fs.unlinkSync(destPath)
-            }
-          }
-          
-          if (fs.statSync(sourcePath).isDirectory()) {
-            copyDirectory(sourcePath, destPath)
-          } else {
-            fs.copyFileSync(sourcePath, destPath)
-          }
-          console.log(\`  ✓ 恢复 \${file}\`)
-        }
-      }
-
-      // 3. 安装依赖
-      console.log('\\n安装依赖...')
-      execSync('npm install', { stdio: 'inherit', cwd: projectRoot })
-
-      // 4. 构建项目
-      console.log('\\n构建项目...')
-      execSync('npm run build', { stdio: 'inherit', cwd: projectRoot })
-      execSync('npm run build:sample-app', { stdio: 'inherit', cwd: projectRoot })
-
-      console.log('\\n✅ 版本回滚完成！')
-      console.log('\\n📝 回滚内容：')
-      console.log(\`  - 回滚到备份: \${selectedBackup}\`)
-      console.log('  - 已恢复文件')
-      console.log('  - 已重新安装依赖')
-      console.log('  - 已重新构建项目')
-      console.log('\\n💡 提示：')
-      console.log('  - 建议重启开发服务器: npm run dev')
-
-    } catch (error) {
-      console.error('❌ 回滚失败:', error.message)
-    } finally {
-      rl.close()
-    }
-  })
-
-} catch (error) {
-  console.error('❌ 回滚失败:', error.message)
-  process.exit(1)
-}
-
-function copyDirectory(src, dest) {
-  fs.mkdirSync(dest, { recursive: true })
-  const entries = fs.readdirSync(src, { withFileTypes: true })
-
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name)
-    const destPath = path.join(dest, entry.name)
-
-    if (entry.isDirectory()) {
-      copyDirectory(srcPath, destPath)
-    } else {
-      fs.copyFileSync(srcPath, destPath)
-    }
-  }
-}
-`
+  const scriptContent = "#!/usr/bin/env node\n\n" +
+    "import fs from 'fs'\n" +
+    "import path from 'path'\n" +
+    "import { execSync } from 'child_process'\n" +
+    "import readline from 'readline'\n" +
+    "import { fileURLToPath } from 'url'\n\n" +
+    "const __filename = fileURLToPath(import.meta.url)\n" +
+    "const __dirname = path.dirname(__filename)\n" +
+    "const projectRoot = path.join(__dirname, '..')\n\n" +
+    "console.log('开始版本回滚...')\n\n" +
+    "try {\n" +
+    "  // 1. 查找备份\n" +
+    "  console.log('\\n查找备份...')\n" +
+    "  const backupsDir = path.join(projectRoot, 'backups')\n" +
+    "  \n" +
+    "  if (!fs.existsSync(backupsDir)) {\n" +
+    "    console.error('❌ 未找到备份目录')\n" +
+    "    process.exit(1)\n" +
+    "  }\n\n" +
+    "  const backups = fs.readdirSync(backupsDir)\n" +
+    "    .filter(dir => dir.startsWith('v" + version + "-'))\n" +
+    "    .sort()\n" +
+    "    .reverse()\n\n" +
+    "  if (backups.length === 0) {\n" +
+    "    console.error('❌ 未找到版本 v" + version + " 的备份')\n" +
+    "    process.exit(1)\n" +
+    "  }\n\n" +
+    "  console.log('\\n可用的备份：')\n" +
+    "  backups.forEach((backup, index) => {\n" +
+    "    console.log('  ' + (index + 1) + '. ' + backup)\n" +
+    "  })\n\n" +
+    "  const rl = readline.createInterface({\n" +
+    "    input: process.stdin,\n" +
+    "    output: process.stdout\n" +
+    "  })\n\n" +
+    "  rl.question('\\n请选择要回滚的备份 (1-' + backups.length + '): ', (answer) => {\n" +
+    "    try {\n" +
+    "      const choice = parseInt(answer.trim()) - 1\n" +
+    "      if (choice < 0 || choice >= backups.length) {\n" +
+    "        console.error('❌ 无效的选择')\n" +
+    "        rl.close()\n" +
+    "        process.exit(1)\n" +
+    "        return\n" +
+    "      }\n\n" +
+    "      const selectedBackup = backups[choice]\n" +
+    "      const backupPath = path.join(backupsDir, selectedBackup)\n\n" +
+    "      console.log('\\n回滚到备份: ' + selectedBackup)\n\n" +
+    "      // 2. 恢复文件\n" +
+    "      console.log('\\n恢复文件...')\n" +
+    "      const filesToRestore = ['src', 'public', 'build', 'scripts', 'docs', '框架核心文档', 'package.json', 'package-lock.json']\n" +
+    "      \n" +
+    "      for (const file of filesToRestore) {\n" +
+    "        const sourcePath = path.join(backupPath, file)\n" +
+    "        const destPath = path.join(projectRoot, file)\n" +
+    "        \n" +
+    "        if (fs.existsSync(sourcePath)) {\n" +
+    "          if (fs.existsSync(destPath)) {\n" +
+    "            if (fs.statSync(destPath).isDirectory()) {\n" +
+    "              fs.rmSync(destPath, { recursive: true, force: true })\n" +
+    "            } else {\n" +
+    "              fs.unlinkSync(destPath)\n" +
+    "            }\n" +
+    "          }\n" +
+    "          \n" +
+    "          if (fs.statSync(sourcePath).isDirectory()) {\n" +
+    "            copyDirectory(sourcePath, destPath)\n" +
+    "          } else {\n" +
+    "            fs.copyFileSync(sourcePath, destPath)\n" +
+    "          }\n" +
+    "          console.log('  ✓ 恢复 ' + file)\n" +
+    "        }\n" +
+    "      }\n\n" +
+    "      // 3. 安装依赖\n" +
+    "      console.log('\\n安装依赖...')\n" +
+    "      execSync('npm install', { stdio: 'inherit', cwd: projectRoot })\n\n" +
+    "      // 4. 构建项目\n" +
+    "      console.log('\\n构建项目...')\n" +
+    "      execSync('npm run build', { stdio: 'inherit', cwd: projectRoot })\n" +
+    "      execSync('npm run build:sample-app', { stdio: 'inherit', cwd: projectRoot })\n\n" +
+    "      console.log('\\n✅ 版本回滚完成！')\n" +
+    "      console.log('\\n📝 回滚内容：')\n" +
+    "      console.log('  - 回滚到备份: ' + selectedBackup)\n" +
+    "      console.log('  - 已恢复文件')\n" +
+    "      console.log('  - 已重新安装依赖')\n" +
+    "      console.log('  - 已重新构建项目')\n" +
+    "      console.log('\\n💡 提示：')\n" +
+    "      console.log('  - 建议重启开发服务器: npm run dev')\n\n" +
+    "    } catch (error) {\n" +
+    "      console.error('❌ 回滚失败:', error.message)\n" +
+    "    } finally {\n" +
+    "      rl.close()\n" +
+    "    }\n" +
+    "  })\n\n" +
+    "} catch (error) {\n" +
+    "  console.error('❌ 回滚失败:', error.message)\n" +
+    "  process.exit(1)\n" +
+    "}\n\n" +
+    "function copyDirectory(src, dest) {\n" +
+    "  fs.mkdirSync(dest, { recursive: true })\n" +
+    "  const entries = fs.readdirSync(src, { withFileTypes: true })\n\n" +
+    "  for (const entry of entries) {\n" +
+    "    const srcPath = path.join(src, entry.name)\n" +
+    "    const destPath = path.join(dest, entry.name)\n\n" +
+    "    if (entry.isDirectory()) {\n" +
+    "      copyDirectory(srcPath, destPath)\n" +
+    "    } else {\n" +
+    "      fs.copyFileSync(srcPath, destPath)\n" +
+    "    }\n" +
+    "  }\n" +
+    "}\n";
 
   fs.writeFileSync(path.join(packageDir, 'rollback.js'), scriptContent)
 }
@@ -537,60 +501,42 @@ function createVersionNote(version) {
   const bugfixes = changes.filter(change => change.type === 'bugfix')
   
   // 生成变更内容
-  const featuresContent = features.length > 0 ? features.map(change => `- ${change.description}`).join('\n') : '- 无'
-  const improvementsContent = improvements.length > 0 ? improvements.map(change => `- ${change.description}`).join('\n') : '- 无'
-  const bugfixesContent = bugfixes.length > 0 ? bugfixes.map(change => `- ${change.description}`).join('\n') : '- 无'
+  const featuresContent = features.length > 0 ? features.map(change => '- ' + change.description).join('\n') : '- 无'
+  const improvementsContent = improvements.length > 0 ? improvements.map(change => '- ' + change.description).join('\n') : '- 无'
+  const bugfixesContent = bugfixes.length > 0 ? bugfixes.map(change => '- ' + change.description).join('\n') : '- 无'
   
-  return `# 版本说明
-
-## 版本信息
-
-- **版本号**：v${version}
-- **发布日期**：${today}
-- **更新类型**：全量更新
-- **上一版本**：v${getPreviousVersion(version)}
-
-## 更新明细
-
-### 新增功能
-
-${featuresContent}
-
-### 优化改进
-
-${improvementsContent}
-
-### 问题修复
-
-${bugfixesContent}
-
-## 技术变更
-
-### 依赖变更
-
-- **新增依赖**：
-  - pinia: ^2.1.7
-  - vue-i18n: ^9.8.0
-  - echarts: ^5.4.3
-
-- **更新依赖**：
-  - arco-design: ^2.61.0
-  - vue: ^3.4.0
-  - vite: ^6.0.3
-
-## 系统要求
-
-- **Node.js**：>= 18.0.0
-- **npm**：>= 8.0.0
-- **磁盘空间**：100MB
-
-## 升级注意事项
-
-- 更新前请确保备份重要数据
-- 更新过程会自动安装新依赖
-- 更新后会自动重新构建项目
-- 更新后请启动开发服务器验证
-`
+  return "# 版本说明\n\n" +
+    "## 版本信息\n\n" +
+    "- **版本号**：v" + version + "\n" +
+    "- **发布日期**：" + today + "\n" +
+    "- **更新类型**：全量更新\n" +
+    "- **上一版本**：v" + getPreviousVersion(version) + "\n\n" +
+    "## 更新明细\n\n" +
+    "### 新增功能\n\n" +
+    featuresContent + "\n\n" +
+    "### 优化改进\n\n" +
+    improvementsContent + "\n\n" +
+    "### 问题修复\n\n" +
+    bugfixesContent + "\n\n" +
+    "## 技术变更\n\n" +
+    "### 依赖变更\n\n" +
+    "- **新增依赖**：\n" +
+    "  - pinia: ^2.1.7\n" +
+    "  - vue-i18n: ^9.8.0\n" +
+    "  - echarts: ^5.4.3\n\n" +
+    "- **更新依赖**：\n" +
+    "  - arco-design: ^2.61.0\n" +
+    "  - vue: ^3.4.0\n" +
+    "  - vite: ^6.0.3\n\n" +
+    "## 系统要求\n\n" +
+    "- **Node.js**：>= 18.0.0\n" +
+    "- **npm**：>= 8.0.0\n" +
+    "- **磁盘空间**：100MB\n\n" +
+    "## 升级注意事项\n\n" +
+    "- 更新前请确保备份重要数据\n" +
+    "- 更新过程会自动安装新依赖\n" +
+    "- 更新后会自动重新构建项目\n" +
+    "- 更新后请启动开发服务器验证\n"
 }
 
 function getPreviousVersion(currentVersion) {
@@ -615,70 +561,46 @@ function getPreviousVersion(currentVersion) {
 }
 
 function createReadme(packageDir, version) {
-  const readmeContent = `# LTC 应用系统 v${version} 更新包
-
-## 更新说明
-
-本更新包用于将 LTC 应用系统更新到 v${version} 版本。
-
-## 更新内容
-
-- 集成 Pinia 状态管理库
-- 集成 Vue I18n 国际化支持
-- 集成 ECharts 数据可视化
-- 优化 Arco Design 组件集成
-- 修复 Pinia 未注册导致页面空白的问题
-
-## 系统要求
-
-- Node.js: >= 18.0.0
-- npm: >= 8.0.0
-- 磁盘空间: 100MB
-
-## 更新步骤
-
-### 1. 解压更新包
-
-将更新包解压到项目根目录。
-
-### 2. 执行更新脚本
-
-\`\`\`bash
-node update.js
-\`\`\`
-
-### 3. 验证更新
-
-更新完成后，启动开发服务器验证：
-
-\`\`\`bash
-npm run dev
-\`\`\`
-
-### 4. 回滚（如需要）
-
-如果更新后出现问题，可以执行回滚脚本：
-
-\`\`\`bash
-node rollback.js
-\`\`\`
-
-## 注意事项
-
-- 更新前会自动创建备份
-- 更新过程中请勿关闭终端
-- 更新完成后建议重启开发服务器
-- 如遇问题，请查看备份目录中的文件
-
-## 技术支持
-
-如遇到问题，请联系技术支持团队。
-
----
-
-更新日期: ${new Date().toISOString().split('T')[0]}
-版本: v${version}
-`
+  const readmeContent = "# LTC 应用系统 v" + version + " 更新包\n\n" +
+    "## 更新说明\n\n" +
+    "本更新包用于将 LTC 应用系统更新到 v" + version + " 版本。\n\n" +
+    "## 更新内容\n\n" +
+    "- 集成 Pinia 状态管理库\n" +
+    "- 集成 Vue I18n 国际化支持\n" +
+    "- 集成 ECharts 数据可视化\n" +
+    "- 优化 Arco Design 组件集成\n" +
+    "- 修复 Pinia 未注册导致页面空白的问题\n\n" +
+    "## 系统要求\n\n" +
+    "- Node.js: >= 18.0.0\n" +
+    "- npm: >= 8.0.0\n" +
+    "- 磁盘空间: 100MB\n\n" +
+    "## 更新步骤\n\n" +
+    "### 1. 解压更新包\n\n" +
+    "将更新包解压到项目根目录。\n\n" +
+    "### 2. 执行更新脚本\n\n" +
+    "```bash\n" +
+    "node update.js\n" +
+    "```\n\n" +
+    "### 3. 验证更新\n\n" +
+    "更新完成后，启动开发服务器验证：\n\n" +
+    "```bash\n" +
+    "npm run dev\n" +
+    "```\n\n" +
+    "### 4. 回滚（如需要）\n\n" +
+    "如果更新后出现问题，可以执行回滚脚本：\n\n" +
+    "```bash\n" +
+    "node rollback.js\n" +
+    "```\n\n" +
+    "## 注意事项\n\n" +
+    "- 更新前会自动创建备份\n" +
+    "- 更新过程中请勿关闭终端\n" +
+    "- 更新完成后建议重启开发服务器\n" +
+    "- 如遇问题，请查看备份目录中的文件\n\n" +
+    "## 技术支持\n\n" +
+    "如遇到问题，请联系技术支持团队。\n\n" +
+    "---\n\n" +
+    "更新日期: " + new Date().toISOString().split('T')[0] + "\n" +
+    "版本: v" + version + "\n"
 
   fs.writeFileSync(path.join(packageDir, 'README.md'), readmeContent)
 }
@@ -690,109 +612,83 @@ function createUpdateContentDoc(packageDir, version) {
   if (fs.existsSync(updateContentPath)) {
     // 如果项目根目录存在更新内容说明.md，复制到更新包
     fs.copyFileSync(updateContentPath, destPath)
-    console.log(`  ✓ 复制更新内容说明.md`)
+    console.log('  ✓ 复制更新内容说明.md')
   } else {
     // 如果不存在，创建一个默认的更新内容说明文档
-    const updateContent = `# LTC 应用系统更新内容说明
-
-## 版本信息
-
-- **版本号**: v${version}
-- **发布日期**: ${new Date().toISOString().split('T')[0]}
-- **更新类型**: 全量更新
-- **目标版本**: v${version}
-- **最低兼容版本**: v1.0.0
-
-## 更新内容
-
-### 新增功能
-
-- 集成 Pinia 状态管理库
-- 集成 Vue I18n 国际化支持
-- 集成 ECharts 数据可视化
-
-### 优化改进
-
-- 优化 Arco Design 组件集成
-- 优化项目构建配置
-- 优化代码结构
-
-### 问题修复
-
-- 修复 Pinia 未注册导致页面空白的问题
-- 修复 Arco Design 组件无法使用的问题
-- 修复示例应用菜单打开空白的问题
-
-## 技术变更
-
-### 依赖变更
-
-- **新增依赖**:
-  - pinia: ^2.1.7
-  - vue-i18n: ^9.8.0
-  - echarts: ^5.4.3
-
-- **更新依赖**:
-  - arco-design: ^2.61.0
-  - vue: ^3.4.0
-  - vite: ^6.0.3
-
-## 系统要求
-
-- **Node.js**: >= 18.0.0
-- **npm**: >= 8.0.0
-- **磁盘空间**: 100MB
-
-## 升级注意事项
-
-- 更新前请确保备份重要数据
-- 更新过程会自动安装新依赖
-- 更新后会自动重新构建项目
-- 更新后请启动开发服务器验证
-
-## 更新方法
-
-### 1. 下载更新包
-- 从开发团队获取 ltc-demo-update-v${version}.zip 更新包
-
-### 2. 解压更新包
-- 将更新包解压到项目根目录
-- 确保解压后的目录结构正确
-
-### 3. 执行更新脚本
-- 打开命令行终端
-- 进入更新包目录
-- 执行以下命令：
-  ```bash
-  node update.js
-  ```
-- 等待更新脚本执行完成
-
-### 4. 验证更新
-- 更新完成后，启动开发服务器：
-  ```bash
-  npm run dev
-  ```
-- 访问 http://localhost:5173/ 验证系统是否正常运行
-- 检查是否有任何错误或警告
-
-### 5. 回滚（如需要）
-- 如果更新后出现问题，可以执行回滚脚本：
-  ```bash
-  node rollback.js
-  ```
-- 按照提示选择要回滚的备份版本
-- 等待回滚脚本执行完成
-- 重新启动开发服务器验证
-
----
-
-**更新日期**: ${new Date().toISOString().split('T')[0]}
-**版本**: v${version}
-**发布团队**: LTC Team
-`
+    const updateContent = "# LTC 应用系统更新内容说明\n\n" +
+      "## 版本信息\n\n" +
+      "- **版本号**: v" + version + "\n" +
+      "- **发布日期**: " + new Date().toISOString().split('T')[0] + "\n" +
+      "- **更新类型**: 全量更新\n" +
+      "- **目标版本**: v" + version + "\n" +
+      "- **最低兼容版本**: v1.0.0\n\n" +
+      "## 更新内容\n\n" +
+      "### 新增功能\n\n" +
+      "- 集成 Pinia 状态管理库\n" +
+      "- 集成 Vue I18n 国际化支持\n" +
+      "- 集成 ECharts 数据可视化\n\n" +
+      "### 优化改进\n\n" +
+      "- 优化 Arco Design 组件集成\n" +
+      "- 优化项目构建配置\n" +
+      "- 优化代码结构\n\n" +
+      "### 问题修复\n\n" +
+      "- 修复 Pinia 未注册导致页面空白的问题\n" +
+      "- 修复 Arco Design 组件无法使用的问题\n" +
+      "- 修复示例应用菜单打开空白的问题\n\n" +
+      "## 技术变更\n\n" +
+      "### 依赖变更\n\n" +
+      "- **新增依赖**:\n" +
+      "  - pinia: ^2.1.7\n" +
+      "  - vue-i18n: ^9.8.0\n" +
+      "  - echarts: ^5.4.3\n\n" +
+      "- **更新依赖**:\n" +
+      "  - arco-design: ^2.61.0\n" +
+      "  - vue: ^3.4.0\n" +
+      "  - vite: ^6.0.3\n\n" +
+      "## 系统要求\n\n" +
+      "- **Node.js**: >= 18.0.0\n" +
+      "- **npm**: >= 8.0.0\n" +
+      "- **磁盘空间**: 100MB\n\n" +
+      "## 升级注意事项\n\n" +
+      "- 更新前请确保备份重要数据\n" +
+      "- 更新过程会自动安装新依赖\n" +
+      "- 更新后会自动重新构建项目\n" +
+      "- 更新后请启动开发服务器验证\n\n" +
+      "## 更新方法\n\n" +
+      "### 1. 下载更新包\n" +
+      "- 从开发团队获取 ltc-demo-update-v" + version + ".zip 更新包\n\n" +
+      "### 2. 解压更新包\n" +
+      "- 将更新包解压到项目根目录\n" +
+      "- 确保解压后的目录结构正确\n\n" +
+      "### 3. 执行更新脚本\n" +
+      "- 打开命令行终端\n" +
+      "- 进入更新包目录\n" +
+      "- 执行以下命令：\n" +
+      "  ```bash\n" +
+      "  node update.js\n" +
+      "  ```\n" +
+      "- 等待更新脚本执行完成\n\n" +
+      "### 4. 验证更新\n" +
+      "- 更新完成后，启动开发服务器：\n" +
+      "  ```bash\n" +
+      "  npm run dev\n" +
+      "  ```\n" +
+      "- 访问 http://localhost:5173/ 验证系统是否正常运行\n" +
+      "- 检查是否有任何错误或警告\n\n" +
+      "### 5. 回滚（如需要）\n" +
+      "- 如果更新后出现问题，可以执行回滚脚本：\n" +
+      "  ```bash\n" +
+      "  node rollback.js\n" +
+      "  ```\n" +
+      "- 按照提示选择要回滚的备份版本\n" +
+      "- 等待回滚脚本执行完成\n" +
+      "- 重新启动开发服务器验证\n\n" +
+      "---\n\n" +
+      "**更新日期**: " + new Date().toISOString().split('T')[0] + "\n" +
+      "**版本**: v" + version + "\n" +
+      "**发布团队**: LTC Team\n"
     fs.writeFileSync(destPath, updateContent)
-    console.log(`  ✓ 创建更新内容说明.md`)
+    console.log('  ✓ 创建更新内容说明.md')
   }
 }
 

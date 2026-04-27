@@ -17,7 +17,7 @@ try {
   console.log(`创建备份目录: ${backupDir}`)
 
   console.log('拉取最新代码...')
-  execSync('git pull origin master', { stdio: 'inherit' })
+  execSync('git pull origin main', { stdio: 'inherit' })
 
   console.log('安装依赖...')
   execSync('npm install', { stdio: 'inherit', cwd: path.join(__dirname, '..') })

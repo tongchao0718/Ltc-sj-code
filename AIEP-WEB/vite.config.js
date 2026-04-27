@@ -17,7 +17,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor': ['vue', 'vue-router', 'pinia']
+          'vendor': ['vue', 'vue-router', 'pinia'],
+          'arco-design': ['@arco-design/web-vue'],
+          'echarts': ['echarts'],
+          'i18n': ['vue-i18n']
         }
       }
     }

@@ -2,11 +2,12 @@
 
 ## 阶段顺序
 
-1. `requirements-clarification`
-2. `prd-design-generation`
-3. `ui-generation`
-4. `code-development`
-5. `test-validation`
+1. 需求生成：`requirements-clarification`
+2. 需求确认：`requirements-clarification` + `prd-design-generation`
+3. 界面生成：`ui-generation`
+4. 界面确认：`ui-generation`
+5. 开发测试：`code-development` + `test-validation`
+6. 发布上线：基于门禁结论执行发布检查与归档
 
 ## 门禁规则
 
@@ -23,4 +24,4 @@
 
 ## 目标
 
-通过标准化的 skill 编排，让 AI 在需求、设计、开发、测试全流程中行为一致、结果可追踪、质量可复核。
+通过标准化的 skill 编排，让 AI 在“需求生成、需求确认、界面生成、界面确认、开发测试、发布上线”全流程中行为一致、结果可追踪、质量可复核。

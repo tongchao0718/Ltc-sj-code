@@ -1,6 +1,6 @@
 ---
 name: ai-dev-stage-gate
-description: 编排AI驱动开发阶段门禁，统一需求澄清、PRD、UI、编码、测试五阶段准入准出规则。用于强制标准化推进。
+description: 编排AI驱动开发阶段门禁，统一“需求生成、需求确认、界面生成、界面确认、开发测试、发布上线”六步准入准出规则。用于强制标准化推进。
 ---
 
 # AI 开发阶段门禁编排
@@ -9,14 +9,14 @@ description: 编排AI驱动开发阶段门禁，统一需求澄清、PRD、UI、
 
 强制执行标准化阶段推进。每次阶段切换前，必须先调用对应阶段 skill 并完成门禁检查。
 
-## 阶段顺序
+## 阶段顺序（六步）
 
-1. `requirements-clarification`
-2. `prd-design-generation`
-3. `ui-generation`（G2-A：前端交互样机评审与界面确认）
-4. G2-B 技术补齐评审（API/数据库/后端，使用 `code-development` 前置评审模式）
-5. `code-development`
-6. `test-validation`
+1. 需求生成：`requirements-clarification`（产出需求草案）
+2. 需求确认：`requirements-clarification` + `prd-design-generation`（产出需求确认单，含 SDD 与技术补齐结论）
+3. 界面生成：`ui-generation`（产出 PRD 草案/界面规格）
+4. 界面确认：`ui-generation`（完成 G2-A 界面确认与字段映射冻结）
+5. 开发测试：`code-development` + `test-validation`（完成实现与测试放行）
+6. 发布上线：发布检查与归档（由门禁结果驱动）
 
 ## 编排规则
 
@@ -26,12 +26,12 @@ description: 编排AI驱动开发阶段门禁，统一需求澄清、PRD、UI、
 4. 阶段结束时，执行门禁检查
 5. 仅在门禁通过后，切换到下一阶段 skill
 
-## UI-first 子流程门禁
+## UI-first 子流程门禁（界面生成/确认）
 
-1. `ui-generation` 阶段结束后，必须先通过 G2-A（界面效果确认）。  
-2. 通过 G2-A 后，必须执行 G2-B 技术补齐评审。  
-3. G2-B 未通过时，禁止进入 `code-development`。  
-4. 若 G2-A 后页面字段有改动，必须同步更新 API/数据库映射并重新检查 G2-B。
+1. 界面生成后，必须先通过 G2-A（界面效果确认）。  
+2. 需求确认阶段必须已完成 G2-B 技术补齐评审。  
+3. G2-A 或 G2-B 任一未通过，禁止进入 `code-development`。  
+4. 若界面确认后页面字段有改动，必须同步更新 API/数据库映射并重新检查 G2-B。
 
 ## 标准门禁检查表
 
@@ -39,6 +39,7 @@ description: 编排AI驱动开发阶段门禁，统一需求澄清、PRD、UI、
 - 必交付物是否完整
 - 风险与待确认项是否显式列出
 - 下一阶段前置条件是否满足
+- 状态枚举是否按统一口径输出（`pass/fail/blocked`）
 
 ## 输出模板
 
@@ -47,7 +48,7 @@ description: 编排AI驱动开发阶段门禁，统一需求澄清、PRD、UI、
 - 当前阶段：
 - 必需输入：
 - 完成状态：
-- 门禁结论：pass / fail
+- 门禁结论：pass / fail / blocked
 - 缺失项：
 - 下一动作：
 ```
@@ -58,3 +59,9 @@ description: 编排AI驱动开发阶段门禁，统一需求澄清、PRD、UI、
 - 保持当前阶段不变
 - 精确列出缺失工件
 - 给出最小补齐动作
+
+## 状态判定口径（强制）
+
+- `pass`：阶段输入完整、必交付物齐备、前置条件满足，可进入下一阶段。
+- `fail`：阶段产物不达标但可在当前阶段内修订闭环。
+- `blocked`：缺少外部决策/合规审批/关键依赖，或关键模板未生成，当前阶段无法继续推进。

@@ -1,7 +1,7 @@
 {
   "name": "ltc-demo",
   "private": true,
-  "version": "1.2.1",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "cd AIEP-WEB && vite --config vite.config.js",

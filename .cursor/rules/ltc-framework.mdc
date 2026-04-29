@@ -1,0 +1,13 @@
+---
+description: LTC 多子应用前端 — 以仓库代码为准，避免按过期长文档从零生成
+alwaysApply: true
+---
+
+# LTC 项目约束
+
+- **唯一事实来源**：`src/`、`vite.config.js`、`build/vite.sample-app.config.js`、`package-lock.json`。
+- **路由**：与 `src/router/index.js` 保持一致；应用中心路径为 `/app-center`（不是 `/apps`）。
+- **帮助/关于**：独立路由页 `HelpPage` / `AboutPage`，路径 `/help`、`/about`；不要仅用弹窗替代主流程。
+- **主应用打包**：`npm run build` → `dist/`；主应用不使用 `dist/main` 或文档中的主应用 IIFE 示例。
+- **版本**：重大依赖变更时更新根目录 `framework-baseline.json`。
+- 长文档《创建指南》仅作背景；实现或重构时优先对照现有文件与 `文档对齐清单.md`。

@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "app_code": "sample-app",
+  "project": "AIEP-DEV",
+  "enabled_gates": ["G2", "G3"],
+  "paths": {
+    "sdd_json": "docs/子应用文档/sample-app/01-需求与设计/SDD-v1.0.json",
+    "mapping_table": "docs/子应用文档/sample-app/01-需求与设计/页面-路由-接口-数据表映射表.md",
+    "acceptance_cases": "docs/子应用文档/sample-app/02-研发与测试/验收脚本-GWT.md"
+  },
+  "g2_rules": {
+    "require_customer_confirmation": true,
+    "require_mapping_table": true,
+    "sdd_required_fields": ["sdd_id", "version", "owner", "app_code", "features", "api_contracts", "state_machine", "acceptance"],
+    "reject_placeholders": true
+  },
+  "g3_rules": {
+    "require_sdd_id_in_commit": true,
+    "require_traceability_matrix": true,
+    "require_gwt_executable": true,
+    "block_on_p0_p1_open": true
+  },
+  "pipeline": {
+    "block_on_status": ["failed", "blocked"],
+    "warn_on_status": ["warning"],
+    "output_report": "docs/子应用文档/sample-app/04-AI治理与审计/gate-report.json"
+  }
+}

@@ -29,10 +29,14 @@ app.get('/health', (req, res) => {
 // 导入路由
 import userRoutes from './src/main/routes/userRoutes.js';
 import sampleRoutes from './src/apps/sample-app/routes/sampleRoutes.js';
+import protocolTemplateRoutes from './src/apps/power-fee-protocol-check/routes/protocolTemplateRoutes.js';
+import protocolFullFlowRoutes from './src/apps/power-fee-protocol-check/routes/protocolFullFlowRoutes.js';
 
 // 使用路由
 app.use('/api/users', userRoutes);
 app.use('/api/sample', sampleRoutes);
+app.use('/api/protocol/template', protocolTemplateRoutes);
+app.use('/api/protocol', protocolFullFlowRoutes);
 
 // 404处理
 app.use((req, res) => {

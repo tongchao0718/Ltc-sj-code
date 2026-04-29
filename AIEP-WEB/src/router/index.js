@@ -36,6 +36,52 @@ const routes = [
     component: () => import('../views/AboutPage.vue')
   },
   {
+    path: '/power-fee-protocol-check',
+    name: 'PowerFeeProtocolCheckApp',
+    component: () => import('../apps/power-fee-protocol-check/PowerFeeProtocolCheckApp.vue'),
+    children: [
+      {
+        path: '',
+        redirect: '/power-fee-protocol-check/template'
+      },
+      {
+        path: 'template',
+        name: 'PowerFeeProtocolTemplateList',
+        component: () => import('../apps/power-fee-protocol-check/views/ProtocolTemplateListPage.vue')
+      },
+      {
+        path: 'sample-annotation',
+        name: 'PowerFeeSampleAnnotation',
+        component: () => import('../apps/power-fee-protocol-check/views/SampleAnnotationPage.vue')
+      },
+      {
+        path: 'rule-publish',
+        name: 'PowerFeeRulePublish',
+        component: () => import('../apps/power-fee-protocol-check/views/RulePublishPage.vue')
+      },
+      {
+        path: 'task-strategy',
+        name: 'PowerFeeTaskStrategy',
+        component: () => import('../apps/power-fee-protocol-check/views/TaskStrategyPage.vue')
+      },
+      {
+        path: 'check-execution',
+        name: 'PowerFeeCheckExecution',
+        component: () => import('../apps/power-fee-protocol-check/views/CheckExecutionPage.vue')
+      },
+      {
+        path: 'module/:moduleCode',
+        name: 'PowerFeeProtocolModuleWorkbench',
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'full-flow',
+        name: 'PowerFeeProtocolFullFlow',
+        component: () => import('../apps/power-fee-protocol-check/views/ProtocolFullFlowPage.vue')
+      }
+    ]
+  },
+  {
     path: '/sample-app',
     name: 'SampleApp',
     component: () => import('../apps/sample-app/SampleApp.vue'),
@@ -91,6 +137,11 @@ const routes = [
         path: 'visualization/multi-dimension-data-analysis',
         name: 'SampleVizMultiDim',
         component: () => import('../apps/sample-app/views/visualization/MultiDimensionPage.vue')
+      },
+      {
+        path: 'visualization/shandong-board',
+        name: 'SampleVizShandongBoard',
+        component: () => import('../apps/sample-app/views/visualization/ShandongMapBoardPage.vue')
       },
       {
         path: 'list/search-table',
@@ -151,6 +202,11 @@ const routes = [
         path: 'user/setting',
         name: 'SampleUserSetting',
         component: () => import('../apps/sample-app/views/user/UserSetting.vue')
+      },
+      {
+        path: 'mobile/cases',
+        name: 'SampleMobileCases',
+        component: () => import('../apps/sample-app/views/mobile/MobileCasesPage.vue')
       },
       {
         path: 'test',

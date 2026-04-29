@@ -38,6 +38,11 @@ const routes = [
     component: () => import('./views/visualization/MultiDimensionPage.vue')
   },
   {
+    path: '/visualization/shandong-board',
+    name: 'StandaloneVizShandongBoard',
+    component: () => import('./views/visualization/ShandongMapBoardPage.vue')
+  },
+  {
     path: '/list/search-table',
     name: 'StandaloneListSearchTable',
     component: () => import('./views/list/SearchTablePage.vue')
@@ -96,6 +101,11 @@ const routes = [
     path: '/user/setting',
     name: 'StandaloneUserSetting',
     component: () => import('./views/user/UserSetting.vue')
+  },
+  {
+    path: '/mobile/cases',
+    name: 'StandaloneMobileCases',
+    component: () => import('./views/mobile/MobileCasesPage.vue')
   },
   {
     path: '/test',

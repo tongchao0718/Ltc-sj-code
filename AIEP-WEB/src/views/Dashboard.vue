@@ -32,6 +32,20 @@
             <div class="link-sub">侧栏分组菜单与业务页（自工作台进入）</div>
           </div>
         </router-link>
+        <router-link to="/power-fee-protocol-check/template" class="quick-link ds-card">
+          <span class="link-icon" aria-hidden="true">🧾</span>
+          <div>
+            <div class="link-text">电费协议核查</div>
+            <div class="link-sub">M01 协议模板库列表（API-01）</div>
+          </div>
+        </router-link>
+        <router-link to="/power-fee-protocol-check/full-flow" class="quick-link ds-card">
+          <span class="link-icon" aria-hidden="true">🔗</span>
+          <div>
+            <div class="link-text">电费协议核查全链路验证</div>
+            <div class="link-sub">API-02~API-08 执行验证工作台</div>
+          </div>
+        </router-link>
       </div>
     </div>
 
@@ -57,7 +71,7 @@
 import { ref, computed } from 'vue'
 
 const stats = ref([
-  { title: '已接入子应用', value: '1', desc: '可扩展为多应用架构' },
+  { title: '已接入子应用', value: '2', desc: '可扩展为多应用架构' },
   { title: '今日访问（演示）', value: '—', desc: '接入统计服务后展示' },
   { title: '构建状态', value: '正常', desc: '主应用 + 子应用独立构建' },
   { title: '文档完备度', value: '基线', desc: '随业务迭代同步更新' }
@@ -69,8 +83,8 @@ const stats = ref([
  * 示例子应用：dashboard×2 + visualization×2 + list×2 + form×2 + profile×1 + result×2 + exception×3 + user×2 = 16
  */
 const metrics = computed(() => ({
-  appCount: 1,
-  pageCount: 6 + 16
+  appCount: 2,
+  pageCount: 6 + 16 + 1
 }))
 
 </script>

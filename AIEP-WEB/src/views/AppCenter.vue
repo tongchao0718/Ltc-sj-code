@@ -32,6 +32,16 @@ const apps = [
     to: '/sample-app/dashboard/workplace',
     tag: '可用',
     tagClass: 'tag-success'
+  },
+  {
+    id: 'power-fee-protocol-check',
+    name: '电费协议核查',
+    folder: 'power-fee-protocol-check',
+    desc: 'M01~M14 模块入口 + API-02~API-08 全链路验证工作台。',
+    icon: '⚙️',
+    to: '/power-fee-protocol-check/full-flow',
+    tag: '开发中',
+    tagClass: 'tag-warning'
   }
 ]
 </script>

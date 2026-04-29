@@ -1,0 +1,94 @@
+{
+  "sdd_id": "SDD-YYYYMMDD-001",
+  "version": "1.0.0",
+  "owner": "产品经理",
+  "stage": "define",
+  "app_code": "<app-code>",
+  "feature_name": "<功能名称>",
+  "in_scope": [
+    "<范围1>"
+  ],
+  "out_of_scope": [
+    "<不做项1>"
+  ],
+  "roles": [
+    {
+      "role": "<角色>",
+      "permissions": [
+        "read"
+      ]
+    }
+  ],
+  "story_map": [
+    {
+      "activity": "<用户活动>",
+      "task": "<用户任务>",
+      "story": "作为<角色>，我希望<目标>，以便<价值>",
+      "requirement_ref": "SA-1/<需求名称>",
+      "release_slice": "MVP",
+      "acceptance_ref": [
+        "AT-01"
+      ],
+      "acceptance_standard": "Given<前置> When<动作> Then<可验证结果>"
+    }
+  ],
+  "features": [
+    {
+      "id": "F-01",
+      "name": "<功能点>",
+      "priority": "P0",
+      "acceptance_ref": [
+        "AT-01"
+      ]
+    }
+  ],
+  "api_contracts": [
+    {
+      "id": "API-01",
+      "path": "/api/<app-code>/<resource>",
+      "method": "GET",
+      "request": {
+        "keyword": "string",
+        "pageNo": "number",
+        "pageSize": "number"
+      },
+      "response": {
+        "code": "number",
+        "message": "string",
+        "data": "object",
+        "requestId": "string"
+      },
+      "errors": [
+        "400",
+        "401",
+        "500"
+      ]
+    }
+  ],
+  "state_machine": [
+    {
+      "page": "<页面名称>",
+      "states": [
+        "loading",
+        "success",
+        "empty",
+        "error"
+      ]
+    }
+  ],
+  "exception_strategy": [
+    {
+      "type": "timeout",
+      "action": "show_retry"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "AT-01",
+      "given": "<前置条件>",
+      "when": "<触发动作>",
+      "then": "<预期结果>"
+    }
+  ],
+  "rollback_plan": "<回滚方案>"
+}

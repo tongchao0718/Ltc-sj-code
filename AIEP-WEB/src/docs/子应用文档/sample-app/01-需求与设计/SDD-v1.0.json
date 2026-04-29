@@ -1,0 +1,60 @@
+{
+  "sdd_id": "SDD-20260428-001",
+  "version": "1.0.0",
+  "owner": "产品经理",
+  "stage": "define",
+  "app_code": "sample-app",
+  "feature_name": "sample-app 核心流程",
+  "in_scope": ["dashboard", "list", "form", "result-exception", "build"],
+  "out_of_scope": ["cross-system-permission-refactor", "complex-algorithm"],
+  "features": [
+    { "id": "F-01", "name": "dashboard", "priority": "P0", "acceptance_ref": ["AT-01"] },
+    { "id": "F-02", "name": "list-query", "priority": "P0", "acceptance_ref": ["AT-02"] },
+    { "id": "F-03", "name": "form-submit", "priority": "P0", "acceptance_ref": ["AT-03"] },
+    { "id": "F-04", "name": "result-exception", "priority": "P1", "acceptance_ref": ["AT-04"] },
+    { "id": "F-05", "name": "build-access", "priority": "P1", "acceptance_ref": ["AT-05"] }
+  ],
+  "api_contracts": [
+    {
+      "id": "API-01",
+      "path": "/api/dashboard/data",
+      "method": "GET",
+      "request": { "dateRange": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "500"]
+    },
+    {
+      "id": "API-02",
+      "path": "/api/list/query",
+      "method": "GET",
+      "request": { "keyword": "string", "status": "string", "pageNo": "number", "pageSize": "number" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "500"]
+    },
+    {
+      "id": "API-03",
+      "path": "/api/form/submit",
+      "method": "POST",
+      "request": { "formBody": "object" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "409", "500"]
+    }
+  ],
+  "state_machine": [
+    { "page": "WorkplacePage", "states": ["loading", "success", "empty", "error"] },
+    { "page": "SearchTablePage", "states": ["loading", "success", "empty", "error"] },
+    { "page": "StepFormPage", "states": ["loading", "success", "error"] }
+  ],
+  "exception_strategy": [
+    { "type": "timeout", "action": "show_retry" },
+    { "type": "network_offline", "action": "show_offline_hint" },
+    { "type": "http_4xx", "action": "show_business_error" },
+    { "type": "http_5xx", "action": "show_fallback_and_retry" }
+  ],
+  "acceptance": [
+    { "id": "AT-01", "given": "用户在工作台", "when": "页面加载完成", "then": "指标与图表渲染成功" },
+    { "id": "AT-02", "given": "用户在查询页", "when": "切换筛选条件", "then": "触发真实请求并重置到第一页" },
+    { "id": "AT-03", "given": "用户提交表单", "when": "接口返回失败", "then": "保留输入并展示错误提示" }
+  ],
+  "rollback_plan": "发布后 P0/P1 异常 30 分钟内回滚"
+}

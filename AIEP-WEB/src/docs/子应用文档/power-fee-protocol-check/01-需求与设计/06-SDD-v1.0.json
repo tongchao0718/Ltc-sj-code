@@ -1,0 +1,200 @@
+{
+  "sdd_id": "SDD-20260428-EPA-001",
+  "version": "2.0.0",
+  "owner": "产品经理",
+  "stage": "define",
+  "app_code": "power-fee-protocol-check",
+  "feature_name": "电费协议核查",
+  "in_scope": [
+    "template",
+    "sample",
+    "rule",
+    "task",
+    "check",
+    "extract",
+    "parse",
+    "verify",
+    "problem",
+    "govern",
+    "task_monitor",
+    "result_monitor",
+    "optimize",
+    "review"
+  ],
+  "out_of_scope": ["cross-system-settlement-refactor"],
+  "business_goal": "建立标准化、可配置、可追溯的协议核查与治理平台",
+  "success_metrics": ["识别成功率", "规则命中率", "异常闭环率", "任务成功率", "关键字段错误率下降"],
+  "roles": [
+    { "role": "业务管理员", "permissions": ["template_config", "rule_publish", "strategy_manage"] },
+    { "role": "核查人员", "permissions": ["task_execute", "issue_handle"] },
+    { "role": "模型运营人员", "permissions": ["annotation_review", "optimize_iterate"] },
+    { "role": "审计人员", "permissions": ["audit_view", "report_export"] }
+  ],
+  "story_map": [
+    {
+      "activity": "配置核查标准",
+      "task": "维护模板、样本、规则",
+      "story": "作为业务管理员，我希望统一核查模板与规则，以便标准化开展核查",
+      "requirement_ref": "SA-1/SA-2/SA-3",
+      "release_slice": "MVP",
+      "acceptance_ref": ["AT-01", "AT-02", "AT-03"],
+      "acceptance_standard": "Given 已配置模板与规则前置条件，When 执行模板保存与规则发布，Then 模板字段生效且规则版本可追溯"
+    },
+    {
+      "activity": "执行核查任务",
+      "task": "配置并执行策略任务",
+      "story": "作为核查人员，我希望系统自动生成并执行任务，以便提高核查效率",
+      "requirement_ref": "SA-4/SA-5/SA-6",
+      "release_slice": "MVP",
+      "acceptance_ref": ["AT-04", "AT-05", "AT-06"],
+      "acceptance_standard": "Given 已配置策略与增量提取规则，When 发起批量任务，Then 任务生成成功并展示进度/成功率"
+    },
+    {
+      "activity": "识别并校核",
+      "task": "解析协议并进行完整性、准确性校核",
+      "story": "作为质检人员，我希望识别结果能自动校核并可人工复核，以便保障质量",
+      "requirement_ref": "SA-7/SA-8/SA-9",
+      "release_slice": "MVP",
+      "acceptance_ref": ["AT-07", "AT-08", "AT-09"],
+      "acceptance_standard": "Given 协议文件已解析，When 执行完整性与准确性校核，Then 生成字段级校核结论与问题记录"
+    },
+    {
+      "activity": "治理与监控",
+      "task": "问题治理、任务监控、结果监控",
+      "story": "作为管理人员，我希望异常可治理、过程可监控、结果可量化，以便闭环管理",
+      "requirement_ref": "SA-10/SA-11/SA-12",
+      "release_slice": "MVP",
+      "acceptance_ref": ["AT-10", "AT-11", "AT-12"],
+      "acceptance_standard": "Given 异常问题已入库，When 自动生成工单并进入监控，Then 可查询治理进度并输出看板报表"
+    },
+    {
+      "activity": "持续优化",
+      "task": "协同复核与识别优化迭代",
+      "story": "作为模型运营人员，我希望持续优化识别能力，以便提升准确率与稳定性",
+      "requirement_ref": "SA-13/SA-14",
+      "release_slice": "R1",
+      "acceptance_ref": ["AT-13", "AT-14"],
+      "acceptance_standard": "Given 收集到复核反馈与错误样本，When 执行优化迭代并验证，Then 关键识别指标提升且可回溯"
+    }
+  ],
+  "features": [
+    { "id": "F-01", "name": "template-management", "priority": "P0", "acceptance_ref": ["AT-01"] },
+    { "id": "F-02", "name": "sample-annotation-management", "priority": "P0", "acceptance_ref": ["AT-02"] },
+    { "id": "F-03", "name": "rule-management", "priority": "P0", "acceptance_ref": ["AT-03"] },
+    { "id": "F-04", "name": "task-strategy-management", "priority": "P0", "acceptance_ref": ["AT-04"] },
+    { "id": "F-05", "name": "check-plan-execution", "priority": "P0", "acceptance_ref": ["AT-05"] },
+    { "id": "F-06", "name": "extract-engine", "priority": "P0", "acceptance_ref": ["AT-06"] },
+    { "id": "F-07", "name": "protocol-parse", "priority": "P0", "acceptance_ref": ["AT-07"] },
+    { "id": "F-08", "name": "result-verify", "priority": "P0", "acceptance_ref": ["AT-08"] },
+    { "id": "F-09", "name": "problem-record", "priority": "P0", "acceptance_ref": ["AT-09"] },
+    { "id": "F-10", "name": "problem-governance", "priority": "P0", "acceptance_ref": ["AT-10"] },
+    { "id": "F-11", "name": "task-monitor", "priority": "P0", "acceptance_ref": ["AT-11"] },
+    { "id": "F-12", "name": "result-monitor", "priority": "P0", "acceptance_ref": ["AT-12"] },
+    { "id": "F-13", "name": "recognition-optimization", "priority": "P1", "acceptance_ref": ["AT-13"] },
+    { "id": "F-14", "name": "collaborative-review", "priority": "P1", "acceptance_ref": ["AT-14"] }
+  ],
+  "api_contracts": [
+    {
+      "id": "API-01",
+      "path": "/api/protocol/template/list",
+      "method": "GET",
+      "request": { "type": "string", "pageNo": "number", "pageSize": "number" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "500"]
+    },
+    {
+      "id": "API-02",
+      "path": "/api/protocol/sample/annotate",
+      "method": "POST",
+      "request": { "sampleId": "string", "annotationResult": "object", "operator": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "500"]
+    },
+    {
+      "id": "API-03",
+      "path": "/api/protocol/rule/publish",
+      "method": "POST",
+      "request": { "ruleId": "string", "versionNo": "string", "changeNote": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "409", "500"]
+    },
+    {
+      "id": "API-04",
+      "path": "/api/protocol/task/generate",
+      "method": "POST",
+      "request": { "strategyId": "string", "unitCodes": "array", "sceneCode": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "409", "500"]
+    },
+    {
+      "id": "API-05",
+      "path": "/api/protocol/issue/govern",
+      "method": "POST",
+      "request": { "issueId": "string", "ticketAction": "string", "assignee": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "500"]
+    },
+    {
+      "id": "API-06",
+      "path": "/api/protocol/optimize/iterate",
+      "method": "POST",
+      "request": { "feedbackId": "string", "sampleBatchId": "string", "modelVersion": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "500"]
+    },
+    {
+      "id": "API-07",
+      "path": "/api/protocol/parse/run",
+      "method": "POST",
+      "request": { "fileId": "string", "protocolType": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "500"]
+    },
+    {
+      "id": "API-08",
+      "path": "/api/protocol/verify/run",
+      "method": "POST",
+      "request": { "taskId": "string", "verifyMode": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "500"]
+    }
+  ],
+  "data_model": [
+    { "entity": "protocol_template", "field": "template_code", "type": "string", "required": true, "constraint": "unique" },
+    { "entity": "protocol_task", "field": "task_id", "type": "string", "required": true, "constraint": "unique" },
+    { "entity": "protocol_issue", "field": "issue_id", "type": "string", "required": true, "constraint": "unique" }
+  ],
+  "state_machine": [
+    { "page": "TemplatePage", "states": ["loading", "success", "empty", "error"] },
+    { "page": "TaskPage", "states": ["loading", "success", "error"] },
+    { "page": "IssuePage", "states": ["loading", "success", "error"] }
+  ],
+  "exception_strategy": [
+    { "type": "timeout", "action": "show_retry" },
+    { "type": "network_offline", "action": "show_offline_hint" },
+    { "type": "http_4xx", "action": "show_business_error" },
+    { "type": "http_5xx", "action": "show_fallback_and_retry" }
+  ],
+  "acceptance": [
+    { "id": "AT-01", "given": "模板库可访问", "when": "新增模板", "then": "模板和基准库同步成功" },
+    { "id": "AT-02", "given": "样本库可用", "when": "执行预处理与标注", "then": "样本状态可追溯" },
+    { "id": "AT-03", "given": "规则待发布", "when": "发布规则版本", "then": "版本号与日志自动记录" },
+    { "id": "AT-04", "given": "策略已配置", "when": "发起任务", "then": "任务进度和成功率可见" },
+    { "id": "AT-05", "given": "存量任务计划已配置", "when": "分批执行核查", "then": "任务按计划完成并可监控" },
+    { "id": "AT-06", "given": "增量对象提取规则已配置", "when": "执行提取", "then": "形成增量核查对象" },
+    { "id": "AT-07", "given": "协议文件已入库", "when": "执行解析", "then": "输出结构化信息" },
+    { "id": "AT-08", "given": "识别结果已生成", "when": "执行完整性与准确性校核", "then": "输出校核结论并落库" },
+    { "id": "AT-09", "given": "存在核查异常", "when": "记录问题", "then": "异常信息完整留痕" },
+    { "id": "AT-10", "given": "问题待处理", "when": "执行自动分类与工单派发", "then": "责任单位收到并处理" },
+    { "id": "AT-11", "given": "任务执行中", "when": "查看任务监控", "then": "可见日志、告警、效率评估结果" },
+    { "id": "AT-12", "given": "批量核查完成", "when": "查看结果监控", "then": "形成问题与质效看板" },
+    { "id": "AT-13", "given": "识别准确率下降", "when": "执行优化迭代", "then": "关键指标改善" },
+    { "id": "AT-14", "given": "业务反馈典型错误", "when": "执行协同复核", "then": "形成错误样本并更新易错字库" }
+  ],
+  "risk_and_rollback": {
+    "risks": [
+      { "id": "R-01", "issue": "OCR识别波动导致异常暴增", "level": "high", "mitigation": "人机复核兜底+样本扩充" }
+    ],
+    "rollback_plan": "关键版本发布后若出现P0/P1问题，30分钟内回滚至上一稳定版本"
+  }
+}

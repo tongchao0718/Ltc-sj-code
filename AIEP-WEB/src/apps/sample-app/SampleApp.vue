@@ -52,8 +52,14 @@ const menuGroups = [
     label: '数据可视化',
     children: [
       { to: '/visualization/data-analysis', label: '数据分析' },
-      { to: '/visualization/multi-dimension-data-analysis', label: '多维数据分析' }
+      { to: '/visualization/multi-dimension-data-analysis', label: '多维数据分析' },
+      { to: '/visualization/shandong-board', label: '山东地图大屏' }
     ]
+  },
+  {
+    key: 'mobile',
+    label: '移动端案例',
+    children: [{ to: '/mobile/cases', label: '移动端功能模板' }]
   },
   {
     key: 'list',

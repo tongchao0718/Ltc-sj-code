@@ -1,0 +1,15 @@
+/**
+ * 电费协议核查子应用内：菜单与正文统一字体（与主系统 design token 一致）。
+ */
+.power-fee-scope {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: 1.5715;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.power-fee-scope .app-sidebar,
+.power-fee-scope .app-content {
+  font-family: inherit;
+}

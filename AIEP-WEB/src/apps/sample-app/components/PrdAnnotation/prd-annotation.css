@@ -1,0 +1,154 @@
+.prd-anchor {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  max-width: 100%;
+}
+
+button.prd-badge,
+.prd-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: top;
+  position: absolute;
+  top: -8px;
+  right: -4px;
+  z-index: 9998;
+  width: auto !important;
+  min-width: 0;
+  max-width: fit-content;
+  height: 14px;
+  min-height: 14px;
+  box-sizing: border-box;
+  flex: none;
+  background: rgb(250, 173, 20);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  padding: 0 4px;
+  border-radius: 2px;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.prd-badge--fixed {
+  position: fixed;
+  margin: 0;
+}
+
+.prd-tooltip {
+  position: fixed;
+  z-index: 9999;
+  width: 450px;
+  max-height: 70vh;
+  overflow: auto;
+  background: #f0efef;
+  border-radius: 4px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  padding: 12px 14px 14px;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.prd-tooltip__close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  cursor: pointer;
+  line-height: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #666;
+  padding: 0;
+}
+
+.prd-tooltip__head {
+  padding-right: 24px;
+}
+
+.prd-tooltip__badge {
+  display: inline-block;
+  vertical-align: top;
+  background: rgb(250, 173, 20);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  padding: 0 4px;
+  border-radius: 2px;
+  margin-right: 6px;
+}
+
+.prd-tooltip__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.prd-tooltip__divider {
+  height: 1px;
+  background: #e8e8e8;
+  margin: 8px 0 12px;
+}
+
+.prd-tooltip__body {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.prd-md-p {
+  margin: 0 0 12px;
+}
+
+.prd-md-spacer {
+  margin: 0;
+  height: 4px;
+}
+
+.prd-md-h3,
+.prd-md-h4 {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.prd-md-ul,
+.prd-md-ol {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.prd-md-bq {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-left: 3px solid #d9d9d9;
+  color: #666;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.prd-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.prd-dot--green {
+  background: #52c41a;
+}
+
+.prd-dot--red {
+  background: #ff4d4f;
+}
+
+.prd-dot--orange {
+  background: #faad14;
+}

@@ -1,72 +1,136 @@
 <template>
   <div class="page-shell">
-    <h1 class="page-title">电费协议核查全链路验证工作台</h1>
-    <p class="page-subtitle">API-02 ~ API-08 一键触发（开发联调页）</p>
-
-    <div class="action-row ds-card">
-      <button class="btn" @click="runAll">一键执行全链路验证</button>
-      <button class="btn btn-secondary" @click="clearLogs">清空日志</button>
+    <div class="page-head">
+      <h1 class="page-title">电费协议核查全链路验证</h1>
+      <p class="page-subtitle">样本 → 规则 → 任务 → 一键核查闭环 → 治理派发 → 优化迭代 → 复核提交</p>
     </div>
 
-    <div class="ds-card">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>步骤</th>
-            <th>接口</th>
-            <th>状态</th>
-            <th>requestId</th>
-            <th>结果摘要</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="row in logs" :key="row.step">
-            <td>{{ row.step }}</td>
-            <td>{{ row.api }}</td>
-            <td>{{ row.status }}</td>
-            <td>{{ row.requestId }}</td>
-            <td>{{ row.summary }}</td>
-          </tr>
-          <tr v-if="logs.length === 0"><td colspan="5" class="empty">暂无执行记录</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <a-card :bordered="false" class="mb">
+      <a-space>
+        <a-button type="primary" :loading="running" @click="runAll">一键执行全链路</a-button>
+        <a-button @click="clearLogs">清空日志</a-button>
+      </a-space>
+    </a-card>
+
+    <a-card :bordered="false">
+      <a-table row-key="step" :columns="columns" :data="logs" :pagination="false">
+        <template #status="{ record }">
+          <a-tag :color="record.status === 'success' ? 'green' : 'red'">{{ record.status }}</a-tag>
+        </template>
+      </a-table>
+    </a-card>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { annotateSample, publishRule, generateTask, governIssue, iterateOptimize, runParse, runVerify } from '../api/protocolFullFlowApi.js';
+import {
+  annotateSample,
+  publishRule,
+  generateTask,
+  governIssue,
+  iterateOptimize,
+  runCheckPlan,
+  reviewSubmit
+} from '../api/protocolDomainApi.js';
+import { pickData, toastOk } from '../composables/usePfcResult.js';
 
+const running = ref(false);
 const logs = ref([]);
-function pushLog(step, api, result, summary) {
-  logs.value.push({ step, api, status: result?.code === 0 ? 'success' : 'failed', requestId: result?.requestId || '-', summary });
+
+const columns = [
+  { title: '步骤', dataIndex: 'step', width: 60 },
+  { title: '接口', dataIndex: 'api' },
+  { title: '状态', slotName: 'status', width: 100 },
+  { title: 'requestId', dataIndex: 'requestId' },
+  { title: '结果摘要', dataIndex: 'summary' }
+];
+
+function pushLog(step, api, res, summary) {
+  const ok = res && (res.code === undefined || res.code === 0);
+  logs.value.push({
+    step,
+    api,
+    status: ok ? 'success' : 'failed',
+    requestId: res?.requestId || '-',
+    summary
+  });
 }
+
 async function runAll() {
+  running.value = true;
   logs.value = [];
-  const r1 = await annotateSample({ sampleId: 'sample_demo_001', operator: 'LTC' });
-  pushLog('1', 'API-02 /sample/annotate', r1, r1?.data?.annotationId || '-');
-  const r2 = await publishRule({ ruleId: 'rule_demo_001', versionNo: '1.0.0' });
-  pushLog('2', 'API-03 /rule/publish', r2, r2?.data?.publishId || '-');
-  const r3 = await generateTask({ strategyId: 'strategy_demo_001', sceneCode: 'SCENE_A' });
-  pushLog('3', 'API-04 /task/generate', r3, r3?.data?.taskId || '-');
-  const r4 = await runParse({ fileId: 'file_demo_001', protocolType: 'TYPE_A' });
-  pushLog('4', 'API-07 /parse/run', r4, r4?.data?.parseId || '-');
-  const r5 = await runVerify({ taskId: r3?.data?.taskId || 'task_demo_001', verifyMode: 'full' });
-  pushLog('5', 'API-08 /verify/run', r5, r5?.data?.verifyId || '-');
-  const r6 = await governIssue({ issueId: 'issue_demo_001', ticketAction: 'dispatch', assignee: 'LTC' });
-  pushLog('6', 'API-05 /issue/govern', r6, r6?.data?.governId || '-');
-  const r7 = await iterateOptimize({ feedbackId: 'feedback_demo_001', modelVersion: 'model_v1' });
-  pushLog('7', 'API-06 /optimize/iterate', r7, r7?.data?.iterationId || '-');
+  try {
+    const r1 = await annotateSample({
+      sampleId: 'sample_demo_001',
+      annotationResult: 'valid',
+      operator: 'LTC'
+    });
+    const d1 = pickData(r1, '');
+    pushLog('1', '/sample/annotate', r1, d1?.annotationId || r1?.message || '-');
+
+    const r2 = await publishRule({ ruleId: 'rule_demo_001', versionNo: '1.0.0', changeNote: 'full-flow', operator: 'LTC' });
+    const d2 = pickData(r2, '');
+    pushLog('2', '/rule/publish', r2, d2?.publishId || '-');
+
+    const r3 = await generateTask({
+      strategyId: 'strategy_demo_001',
+      sceneCode: 'SCENE_A',
+      unitCodes: ['UNIT001'],
+      idempotencyKey: `fullflow_${Date.now()}`
+    });
+    const d3 = pickData(r3, '');
+    const taskId = d3?.taskId;
+    pushLog('3', '/task/generate', r3, taskId || '-');
+
+    const r4 = await runCheckPlan({
+      fileId: 'file_demo_001',
+      protocolType: 'TYPE_A',
+      verifyMode: 'full',
+      taskId,
+      operator: 'LTC'
+    });
+    const d4 = pickData(r4, '');
+    pushLog(
+      '4',
+      '/check/run',
+      r4,
+      d4 ? `plan=${d4.plan?.planId}, verify=${d4.verify?.verifyStatus}, problem=${d4.problemId || '-'}` : '-'
+    );
+
+    const r5 = await governIssue({ issueId: 'issue_demo_flow', ticketAction: 'dispatch', assignee: 'LTC', operator: 'LTC' });
+    const d5 = pickData(r5, '');
+    pushLog('5', '/issue/govern', r5, d5?.ticket?.ticketId || d5?.governId || '-');
+
+    const r6 = await iterateOptimize({ feedbackId: 'feedback_demo_001', modelVersion: 'model_v1' });
+    const d6 = pickData(r6, '');
+    pushLog('6', '/optimize/iterate', r6, d6?.iterationId || '-');
+
+    const r7 = await reviewSubmit({
+      reviewTaskId: 'rev_src_fullflow',
+      conclusion: 'corrected',
+      operator: 'LTC',
+      corrections: '易错词：交费→缴费'
+    });
+    const d7 = pickData(r7, '');
+    pushLog('7', '/review/submit', r7, d7?.reviewTaskId || '-');
+
+    toastOk('全链路步骤已执行（请查看失败项）');
+  } finally {
+    running.value = false;
+  }
 }
-function clearLogs() { logs.value = []; }
+
+function clearLogs() {
+  logs.value = [];
+}
 </script>
 
 <style scoped>
-.action-row { display: flex; gap: 10px; margin-bottom: 16px; }
-.btn { border: 1px solid #165dff; background: #165dff; color: #fff; padding: 7px 14px; border-radius: 6px; cursor: pointer; }
-.btn-secondary { background: #fff; color: #165dff; }
-.table { width: 100%; border-collapse: collapse; }
-th, td { border-bottom: 1px solid var(--color-border-2); text-align: left; padding: 10px; }
-.empty { text-align: center; color: var(--color-text-3); }
+.page-head {
+  margin-bottom: 12px;
+}
+.mb {
+  margin-bottom: 16px;
+}
 </style>

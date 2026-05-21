@@ -37,7 +37,7 @@ const apps = [
     id: 'power-fee-protocol-check',
     name: '电费协议核查',
     folder: 'power-fee-protocol-check',
-    desc: 'M01~M14 模块入口 + API-02~API-08 全链路验证工作台。',
+    desc: 'PRD 路由子功能入口与 API-02~API-08 全链路验证工作台。',
     icon: '⚙️',
     to: '/power-fee-protocol-check/full-flow',
     tag: '开发中',

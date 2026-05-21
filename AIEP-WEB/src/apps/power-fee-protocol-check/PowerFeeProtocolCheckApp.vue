@@ -3,18 +3,28 @@
     <aside class="app-sidebar" aria-label="侧栏菜单">
       <div class="sidebar-title">电费协议核查</div>
       <nav class="sidebar-nav">
-        <section v-for="group in menuGroups" :key="group.title" class="menu-group">
-          <div class="menu-group-title">{{ group.title }}</div>
-          <router-link
-            v-for="item in group.items"
-            :key="item.to"
-            :to="`${base}${item.to}`"
-            class="menu-link"
-            active-class="menu-link--active"
+        <div v-for="group in menuGroups" :key="group.key" class="nav-group">
+          <button
+            type="button"
+            class="group-head"
+            :aria-expanded="expanded[group.key]"
+            @click="toggle(group.key)"
           >
-            {{ item.label }}
-          </router-link>
-        </section>
+            <span>{{ group.label }}</span>
+            <span class="chev">{{ expanded[group.key] ? '▼' : '▶' }}</span>
+          </button>
+          <div v-show="expanded[group.key]" class="group-body">
+            <router-link
+              v-for="child in group.children"
+              :key="child.to"
+              :to="`${base}${child.to}`"
+              class="menu-link"
+              active-class="menu-link--active"
+            >
+              {{ child.label }}
+            </router-link>
+          </div>
+        </div>
       </nav>
     </aside>
     <main class="app-content">
@@ -24,109 +34,235 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import './styles/power-fee-protocol-arco.css';
 
+const menuGroups = [
+  {
+    key: 'protocol-mgmt',
+    label: '协议核查管理',
+    children: [
+      { to: '/template', label: '协议模板库管理' },
+      { to: '/sample', label: '协议样本标注管理' },
+      { to: '/rule', label: '核查规则管理' },
+      { to: '/task', label: '核查任务策略管理' }
+    ]
+  },
+  {
+    key: 'anomaly-govern',
+    label: '异常分析及治理',
+    children: [
+      { to: '/check', label: '协议识别核查执行' },
+      { to: '/extract', label: '协议信息提取引擎' },
+      { to: '/parse', label: '协议信息解析' },
+      { to: '/verify', label: '识别结果校核' },
+      { to: '/problem', label: '识别问题结果记录' },
+      { to: '/govern', label: '问题分析及治理' },
+      { to: '/task-monitor', label: '核查任务监控' },
+      { to: '/result-monitor', label: '核查结果监控' }
+    ]
+  },
+  {
+    key: 'capability-optimize',
+    label: '识别能力优化',
+    children: [
+      { to: '/optimize', label: '协议识别能力优化' },
+      { to: '/review', label: '协同复核' }
+    ]
+  },
+  {
+    key: 'aux-verify',
+    label: '辅助验证',
+    children: [{ to: '/full-flow', label: '全链路验证' }]
+  }
+];
+
+const route = useRoute();
 const base = computed(() => {
   const isStandalone = window.location.hash.startsWith('#/') || window.location.protocol === 'file:';
   return isStandalone ? '' : '/power-fee-protocol-check';
 });
 
-const menuGroups = [
-  {
-    title: '协议核查管理',
-    items: [
-      { label: '协议模板库管理', to: '/template' },
-      { label: '样本标注管理', to: '/sample-annotation' },
-      { label: '核查规则管理', to: '/rule-publish' },
-      { label: '核查任务策略管理', to: '/task-strategy' }
-    ]
-  },
-  {
-    title: '异常分析及治理',
-    items: [
-      { label: '协议识别核查执行', to: '/check-execution' },
-      { label: '协议信息提取引擎', to: '/module/M06' },
-      { label: '协议信息解析', to: '/module/M07' },
-      { label: '识别结果校核', to: '/module/M08' },
-      { label: '识别问题结果记录', to: '/module/M09' },
-      { label: '问题分析及治理', to: '/module/M10' },
-      { label: '核查任务监控', to: '/module/M11' },
-      { label: '核查结果监控', to: '/module/M12' }
-    ]
-  },
-  {
-    title: '识别能力优化',
-    items: [
-      { label: '能力优化迭代', to: '/module/M13' },
-      { label: '协同复核', to: '/module/M14' }
-    ]
-  },
-  {
-    title: '辅助验证',
-    items: [{ label: '全链路验证', to: '/full-flow' }]
+const expanded = reactive(Object.fromEntries(menuGroups.map((g) => [g.key, true])));
+
+function toggle(key) {
+  expanded[key] = !expanded[key];
+}
+
+function syncOpenFromRoute() {
+  const p = route.path;
+  const b = base.value;
+  const rel = b ? p.slice(b.length) || '/' : p;
+  for (const g of menuGroups) {
+    const hit = g.children.some((c) => rel === c.to || rel.startsWith(`${c.to}/`));
+    if (hit) expanded[g.key] = true;
   }
-];
+}
+
+watch(
+  () => route.path,
+  () => syncOpenFromRoute(),
+  { immediate: true }
+);
 </script>
 
 <style scoped>
 .app-layout {
   display: flex;
-  min-height: 100%;
+  flex: 1 1 0;
+  align-items: stretch;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
   background: #f0f2f5;
 }
+
 .app-sidebar {
-  width: 220px;
-  background: #fff;
+  width: 228px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  align-self: stretch;
+  background: #ffffff;
   border-right: 1px solid #e8e8e8;
-  padding: 12px 10px;
+  overflow: hidden;
 }
+
 .sidebar-title {
+  flex-shrink: 0;
+  padding: 14px 16px 10px;
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 10px;
+  color: #333;
+  line-height: 24px;
+  border-bottom: 1px solid #e8e8e8;
 }
+
 .sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 8px 0 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
-.menu-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+
+.nav-group {
+  margin-bottom: 4px;
 }
-.menu-group-title {
-  font-size: 13px;
-  line-height: 20px;
-  color: #86909c;
+
+.group-head {
+  width: calc(100% - 16px);
+  margin: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
   padding: 0 10px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  text-align: left;
 }
+
+.group-head:hover {
+  background: #f0f0f0;
+}
+
+.chev {
+  font-size: 10px;
+  color: #999;
+}
+
+.group-body {
+  padding: 4px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .menu-link {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px 0 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #666;
   text-decoration: none;
-  color: #4e5969;
-  border-radius: 6px;
-  padding: 7px 10px 7px 18px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
+
 .menu-link:hover {
-  background: #f2f3f5;
+  color: #165dff;
+  background: #f0f0f0;
 }
+
 .menu-link--active {
   color: #165dff;
-  background: #e8f3ff;
+  background: #f0f9ff;
+  font-weight: 500;
 }
+
 .app-content {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
-  padding: 16px;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px 28px;
+  background: #f0f2f5;
 }
+
 @media (max-width: 768px) {
   .app-layout {
     flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
   }
+
   .app-sidebar {
     width: 100%;
+    flex: 0 0 auto;
+    max-height: 42vh;
+    min-height: 0;
+    overflow: hidden;
     border-right: none;
-    border-bottom: 1px solid #e8e8e8;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .sidebar-nav {
+    max-height: 36vh;
+  }
+
+  .group-body {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .menu-link {
+    min-height: 34px;
+    padding-left: 12px;
+  }
+
+  .app-content {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
   }
 }
 </style>

@@ -5,6 +5,7 @@
     </div>
     <h1 class="page-title">查询表格</h1>
     <div class="content">
+      <PrdAnnotationAnchor :id="2" :enabled="prdAnnotationEnabled" class="filter-prd-wrap">
       <div class="filter">
         <div class="filter-grid">
           <label class="fg">
@@ -50,7 +51,9 @@
           <button type="button" class="btn-secondary btn-sm" @click="onReset">重置</button>
         </div>
       </div>
+      </PrdAnnotationAnchor>
 
+      <PrdAnnotationAnchor :id="3" :enabled="prdAnnotationEnabled" class="table-prd-wrap">
       <div class="toolbar">
         <button type="button" class="btn-primary btn-sm">新建</button>
         <button type="button" class="btn-secondary btn-sm">批量导入</button>
@@ -100,12 +103,16 @@
           <button type="button" class="btn-secondary btn-sm" disabled>下一页</button>
         </div>
       </div>
+      </PrdAnnotationAnchor>
     </div>
   </div>
 </template>
 
 <script setup>
 import { reactive } from 'vue'
+import { PrdAnnotationAnchor, PRD_ANNOTATION_ENABLED } from '../../components/PrdAnnotation/index.js'
+
+const prdAnnotationEnabled = PRD_ANNOTATION_ENABLED
 // import ArcoDemoShell from '../../components/ArcoDemoShell.vue'
 
 const form = reactive({
@@ -195,6 +202,13 @@ function onReset() {
   padding: 20px;
   border-radius: 4px;
   border: 1px solid #e8e8e8;
+}
+
+.filter-prd-wrap,
+.table-prd-wrap {
+  display: block;
+  position: relative;
+  width: 100%;
 }
 
 .filter {

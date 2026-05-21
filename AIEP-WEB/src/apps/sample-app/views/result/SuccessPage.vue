@@ -4,6 +4,7 @@
       <span>结果页</span> / <span>成功页</span>
     </div>
     <h1 class="page-title">成功页</h1>
+    <PrdAnnotationAnchor :id="5" :enabled="prdAnnotationEnabled">
     <div class="content">
       <div class="icon-wrap" aria-hidden="true">
         <span class="icon">✓</span>
@@ -30,11 +31,15 @@
         <router-link :to="`${base}/dashboard/workplace`" class="btn-primary btn-sm">返回项目列表</router-link>
       </div>
     </div>
+    </PrdAnnotationAnchor>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { PrdAnnotationAnchor, PRD_ANNOTATION_ENABLED } from '../../components/PrdAnnotation/index.js'
+
+const prdAnnotationEnabled = PRD_ANNOTATION_ENABLED
 import { useRoute } from 'vue-router'
 // import ArcoDemoShell from '../../components/ArcoDemoShell.vue'
 

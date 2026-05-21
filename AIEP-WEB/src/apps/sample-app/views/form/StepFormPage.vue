@@ -5,6 +5,7 @@
     </div>
     <h1 class="page-title">分步表单</h1>
     <div class="content">
+      <PrdAnnotationAnchor :id="4" :enabled="prdAnnotationEnabled">
       <ol class="steps">
         <li :class="{ on: step >= 1, cur: step === 1 }">
           <div class="st-title">选择基本信息</div>
@@ -19,6 +20,7 @@
           <div class="st-sub">创建成功</div>
         </li>
       </ol>
+      </PrdAnnotationAnchor>
 
       <div v-if="step === 1" class="step-pane">
         <h3 class="pane-h">渠道表单说明</h3>
@@ -89,7 +91,10 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { PrdAnnotationAnchor, PRD_ANNOTATION_ENABLED } from '../../components/PrdAnnotation/index.js'
 // import ArcoDemoShell from '../../components/ArcoDemoShell.vue'
+
+const prdAnnotationEnabled = PRD_ANNOTATION_ENABLED
 
 const step = ref(1)
 

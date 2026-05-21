@@ -1,8 +1,10 @@
 {
   "sdd_id": "SDD-20260428-EPA-001",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "owner": "产品经理",
   "stage": "define",
+  "requirement_ref": "《01-需求说明书》V2.1",
+  "updated_at": "2026-05-14",
   "app_code": "power-fee-protocol-check",
   "feature_name": "电费协议核查",
   "in_scope": [
@@ -21,8 +23,13 @@
     "optimize",
     "review"
   ],
-  "out_of_scope": ["cross-system-settlement-refactor"],
-  "business_goal": "建立标准化、可配置、可追溯的协议核查与治理平台",
+  "out_of_scope": ["cross-system-settlement-refactor", "finance-ledger-refactor"],
+  "tech_stack": {
+    "backend": "Node.js + Express",
+    "frontend": "Vue 3 + Vue Router + Arco Design",
+    "database": "MongoDB (Mongoose)"
+  },
+  "business_goal": "建设协议核查管理—异常分析治理—识别能力优化全链路，形成识别、核查、治理与持续优化闭环",
   "success_metrics": ["识别成功率", "规则命中率", "异常闭环率", "任务成功率", "关键字段错误率下降"],
   "roles": [
     { "role": "业务管理员", "permissions": ["template_config", "rule_publish", "strategy_manage"] },

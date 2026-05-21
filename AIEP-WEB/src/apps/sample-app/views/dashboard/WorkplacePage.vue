@@ -3,9 +3,11 @@
   <div class="wp-root">
     <div class="wp-left">
       <div class="wp-stack">
-        <header class="wp-banner">
-          <h1 class="wp-greet">欢迎回来！{{ userName }}</h1>
-        </header>
+        <PrdAnnotationAnchor :id="1" :enabled="prdAnnotationEnabled">
+          <header class="wp-banner">
+            <h1 class="wp-greet">欢迎回来！{{ userName }}</h1>
+          </header>
+        </PrdAnnotationAnchor>
         <div class="wp-divider" />
         <section class="wp-stats">
           <div v-for="(s, i) in statBlocks" :key="s.key" class="wp-stat" :class="{ 'wp-stat--last': i === 3 }">
@@ -167,7 +169,9 @@ import EChart from '../../components/EChart.vue'
 import { workplaceContentChartOption, workplaceCategoriesPieOption } from '../../utils/chartTheme.js'
 import { useDashboardStore } from '../../store/modules/dashboard'
 import { useUserStore } from '../../store/modules/user'
+import { PrdAnnotationAnchor, PRD_ANNOTATION_ENABLED } from '../../components/PrdAnnotation/index.js'
 
+const prdAnnotationEnabled = PRD_ANNOTATION_ENABLED
 const dashboardStore = useDashboardStore()
 const userStore = useUserStore()
 

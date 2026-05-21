@@ -36,7 +36,7 @@
           <span class="link-icon" aria-hidden="true">🧾</span>
           <div>
             <div class="link-text">电费协议核查</div>
-            <div class="link-sub">M01 协议模板库列表（API-01）</div>
+            <div class="link-sub">协议模板库列表（API-01）</div>
           </div>
         </router-link>
         <router-link to="/power-fee-protocol-check/full-flow" class="quick-link ds-card">

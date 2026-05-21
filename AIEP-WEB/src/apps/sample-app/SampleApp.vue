@@ -1,7 +1,9 @@
 <template>
   <div class="app-layout sample-app-scope">
     <aside class="app-sidebar" aria-label="侧栏菜单">
-      <div class="sidebar-title">示例应用</div>
+      <PrdAnnotationAnchor :id="6" :enabled="prdAnnotationEnabled" class="sidebar-title-anchor">
+        <div class="sidebar-title">示例应用</div>
+      </PrdAnnotationAnchor>
       <nav class="sidebar-nav">
         <div v-for="group in menuGroups" :key="group.key" class="nav-group">
           <button
@@ -37,6 +39,9 @@
 import { computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import './styles/sample-arco.css'
+import { PrdAnnotationAnchor, PRD_ANNOTATION_ENABLED } from './components/PrdAnnotation/index.js'
+
+const prdAnnotationEnabled = PRD_ANNOTATION_ENABLED
 
 const menuGroups = [
   {
@@ -167,6 +172,13 @@ watch(
   background: #ffffff;
   border-right: 1px solid #e8e8e8;
   overflow: hidden;
+}
+
+.sidebar-title-anchor {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  flex-shrink: 0;
 }
 
 .sidebar-title {

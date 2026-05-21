@@ -50,34 +50,109 @@ const routes = [
         component: () => import('../apps/power-fee-protocol-check/views/ProtocolTemplateListPage.vue')
       },
       {
-        path: 'sample-annotation',
+        path: 'sample',
         name: 'PowerFeeSampleAnnotation',
         component: () => import('../apps/power-fee-protocol-check/views/SampleAnnotationPage.vue')
       },
       {
-        path: 'rule-publish',
+        path: 'rule',
         name: 'PowerFeeRulePublish',
         component: () => import('../apps/power-fee-protocol-check/views/RulePublishPage.vue')
       },
       {
-        path: 'task-strategy',
+        path: 'task',
         name: 'PowerFeeTaskStrategy',
         component: () => import('../apps/power-fee-protocol-check/views/TaskStrategyPage.vue')
       },
       {
-        path: 'check-execution',
+        path: 'check',
         name: 'PowerFeeCheckExecution',
         component: () => import('../apps/power-fee-protocol-check/views/CheckExecutionPage.vue')
       },
       {
-        path: 'module/:moduleCode',
-        name: 'PowerFeeProtocolModuleWorkbench',
+        path: 'extract',
+        name: 'PowerFeeProtocolExtract',
+        meta: { pfcModule: 'M06' },
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'parse',
+        name: 'PowerFeeProtocolParse',
+        meta: { pfcModule: 'M07' },
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'verify',
+        name: 'PowerFeeProtocolVerify',
+        meta: { pfcModule: 'M08' },
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'problem',
+        name: 'PowerFeeProtocolProblem',
+        meta: { pfcModule: 'M09' },
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'govern',
+        name: 'PowerFeeProtocolGovern',
+        meta: { pfcModule: 'M10' },
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'task-monitor',
+        name: 'PowerFeeProtocolTaskMonitor',
+        meta: { pfcModule: 'M11' },
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'result-monitor',
+        name: 'PowerFeeProtocolResultMonitor',
+        meta: { pfcModule: 'M12' },
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'optimize',
+        name: 'PowerFeeProtocolOptimize',
+        meta: { pfcModule: 'M13' },
+        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
+      },
+      {
+        path: 'review',
+        name: 'PowerFeeProtocolReview',
+        meta: { pfcModule: 'M14' },
         component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
       },
       {
         path: 'full-flow',
         name: 'PowerFeeProtocolFullFlow',
         component: () => import('../apps/power-fee-protocol-check/views/ProtocolFullFlowPage.vue')
+      },
+      { path: 'sample-annotation', redirect: { name: 'PowerFeeSampleAnnotation' } },
+      { path: 'rule-publish', redirect: { name: 'PowerFeeRulePublish' } },
+      { path: 'task-strategy', redirect: { name: 'PowerFeeTaskStrategy' } },
+      { path: 'check-execution', redirect: { name: 'PowerFeeCheckExecution' } },
+      {
+        path: 'module/:moduleCode',
+        redirect: (to) => {
+          const map = {
+            M02: 'PowerFeeSampleAnnotation',
+            M03: 'PowerFeeRulePublish',
+            M04: 'PowerFeeTaskStrategy',
+            M05: 'PowerFeeCheckExecution',
+            M06: 'PowerFeeProtocolExtract',
+            M07: 'PowerFeeProtocolParse',
+            M08: 'PowerFeeProtocolVerify',
+            M09: 'PowerFeeProtocolProblem',
+            M10: 'PowerFeeProtocolGovern',
+            M11: 'PowerFeeProtocolTaskMonitor',
+            M12: 'PowerFeeProtocolResultMonitor',
+            M13: 'PowerFeeProtocolOptimize',
+            M14: 'PowerFeeProtocolReview'
+          };
+          const name = map[to.params.moduleCode];
+          return name ? { name } : { path: '/power-fee-protocol-check/template' };
+        }
       }
     ]
   },

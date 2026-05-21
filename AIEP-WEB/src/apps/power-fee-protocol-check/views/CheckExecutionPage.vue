@@ -1,85 +1,167 @@
 <template>
   <div class="page-shell">
-    <h1 class="page-title">协议识别核查执行（M05）</h1>
-    <p class="page-subtitle">执行链路：API-07（解析）+ API-08（校核）</p>
-
-    <div class="ds-card form">
-      <label>
-        <span>文件ID</span>
-        <input v-model="form.fileId" />
-      </label>
-      <label>
-        <span>协议类型</span>
-        <select v-model="form.protocolType">
-          <option value="TYPE_A">TYPE_A</option>
-          <option value="TYPE_B">TYPE_B</option>
-          <option value="TYPE_C">TYPE_C</option>
-        </select>
-      </label>
-      <label>
-        <span>校核模式</span>
-        <select v-model="form.verifyMode">
-          <option value="full">full</option>
-          <option value="overview">overview</option>
-        </select>
-      </label>
-      <button class="btn" @click="runPipeline">执行核查</button>
+    <div class="page-head">
+      <h1 class="page-title">协议识别核查执行</h1>
+      <p class="page-subtitle">推荐：一键闭环（解析→校核→必要时问题建档）；亦可分步调试</p>
     </div>
 
-    <div class="ds-card" v-if="steps.length">
-      <table class="table">
-        <thead>
-          <tr><th>步骤</th><th>接口</th><th>requestId</th><th>结果</th></tr>
-        </thead>
-        <tbody>
-          <tr v-for="s in steps" :key="s.step">
-            <td>{{ s.step }}</td>
-            <td>{{ s.api }}</td>
-            <td>{{ s.requestId }}</td>
-            <td>{{ s.summary }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <a-tabs default-active-key="one">
+      <a-tab-pane key="one" title="一键核查闭环">
+        <a-card :bordered="false">
+          <a-form :model="checkForm" layout="vertical" class="form-grid">
+            <a-form-item label="文件ID"><a-input v-model="checkForm.fileId" /></a-form-item>
+            <a-form-item label="协议类型">
+              <a-select v-model="checkForm.protocolType">
+                <a-option value="TYPE_A">TYPE_A（预期通过）</a-option>
+                <a-option value="TYPE_B">TYPE_B</a-option>
+                <a-option value="TYPE_C">TYPE_C</a-option>
+                <a-option value="TYPE_D">TYPE_D（演示校核失败→问题单）</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item label="校核模式">
+              <a-select v-model="checkForm.verifyMode">
+                <a-option value="full">full</a-option>
+                <a-option value="overview">overview</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item label="关联任务ID（可选）"><a-input v-model="checkForm.taskId" placeholder="可空" /></a-form-item>
+            <a-form-item label="模拟不一致（强制校核失败）">
+              <a-switch v-model="checkForm.simulateMismatch" />
+            </a-form-item>
+          </a-form>
+          <a-button type="primary" :loading="checkLoading" @click="runOneClick">执行一键核查</a-button>
+
+          <a-descriptions v-if="checkResult" title="闭环结果" :column="1" bordered class="mt" size="large">
+            <a-descriptions-item label="计划">{{ checkResult.plan?.planId }} / {{ checkResult.plan?.planStatus }}</a-descriptions-item>
+            <a-descriptions-item label="解析 parseId">{{ checkResult.parse?.parseId }}</a-descriptions-item>
+            <a-descriptions-item label="校核 verifyId / 状态">
+              {{ checkResult.verify?.verifyId }} — {{ checkResult.verify?.verifyStatus }}
+            </a-descriptions-item>
+            <a-descriptions-item label="自动生成问题单">{{ checkResult.problemId || '无' }}</a-descriptions-item>
+          </a-descriptions>
+        </a-card>
+      </a-tab-pane>
+
+      <a-tab-pane key="two" title="分步（解析 → 校核）">
+        <a-card :bordered="false">
+          <a-form :model="stepForm" layout="vertical" class="form-grid">
+            <a-form-item label="文件ID"><a-input v-model="stepForm.fileId" /></a-form-item>
+            <a-form-item label="协议类型">
+              <a-select v-model="stepForm.protocolType">
+                <a-option value="TYPE_A">TYPE_A</a-option>
+                <a-option value="TYPE_B">TYPE_B</a-option>
+                <a-option value="TYPE_C">TYPE_C</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item label="校核模式">
+              <a-select v-model="stepForm.verifyMode">
+                <a-option value="full">full</a-option>
+                <a-option value="overview">overview</a-option>
+              </a-select>
+            </a-form-item>
+          </a-form>
+          <a-button type="primary" :loading="stepLoading" @click="runSteps">执行解析并校核</a-button>
+
+          <a-table v-if="steps.length" class="mt" row-key="step" :columns="stepColumns" :data="steps" :pagination="false" />
+        </a-card>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue';
-import { runParse, runVerify } from '../api/protocolFullFlowApi.js';
+import { runCheckPlan, runParse, runVerify } from '../api/protocolDomainApi.js';
+import { pickData, toastOk } from '../composables/usePfcResult.js';
 
-const form = reactive({
+const checkForm = reactive({
+  fileId: 'file_demo_001',
+  protocolType: 'TYPE_A',
+  verifyMode: 'full',
+  taskId: '',
+  simulateMismatch: false
+});
+const checkLoading = ref(false);
+const checkResult = ref(null);
+
+const stepForm = reactive({
   fileId: 'file_demo_001',
   protocolType: 'TYPE_A',
   verifyMode: 'full'
 });
+const stepLoading = ref(false);
 const steps = ref([]);
 
-async function runPipeline() {
+const stepColumns = [
+  { title: '步骤', dataIndex: 'step', width: 70 },
+  { title: '接口', dataIndex: 'api' },
+  { title: 'requestId', dataIndex: 'requestId' },
+  { title: '摘要', dataIndex: 'summary' }
+];
+
+async function runOneClick() {
+  checkLoading.value = true;
+  checkResult.value = null;
+  try {
+    const res = await runCheckPlan({
+      fileId: checkForm.fileId,
+      protocolType: checkForm.protocolType,
+      verifyMode: checkForm.verifyMode,
+      taskId: checkForm.taskId || undefined,
+      simulateMismatch: checkForm.simulateMismatch,
+      operator: 'LTC'
+    });
+    const data = pickData(res, '核查：');
+    if (!data) return;
+    checkResult.value = data;
+    toastOk('核查闭环已执行');
+  } finally {
+    checkLoading.value = false;
+  }
+}
+
+async function runSteps() {
+  stepLoading.value = true;
   steps.value = [];
-  const parseRes = await runParse({ fileId: form.fileId, protocolType: form.protocolType });
-  steps.value.push({
-    step: '1',
-    api: 'API-07 /parse/run',
-    requestId: parseRes?.requestId || '-',
-    summary: parseRes?.data?.parseId || '-'
-  });
-  const verifyRes = await runVerify({ taskId: parseRes?.data?.parseId || 'task_demo_001', verifyMode: form.verifyMode });
-  steps.value.push({
-    step: '2',
-    api: 'API-08 /verify/run',
-    requestId: verifyRes?.requestId || '-',
-    summary: verifyRes?.data?.verifyId || '-'
-  });
+  try {
+    const pRes = await runParse({ fileId: stepForm.fileId, protocolType: stepForm.protocolType });
+    const pData = pickData(pRes, '解析：');
+    if (!pData) return;
+    steps.value.push({
+      step: '1',
+      api: '/parse/run',
+      requestId: pRes.requestId || '-',
+      summary: pData.parseId || '-'
+    });
+    const vRes = await runVerify({
+      parseId: pData.parseId,
+      verifyMode: stepForm.verifyMode,
+      fileId: stepForm.fileId,
+      protocolType: stepForm.protocolType
+    });
+    const vData = pickData(vRes, '校核：');
+    if (!vData) return;
+    steps.value.push({
+      step: '2',
+      api: '/verify/run',
+      requestId: vRes.requestId || '-',
+      summary: `${vData.verifyId} / ${vData.verifyStatus}`
+    });
+    toastOk('分步执行完成');
+  } finally {
+    stepLoading.value = false;
+  }
 }
 </script>
 
 <style scoped>
-.form { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 12px; align-items: end; margin-bottom: 16px; }
-label { display: flex; flex-direction: column; gap: 6px; }
-input, select { padding: 7px 8px; }
-.btn { border: 1px solid #165dff; background: #165dff; color: #fff; padding: 7px 14px; border-radius: 6px; cursor: pointer; height: 34px; }
-.table { width: 100%; border-collapse: collapse; }
-th, td { border-bottom: 1px solid var(--color-border-2); text-align: left; padding: 10px; }
-@media (max-width: 900px) { .form { grid-template-columns: 1fr; } }
+.page-head {
+  margin-bottom: 12px;
+}
+.form-grid {
+  max-width: 520px;
+}
+.mt {
+  margin-top: 16px;
+}
 </style>

@@ -23,6 +23,7 @@
 | `requirements-clarification` | 主线  | `src/skills/requirements-clarification/SKILL.md` | 需求澄清与验收标准固化                       | 需求澄清、边界、用户故事               |
 | `prd-design-generation`      | 主线  | `src/skills/prd-design-generation/SKILL.md`      | 结构化 PRD 设计生成                      | PRD、目标、指标、发布计划             |
 | `ui-generation`              | 主线  | `src/skills/ui-generation/SKILL.md`              | 页面与交互规格生成（可吸收 `stitch-design` 产物） | 界面生成、页面规格、组件、stitch-design |
+| `prd-page-annotation`        | 可选  | `src/skills/prd-page-annotation/SKILL.md`        | PRD 模块化页面标注（角标+浮窗，双向编号）           | PRD 标注、初始化标注、标注更新、角标、浮窗     |
 | `code-development`           | 主线  | `src/skills/code-development/SKILL.md`           | 可追溯代码开发与验证（含 G2-B 技术补齐评审）         | 编码实现、任务拆解、追溯               |
 | `test-validation`            | 主线  | `src/skills/test-validation/SKILL.md`            | 测试验证与放行判断                         | 测试矩阵、回归、放行                 |
 
@@ -50,6 +51,7 @@
 | 新页面设计或改版（UI-first） | `enhance-prompt` -> `stitch-design` -> `ui-generation` |
 | 需要统一设计语言           | `design-md`（必要时 `taste-design`）                        |
 | 设计稿转前端组件           | `react:components`（必要时 `shadcn-ui`）                    |
+| 页面已实现、需 PRD 可视化标注  | `prd-page-annotation`（Workflow A 初始化 / B 增量更新；见 `.cursor/skills/prd-page-annotation/`） |
 | 汇报演示与 walkthrough  | `remotion`                                             |
 | 连续页面自动迭代           | `stitch-loop`（需负责人批准）                                  |
 

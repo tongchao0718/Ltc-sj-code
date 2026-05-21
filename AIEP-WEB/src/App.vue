@@ -71,9 +71,12 @@ const isScrolled = ref(false)
 const menuCloseTimer = ref(null)
 const userDisplayName = ref('')
 
-const isSubAppEmbed = computed(() => {
-  return route.path.startsWith('/sample-app')
-})
+/** 与 SampleApp 一致：主区不自身滚动，高度经 main-fill 交给子应用双栏布局 */
+const SUB_APP_EMBED_PREFIXES = ['/sample-app', '/power-fee-protocol-check']
+
+const isSubAppEmbed = computed(() =>
+  SUB_APP_EMBED_PREFIXES.some((prefix) => route.path.startsWith(prefix))
+)
 
 const userInitial = computed(() => {
   const n = (userDisplayName.value || '').trim()

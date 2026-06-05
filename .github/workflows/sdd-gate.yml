@@ -1,0 +1,32 @@
+name: SDD Gate (G2)
+
+on:
+  pull_request:
+    paths:
+      - 'AIEP-WEB/src/docs/子应用文档/**'
+      - 'AIEP-WEB/scripts/sdd-validate.mjs'
+      - 'AIEP-WEB/scripts/sub-app-registry-validate.mjs'
+      - 'AIEP-WEB/src/config/subApps.js'
+      - 'AIEP-WEB/scripts/sdd.schema.json'
+  workflow_dispatch:
+    inputs:
+      app_code:
+        description: '子应用 app-code'
+        required: true
+        default: 'sample-app'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [sample-app, ai-smart-crm]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Main app registry (global)
+        run: npm run validate:sub-app-registry
+      - name: G2 validate ${{ matrix.app }}
+        run: npm run validate:sdd -- --app ${{ matrix.app }} --gate G2

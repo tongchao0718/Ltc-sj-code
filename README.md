@@ -206,12 +206,17 @@ npm run build:sample-app
 
 ## 新增子应用（最小步骤）
 
+> **完整规范**：`核心文档/框架核心文档/主应用子应用接入规范.md`
+
 1. 在 `AIEP-WEB/src/apps/` 下创建新子应用目录
 2. 添加 `{AppName}.vue`、`main.js`、`views/`、`store/`、`api/` 等基础结构
 3. 在 `AIEP-WEB/build/` 下新增对应 HTML 入口与 Vite 配置
 4. 在根目录 `package.json` 增加 `dev:{app}` / `build:{app}` 脚本
-5. 在 `AIEP-WEB/src/router/index.js` 增加嵌入路由
-6. 在 `AIEP-WEB/src/views/AppCenter.vue` 增加应用入口卡片
+5. 在 `AIEP-WEB/src/config/subApps.js` 注册（`appCode`、`to`、`pageCount`）
+6. 在 `AIEP-WEB/src/router/index.js` 增加嵌入路由
+7. 在 `AIEP-WEB/src/App.vue` 的 `SUB_APP_EMBED_PREFIXES` 增加前缀
+8. 子应用壳层实现 `base` 双模式（嵌入 / 独立 Hash）
+9. 校验：`npm run validate:sub-app-registry -- --app <app-code>`
 
 ## 常见问题
 

@@ -1,0 +1,303 @@
+{
+  "sdd_id": "SDD-20260605-CRM-001",
+  "version": "1.0.0",
+  "owner": "AI产品组",
+  "stage": "define",
+  "app_code": "ai-smart-crm",
+  "feature_name": "AI智能CRM管理",
+  "requirement_ref": "《01-需求说明书》V1.2",
+  "updated_at": "2026-06-05",
+  "track": "full",
+  "in_scope": [
+    "app-workbench",
+    "customer-lead-opportunity",
+    "activity-follow-up",
+    "ai-score-assistant-suggestion",
+    "mobile-ocr-push",
+    "web-admin-config-import",
+    "independent-auth",
+    "dual-build"
+  ],
+  "out_of_scope": [
+    "aiep-sso-integration",
+    "wechat-miniprogram",
+    "app-store-operations",
+    "finance-erp",
+    "marketing-automation-full"
+  ],
+  "tech_stack": {
+    "backend": "Node.js + Express + Mongoose",
+    "app_frontend": "uni-app Vue3",
+    "web_admin": "Vue3 + Arco Design",
+    "database": "MongoDB"
+  },
+  "business_goal": "双端协同移动智能化CRM：外勤作业+Web治理+独立账号+AI增效",
+  "success_metrics": [
+    "app_first_screen_2s",
+    "login_success_99_5",
+    "import_success_98",
+    "ai_suggestion_adoption_30",
+    "traceability_100"
+  ],
+  "roles": [
+    { "role": "销售", "permissions": ["customer_crud", "lead_crud", "opportunity_crud", "activity_crud", "ai_assistant"], "data_scope": "SELF" },
+    { "role": "主管", "permissions": ["team_assign", "team_report"], "data_scope": "TEAM" },
+    { "role": "客服", "permissions": ["ticket_handle", "customer_read"], "data_scope": "TEAM" },
+    { "role": "管理员", "permissions": ["admin_config", "import_export", "user_manage"], "data_scope": "ALL" },
+    { "role": "管理层", "permissions": ["report_read"], "data_scope": "ALL" }
+  ],
+  "story_map": [
+    {
+      "activity": "每日开工",
+      "task": "查看待办与KPI",
+      "story": "作为外勤销售，我希望打开APP首页看到待跟进与核心指标",
+      "requirement_ref": "SA-1/销售工作台",
+      "release_slice": "MVP",
+      "acceptance_ref": ["AT-01"],
+      "acceptance_standard": "Given已登录 When进入首页 Then KPI与待办渲染且可跳转"
+    },
+    {
+      "activity": "账号开通",
+      "task": "管理员创建账号",
+      "story": "作为运营管理员，我希望在Web创建销售账号以便独立登录APP",
+      "requirement_ref": "SA-20/独立账号与认证",
+      "release_slice": "MVP",
+      "acceptance_ref": ["AT-20"],
+      "acceptance_standard": "Given管理员创建销售账号 When APP登录 Then 仅见权限内数据"
+    },
+    {
+      "activity": "后台配置",
+      "task": "维护销售规则",
+      "story": "作为运营管理员，我希望在Web配置销售阶段以便APP按统一规则作业",
+      "requirement_ref": "SA-19/Web管理台",
+      "release_slice": "MVP",
+      "acceptance_ref": ["AT-19"],
+      "acceptance_standard": "Given发布阶段配置 When APP新建商机 Then 默认阶段生效"
+    }
+  ],
+  "features": [
+    { "id": "F-01", "name": "sales-workbench", "priority": "P0", "acceptance_ref": ["AT-01"] },
+    { "id": "F-02", "name": "customer-management", "priority": "P0", "acceptance_ref": ["AT-02"] },
+    { "id": "F-03", "name": "lead-management", "priority": "P0", "acceptance_ref": ["AT-03"] },
+    { "id": "F-04", "name": "contact-management", "priority": "P0", "acceptance_ref": ["AT-04"] },
+    { "id": "F-05", "name": "opportunity-pipeline", "priority": "P0", "acceptance_ref": ["AT-05"] },
+    { "id": "F-06", "name": "activity-follow-up", "priority": "P0", "acceptance_ref": ["AT-06"] },
+    { "id": "F-07", "name": "contract-payment", "priority": "P1", "acceptance_ref": ["AT-07"] },
+    { "id": "F-08", "name": "ai-customer-score", "priority": "P0", "acceptance_ref": ["AT-08"] },
+    { "id": "F-09", "name": "ai-sales-assistant", "priority": "P0", "acceptance_ref": ["AT-09"] },
+    { "id": "F-10", "name": "ai-follow-suggestion", "priority": "P0", "acceptance_ref": ["AT-10"] },
+    { "id": "F-11", "name": "ai-sales-forecast", "priority": "P1", "acceptance_ref": ["AT-11"] },
+    { "id": "F-12", "name": "ai-knowledge-base", "priority": "P1", "acceptance_ref": ["AT-12"] },
+    { "id": "F-13", "name": "service-ticket", "priority": "P1", "acceptance_ref": ["AT-13"] },
+    { "id": "F-14", "name": "mobile-data-capture", "priority": "P0", "acceptance_ref": ["AT-14"] },
+    { "id": "F-15", "name": "report-brief", "priority": "P0", "acceptance_ref": ["AT-15"] },
+    { "id": "F-16", "name": "app-settings", "priority": "P0", "acceptance_ref": ["AT-16"] },
+    { "id": "F-17", "name": "push-notification", "priority": "P0", "acceptance_ref": ["AT-17"] },
+    { "id": "F-18", "name": "app-build", "priority": "P0", "acceptance_ref": ["AT-18"] },
+    { "id": "F-19", "name": "web-admin", "priority": "P0", "acceptance_ref": ["AT-19"] },
+    { "id": "F-20", "name": "independent-auth", "priority": "P0", "acceptance_ref": ["AT-20"] },
+    { "id": "F-21", "name": "web-admin-build", "priority": "P0", "acceptance_ref": ["AT-21", "AT-22"] }
+  ],
+  "api_contracts": [
+    {
+      "id": "API-A01",
+      "path": "/api/ai-smart-crm/auth/login",
+      "method": "POST",
+      "request": { "account": "string", "password": "string", "clientType": "app|web" },
+      "response": { "code": "number", "message": "string", "data": { "accessToken": "string", "refreshToken": "string", "user": "object" }, "requestId": "string" },
+      "errors": ["400", "401", "423"]
+    },
+    {
+      "id": "API-A02",
+      "path": "/api/ai-smart-crm/auth/refresh",
+      "method": "POST",
+      "request": { "refreshToken": "string" },
+      "response": { "code": "number", "message": "string", "data": { "accessToken": "string" }, "requestId": "string" },
+      "errors": ["401"]
+    },
+    {
+      "id": "API-01",
+      "path": "/api/ai-smart-crm/dashboard/summary",
+      "method": "GET",
+      "request": { "dateRange": "string", "scope": "self|team" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "401", "500"]
+    },
+    {
+      "id": "API-02",
+      "path": "/api/ai-smart-crm/customers",
+      "method": "GET",
+      "request": { "keyword": "string", "level": "string", "pageNo": "number", "pageSize": "number" },
+      "response": { "code": "number", "message": "string", "data": { "list": "array", "total": "number" }, "requestId": "string" },
+      "errors": ["400", "401", "403", "500"]
+    },
+    {
+      "id": "API-03",
+      "path": "/api/ai-smart-crm/customers",
+      "method": "POST",
+      "request": { "name": "string", "type": "string", "ownerId": "string", "tags": "array" },
+      "response": { "code": "number", "message": "string", "data": { "customerId": "string" }, "requestId": "string" },
+      "errors": ["400", "401", "403", "500"]
+    },
+    {
+      "id": "API-04",
+      "path": "/api/ai-smart-crm/leads",
+      "method": "GET",
+      "request": { "status": "string", "pool": "boolean", "pageNo": "number", "pageSize": "number" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "401", "500"]
+    },
+    {
+      "id": "API-05",
+      "path": "/api/ai-smart-crm/leads/{id}/claim",
+      "method": "POST",
+      "request": {},
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "401", "403", "409", "500"]
+    },
+    {
+      "id": "API-06",
+      "path": "/api/ai-smart-crm/leads/{id}/convert",
+      "method": "POST",
+      "request": { "createOpportunity": "boolean" },
+      "response": { "code": "number", "message": "string", "data": { "customerId": "string", "opportunityId": "string" }, "requestId": "string" },
+      "errors": ["400", "401", "500"]
+    },
+    {
+      "id": "API-07",
+      "path": "/api/ai-smart-crm/opportunities/{id}/stage",
+      "method": "PUT",
+      "request": { "targetStage": "string", "reason": "string" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "401", "403", "1003", "500"]
+    },
+    {
+      "id": "API-08",
+      "path": "/api/ai-smart-crm/activities",
+      "method": "POST",
+      "request": { "customerId": "string", "opportunityId": "string", "type": "string", "content": "string", "nextFollowAt": "string" },
+      "response": { "code": "number", "message": "string", "data": { "activityId": "string" }, "requestId": "string" },
+      "errors": ["400", "401", "500"]
+    },
+    {
+      "id": "API-09",
+      "path": "/api/ai-smart-crm/ai/scores/{customerId}",
+      "method": "GET",
+      "request": {},
+      "response": { "code": "number", "message": "string", "data": { "score": "number", "level": "string", "factors": "array" }, "requestId": "string" },
+      "errors": ["401", "404", "500"]
+    },
+    {
+      "id": "API-10",
+      "path": "/api/ai-smart-crm/ai/assistant",
+      "method": "POST",
+      "request": { "scene": "string", "contextId": "string", "prompt": "string" },
+      "response": { "code": "number", "message": "string", "data": { "content": "string", "logId": "string" }, "requestId": "string" },
+      "errors": ["400", "401", "1006", "500"]
+    },
+    {
+      "id": "API-11",
+      "path": "/api/ai-smart-crm/ai/suggestions",
+      "method": "GET",
+      "request": { "status": "string", "pageNo": "number", "pageSize": "number" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["401", "500"]
+    },
+    {
+      "id": "API-12",
+      "path": "/api/ai-smart-crm/ocr/business-card",
+      "method": "POST",
+      "request": { "imageBase64": "string" },
+      "response": { "code": "number", "message": "string", "data": { "name": "string", "phone": "string", "company": "string", "title": "string" }, "requestId": "string" },
+      "errors": ["400", "401", "500"]
+    },
+    {
+      "id": "API-13",
+      "path": "/api/ai-smart-crm/admin/config/stages",
+      "method": "PUT",
+      "request": { "stages": "array" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "401", "403", "500"]
+    },
+    {
+      "id": "API-14",
+      "path": "/api/ai-smart-crm/admin/import",
+      "method": "POST",
+      "request": { "type": "customer|lead|contact|opportunity", "fileUrl": "string" },
+      "response": { "code": "number", "message": "string", "data": { "batchId": "string" }, "requestId": "string" },
+      "errors": ["400", "401", "403", "500"]
+    },
+    {
+      "id": "API-15",
+      "path": "/api/ai-smart-crm/admin/users",
+      "method": "POST",
+      "request": { "account": "string", "name": "string", "phone": "string", "roleIds": "array", "orgId": "string", "initialPassword": "string" },
+      "response": { "code": "number", "message": "string", "data": { "userId": "string" }, "requestId": "string" },
+      "errors": ["400", "401", "403", "500"]
+    },
+    {
+      "id": "API-16",
+      "path": "/api/ai-smart-crm/notifications/ack",
+      "method": "POST",
+      "request": { "notificationId": "string", "action": "delivered|clicked|dismissed" },
+      "response": { "code": "number", "message": "string", "data": "object", "requestId": "string" },
+      "errors": ["400", "401", "500"]
+    }
+  ],
+  "data_model": [
+    { "entity": "crm_user", "primary_key": "user_id", "description": "独立账号用户" },
+    { "entity": "crm_role", "primary_key": "role_id", "description": "角色权限" },
+    { "entity": "crm_organization", "primary_key": "org_id", "description": "组织树" },
+    { "entity": "crm_customer", "primary_key": "customer_id", "description": "客户主数据" },
+    { "entity": "crm_lead", "primary_key": "lead_id", "description": "线索" },
+    { "entity": "crm_contact", "primary_key": "contact_id", "description": "联系人" },
+    { "entity": "crm_opportunity", "primary_key": "opportunity_id", "description": "商机" },
+    { "entity": "crm_activity", "primary_key": "activity_id", "description": "跟进活动" },
+    { "entity": "crm_ai_score", "primary_key": "score_id", "description": "AI意向评分" },
+    { "entity": "crm_ai_suggestion", "primary_key": "suggestion_id", "description": "AI跟进建议" },
+    { "entity": "crm_config_stage", "primary_key": "config_id", "description": "销售阶段配置" },
+    { "entity": "crm_import_batch", "primary_key": "batch_id", "description": "导入批次" },
+    { "entity": "crm_audit_log", "primary_key": "log_id", "description": "审计日志" }
+  ],
+  "state_machine": [
+    { "page": "AppHomePage", "states": ["loading", "success", "empty", "error"] },
+    { "page": "CustomerListPage", "states": ["loading", "success", "empty", "error"] },
+    { "page": "OpportunityDetailPage", "states": ["idle", "submitting", "success", "error"] },
+    { "page": "AiAssistantSheet", "states": ["idle", "streaming", "done", "error"] },
+    { "page": "AdminImportPage", "states": ["pending", "processing", "done", "failed"] },
+    { "page": "LoginPage", "states": ["idle", "submitting", "success", "error"] }
+  ],
+  "exception_strategy": [
+    { "type": "network_offline", "action": "save_draft_queue", "user_hint": "网络不可用，已保存草稿" },
+    { "type": "timeout", "action": "show_retry", "user_hint": "请求超时，请重试" },
+    { "type": "http_401", "action": "redirect_login", "user_hint": "登录已过期" },
+    { "type": "http_403", "action": "show_forbidden", "user_hint": "无访问权限" },
+    { "type": "ai_quota", "code": 1006, "action": "block_ai", "user_hint": "今日AI次数已用完" },
+    { "type": "import_row_error", "code": 1007, "action": "download_error_report", "user_hint": "部分行导入失败" }
+  ],
+  "acceptance": [
+    { "id": "AT-01", "given": "销售已登录且有负责商机", "when": "打开APP首页", "then": "KPI与待办列表渲染且可跳转详情", "priority": "P0" },
+    { "id": "AT-02", "given": "销售角色数据权限为SELF", "when": "查询客户列表", "then": "仅返回本人负责客户", "priority": "P0" },
+    { "id": "AT-03", "given": "公海池有待领取线索", "when": "销售执行领取", "then": "负责人更新成功并产生通知", "priority": "P0" },
+    { "id": "AT-04", "given": "客户已有主联系人", "when": "设置另一联系人为主联系人", "then": "原主联系人自动取消且仅一名主联系人", "priority": "P0" },
+    { "id": "AT-05", "given": "商机处于阶段A且规则允许", "when": "切换至阶段B", "then": "阶段更新且活动时间线新增记录", "priority": "P0" },
+    { "id": "AT-06", "given": "用户在客户详情页", "when": "提交快速跟进", "then": "活动记录入库并出现在时间线", "priority": "P0" },
+    { "id": "AT-07", "given": "赢单商机存在", "when": "登记合同", "then": "合同与商机关联成功", "priority": "P1" },
+    { "id": "AT-08", "given": "客户有跟进与商机行为", "when": "查看意向评分", "then": "展示分数等级及Top3影响因子", "priority": "P0" },
+    { "id": "AT-09", "given": "用户在客户详情", "when": "唤起AI助手生成话术", "then": "返回可复制内容且记录采纳状态", "priority": "P0" },
+    { "id": "AT-10", "given": "存在超期未跟进商机", "when": "查看AI建议", "then": "可采纳或忽略并更新建议状态", "priority": "P0" },
+    { "id": "AT-11", "given": "团队有历史商机数据", "when": "打开销售预测", "then": "展示预测区间与关键假设", "priority": "P1" },
+    { "id": "AT-12", "given": "知识库有FAQ条目", "when": "APP发起问答", "then": "返回答案并附带引用来源", "priority": "P1" },
+    { "id": "AT-13", "given": "客服收到工单", "when": "处理并关闭", "then": "工单状态闭环且客户时间线可见", "priority": "P1" },
+    { "id": "AT-14", "given": "上传清晰名片图片", "when": "执行OCR识别", "then": "姓名手机公司等字段预填可编辑", "priority": "P0" },
+    { "id": "AT-15", "given": "用户有本周业务数据", "when": "打开简报", "then": "核心指标与迷你漏斗展示正确", "priority": "P0" },
+    { "id": "AT-16", "given": "用户修改推送开关", "when": "保存设置", "then": "设置持久化且推送行为随之变化", "priority": "P0" },
+    { "id": "AT-17", "given": "收到跟进提醒推送", "when": "点击通知", "then": "APP直达对应商机详情页", "priority": "P0" },
+    { "id": "AT-18", "given": "执行APP双端构建", "when": "安装并启动", "then": "登录后核心Tab页面可访问", "priority": "P0" },
+    { "id": "AT-19", "given": "管理员上传合法导入模板", "when": "执行导入", "then": "生成成功失败统计且可下载错误明细", "priority": "P0" },
+    { "id": "AT-20", "given": "管理员创建销售账号", "when": "该用户APP登录", "then": "仅访问权限范围内业务数据", "priority": "P0" },
+    { "id": "AT-21", "given": "执行 build:ai-smart-crm-admin", "when": "浏览器独立访问管理台", "then": "登录后仪表盘页面正常渲染", "priority": "P0" },
+    { "id": "AT-22", "given": "主应用 npm run dev 且 validate:sub-app-registry 通过", "when": "应用中心进入或访问 /ai-smart-crm-admin/dashboard", "then": "嵌入主应用顶栏下侧栏与仪表盘正常；首页应用数量为 3", "priority": "P0" }
+  ],
+  "rollback_plan": "发布后P0/P1故障30分钟内回滚API与Web静态资源；APP强制最低兼容版本"
+}

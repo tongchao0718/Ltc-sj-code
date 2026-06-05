@@ -1,0 +1,150 @@
+/* AI 智能 CRM — Web 管理台 + 设计 Token（ui-ux-pro-max #101） */
+.ai-smart-crm-scope {
+  --crm-primary: #2563eb;
+  --crm-primary-light: #3b82f6;
+  --crm-success: #059669;
+  --crm-danger: #dc2626;
+  --crm-bg: #f8fafc;
+  --crm-surface: #ffffff;
+  --crm-text: #0f172a;
+  --crm-text-secondary: #64748b;
+  --crm-border: #e4ecfc;
+  --crm-sidebar-w: 220px;
+}
+
+.ai-smart-crm-scope .app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--crm-bg);
+  font-family: Inter, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.ai-smart-crm-scope .app-sidebar {
+  width: var(--crm-sidebar-w);
+  flex-shrink: 0;
+  background: var(--crm-surface);
+  border-right: 1px solid var(--crm-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-smart-crm-scope .sidebar-brand {
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--crm-border);
+}
+
+.ai-smart-crm-scope .sidebar-brand strong {
+  display: block;
+  font-size: 15px;
+  color: var(--crm-text);
+}
+
+.ai-smart-crm-scope .sidebar-brand small {
+  color: var(--crm-text-secondary);
+  font-size: 12px;
+}
+
+.ai-smart-crm-scope .sidebar-nav {
+  padding: 12px 8px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.ai-smart-crm-scope .nav-group {
+  margin-bottom: 8px;
+}
+
+.ai-smart-crm-scope .group-head {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-text-secondary);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.ai-smart-crm-scope .group-head:hover {
+  background: #f1f5fd;
+}
+
+.ai-smart-crm-scope .menu-link {
+  display: block;
+  padding: 8px 10px 8px 20px;
+  font-size: 14px;
+  color: var(--crm-text);
+  text-decoration: none;
+  border-radius: 6px;
+  margin: 2px 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ai-smart-crm-scope .menu-link:hover {
+  background: #f1f5fd;
+  color: var(--crm-primary);
+}
+
+.ai-smart-crm-scope .menu-link--active {
+  background: #eff6ff;
+  color: var(--crm-primary);
+  font-weight: 500;
+}
+
+.ai-smart-crm-scope .app-content {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+}
+
+.ai-smart-crm-scope .page-wrap {
+  padding: 20px 24px 32px;
+}
+
+.ai-smart-crm-scope .page-title {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--crm-text);
+}
+
+.ai-smart-crm-scope .page-desc {
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--crm-text-secondary);
+}
+
+.ai-smart-crm-scope .breadcrumb {
+  font-size: 13px;
+  color: var(--crm-text-secondary);
+  margin-bottom: 12px;
+}
+
+.ai-smart-crm-scope .level-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ai-smart-crm-scope .level-A { background: #ecfdf5; color: #059669; }
+.ai-smart-crm-scope .level-B { background: #eff6ff; color: #2563eb; }
+.ai-smart-crm-scope .level-C { background: #f1f5f9; color: #64748b; }
+
+.ai-smart-crm-scope .score-badge {
+  font-weight: 600;
+  color: var(--crm-primary);
+}
+
+.ai-smart-crm-scope .stage-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}

@@ -36,127 +36,6 @@ const routes = [
     component: () => import('../views/AboutPage.vue')
   },
   {
-    path: '/power-fee-protocol-check',
-    name: 'PowerFeeProtocolCheckApp',
-    component: () => import('../apps/power-fee-protocol-check/PowerFeeProtocolCheckApp.vue'),
-    children: [
-      {
-        path: '',
-        redirect: '/power-fee-protocol-check/template'
-      },
-      {
-        path: 'template',
-        name: 'PowerFeeProtocolTemplateList',
-        component: () => import('../apps/power-fee-protocol-check/views/ProtocolTemplateListPage.vue')
-      },
-      {
-        path: 'sample',
-        name: 'PowerFeeSampleAnnotation',
-        component: () => import('../apps/power-fee-protocol-check/views/SampleAnnotationPage.vue')
-      },
-      {
-        path: 'rule',
-        name: 'PowerFeeRulePublish',
-        component: () => import('../apps/power-fee-protocol-check/views/RulePublishPage.vue')
-      },
-      {
-        path: 'task',
-        name: 'PowerFeeTaskStrategy',
-        component: () => import('../apps/power-fee-protocol-check/views/TaskStrategyPage.vue')
-      },
-      {
-        path: 'check',
-        name: 'PowerFeeCheckExecution',
-        component: () => import('../apps/power-fee-protocol-check/views/CheckExecutionPage.vue')
-      },
-      {
-        path: 'extract',
-        name: 'PowerFeeProtocolExtract',
-        meta: { pfcModule: 'M06' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'parse',
-        name: 'PowerFeeProtocolParse',
-        meta: { pfcModule: 'M07' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'verify',
-        name: 'PowerFeeProtocolVerify',
-        meta: { pfcModule: 'M08' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'problem',
-        name: 'PowerFeeProtocolProblem',
-        meta: { pfcModule: 'M09' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'govern',
-        name: 'PowerFeeProtocolGovern',
-        meta: { pfcModule: 'M10' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'task-monitor',
-        name: 'PowerFeeProtocolTaskMonitor',
-        meta: { pfcModule: 'M11' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'result-monitor',
-        name: 'PowerFeeProtocolResultMonitor',
-        meta: { pfcModule: 'M12' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'optimize',
-        name: 'PowerFeeProtocolOptimize',
-        meta: { pfcModule: 'M13' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'review',
-        name: 'PowerFeeProtocolReview',
-        meta: { pfcModule: 'M14' },
-        component: () => import('../apps/power-fee-protocol-check/views/ModuleWorkbenchPage.vue')
-      },
-      {
-        path: 'full-flow',
-        name: 'PowerFeeProtocolFullFlow',
-        component: () => import('../apps/power-fee-protocol-check/views/ProtocolFullFlowPage.vue')
-      },
-      { path: 'sample-annotation', redirect: { name: 'PowerFeeSampleAnnotation' } },
-      { path: 'rule-publish', redirect: { name: 'PowerFeeRulePublish' } },
-      { path: 'task-strategy', redirect: { name: 'PowerFeeTaskStrategy' } },
-      { path: 'check-execution', redirect: { name: 'PowerFeeCheckExecution' } },
-      {
-        path: 'module/:moduleCode',
-        redirect: (to) => {
-          const map = {
-            M02: 'PowerFeeSampleAnnotation',
-            M03: 'PowerFeeRulePublish',
-            M04: 'PowerFeeTaskStrategy',
-            M05: 'PowerFeeCheckExecution',
-            M06: 'PowerFeeProtocolExtract',
-            M07: 'PowerFeeProtocolParse',
-            M08: 'PowerFeeProtocolVerify',
-            M09: 'PowerFeeProtocolProblem',
-            M10: 'PowerFeeProtocolGovern',
-            M11: 'PowerFeeProtocolTaskMonitor',
-            M12: 'PowerFeeProtocolResultMonitor',
-            M13: 'PowerFeeProtocolOptimize',
-            M14: 'PowerFeeProtocolReview'
-          };
-          const name = map[to.params.moduleCode];
-          return name ? { name } : { path: '/power-fee-protocol-check/template' };
-        }
-      }
-    ]
-  },
-  {
     path: '/sample-app',
     name: 'SampleApp',
     component: () => import('../apps/sample-app/SampleApp.vue'),
@@ -287,6 +166,72 @@ const routes = [
         path: 'test',
         name: 'SampleTestPage',
         component: () => import('../apps/sample-app/views/test/TestPage.vue')
+      }
+    ]
+  },
+  {
+    path: '/ai-smart-crm-admin',
+    name: 'AiSmartCrmAdminApp',
+    component: () => import('../apps/ai-smart-crm-admin/AiSmartCrmAdminApp.vue'),
+    children: [
+      {
+        path: '',
+        redirect: '/ai-smart-crm-admin/login'
+      },
+      {
+        path: 'login',
+        name: 'CrmAdminLogin',
+        component: () => import('../apps/ai-smart-crm-admin/views/auth/LoginPage.vue')
+      },
+      {
+        path: 'dashboard',
+        name: 'CrmAdminDashboard',
+        component: () => import('../apps/ai-smart-crm-admin/views/dashboard/AdminDashboardPage.vue')
+      },
+      {
+        path: 'customers',
+        name: 'CrmAdminCustomers',
+        component: () => import('../apps/ai-smart-crm-admin/views/customer/CustomerListPage.vue')
+      },
+      {
+        path: 'leads',
+        name: 'CrmAdminLeads',
+        component: () => import('../apps/ai-smart-crm-admin/views/lead/LeadListPage.vue')
+      },
+      {
+        path: 'opportunities',
+        name: 'CrmAdminOpportunities',
+        component: () => import('../apps/ai-smart-crm-admin/views/opportunity/OpportunityListPage.vue')
+      },
+      {
+        path: 'import',
+        name: 'CrmAdminImport',
+        component: () => import('../apps/ai-smart-crm-admin/views/import/ImportPage.vue')
+      },
+      {
+        path: 'reports',
+        name: 'CrmAdminReports',
+        component: () => import('../apps/ai-smart-crm-admin/views/report/ReportPage.vue')
+      },
+      {
+        path: 'settings/stages',
+        name: 'CrmAdminStageConfig',
+        component: () => import('../apps/ai-smart-crm-admin/views/settings/StageConfigPage.vue')
+      },
+      {
+        path: 'settings/pool',
+        name: 'CrmAdminPoolConfig',
+        component: () => import('../apps/ai-smart-crm-admin/views/settings/PoolConfigPage.vue')
+      },
+      {
+        path: 'system/users',
+        name: 'CrmAdminUsers',
+        component: () => import('../apps/ai-smart-crm-admin/views/system/UserListPage.vue')
+      },
+      {
+        path: 'mobile/preview',
+        name: 'CrmAdminMobilePreview',
+        component: () => import('../apps/ai-smart-crm-admin/views/mobile/AppMobilePreviewPage.vue')
       }
     ]
   }

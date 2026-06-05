@@ -25,25 +25,16 @@
             <div class="link-sub">从应用中心进入子应用</div>
           </div>
         </router-link>
-        <router-link to="/sample-app/dashboard/workplace" class="quick-link ds-card">
-          <span class="link-icon" aria-hidden="true">⚡</span>
+        <router-link
+          v-for="app in subApps"
+          :key="app.id"
+          :to="app.to"
+          class="quick-link ds-card"
+        >
+          <span class="link-icon" aria-hidden="true">{{ app.icon }}</span>
           <div>
-            <div class="link-text">示例应用</div>
-            <div class="link-sub">侧栏分组菜单与业务页（自工作台进入）</div>
-          </div>
-        </router-link>
-        <router-link to="/power-fee-protocol-check/template" class="quick-link ds-card">
-          <span class="link-icon" aria-hidden="true">🧾</span>
-          <div>
-            <div class="link-text">电费协议核查</div>
-            <div class="link-sub">协议模板库列表（API-01）</div>
-          </div>
-        </router-link>
-        <router-link to="/power-fee-protocol-check/full-flow" class="quick-link ds-card">
-          <span class="link-icon" aria-hidden="true">🔗</span>
-          <div>
-            <div class="link-text">电费协议核查全链路验证</div>
-            <div class="link-sub">API-02~API-08 执行验证工作台</div>
+            <div class="link-text">{{ app.name }}</div>
+            <div class="link-sub">{{ app.folder }}</div>
           </div>
         </router-link>
       </div>
@@ -68,25 +59,17 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+import { subApps, getSubAppMetrics } from '../config/subApps.js'
 
-const stats = ref([
-  { title: '已接入子应用', value: '2', desc: '可扩展为多应用架构' },
+const metrics = computed(() => getSubAppMetrics())
+
+const stats = computed(() => [
+  { title: '已接入子应用', value: String(metrics.value.appCount), desc: '可扩展为多应用架构' },
   { title: '今日访问（演示）', value: '—', desc: '接入统计服务后展示' },
   { title: '构建状态', value: '正常', desc: '主应用 + 子应用独立构建' },
   { title: '文档完备度', value: '基线', desc: '随业务迭代同步更新' }
 ])
-
-/**
- * 与 `src/router/index.js` 当前配置保持一致，新增路由时请同步更新计数逻辑。
- * 主系统：dashboard、app-center、profile、review-center、help、about = 6
- * 示例子应用：dashboard×2 + visualization×2 + list×2 + form×2 + profile×1 + result×2 + exception×3 + user×2 = 16
- */
-const metrics = computed(() => ({
-  appCount: 2,
-  pageCount: 6 + 16 + 1
-}))
-
 </script>
 
 <style scoped>

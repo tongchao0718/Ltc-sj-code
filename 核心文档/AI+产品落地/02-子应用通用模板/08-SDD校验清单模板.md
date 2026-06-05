@@ -24,6 +24,9 @@
 | 异常策略完整（超时/断网/4xx/5xx） |  |  |
 | Given/When/Then 验收脚本完整 |  |  |
 | 风险与回滚策略完整 |  |  |
+| SDD §8 无纯 UI 内容越界（动效/文案/布局应在 PRD） |  |  |
+| `SDD-v*.md` 与 `SDD-v*.json` 关键字段一致（sdd_id、api_contracts、acceptance） |  |  |
+| 主应用注册完整（`subApps.js` + router + embed；`validate:sub-app-registry`） |  | Web 子应用必填；见《主应用子应用接入规范》 |
 
 ## 三、质量与一致性校验
 

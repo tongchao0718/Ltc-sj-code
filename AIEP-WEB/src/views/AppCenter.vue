@@ -22,28 +22,9 @@
 </template>
 
 <script setup>
-const apps = [
-  {
-    id: 'sample',
-    name: '示例应用',
-    folder: 'sample-app',
-    desc: '多分组菜单与业务演示页（仪表盘、可视化、列表、表单、结果与异常页等）。',
-    icon: '📋',
-    to: '/sample-app/dashboard/workplace',
-    tag: '可用',
-    tagClass: 'tag-success'
-  },
-  {
-    id: 'power-fee-protocol-check',
-    name: '电费协议核查',
-    folder: 'power-fee-protocol-check',
-    desc: 'PRD 路由子功能入口与 API-02~API-08 全链路验证工作台。',
-    icon: '⚙️',
-    to: '/power-fee-protocol-check/full-flow',
-    tag: '开发中',
-    tagClass: 'tag-warning'
-  }
-]
+import { subApps } from '../config/subApps.js'
+
+const apps = subApps
 </script>
 
 <style scoped>

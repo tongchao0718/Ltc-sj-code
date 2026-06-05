@@ -11,6 +11,7 @@
   "g2_rules": {
     "require_customer_confirmation": true,
     "require_mapping_table": true,
+    "require_main_app_registry": true,
     "sdd_required_fields": [
       "sdd_id",
       "version",

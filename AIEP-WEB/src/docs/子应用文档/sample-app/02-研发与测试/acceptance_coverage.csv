@@ -1,0 +1,4 @@
+﻿"acceptance_id","feature_ids","given","when","then","test_case_id","covered"
+"AT-01","F-01","用户在工作台","页面加载完成","指标与图表渲染成功","","pending"
+"AT-02","F-02","用户在查询页","切换筛选条件","触发真实请求并重置到第一页","","pending"
+"AT-03","F-03","用户提交表单","接口返回失败","保留输入并展示错误提示","","pending"

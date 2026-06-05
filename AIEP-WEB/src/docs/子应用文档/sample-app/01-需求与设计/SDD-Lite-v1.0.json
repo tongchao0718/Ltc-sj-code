@@ -1,0 +1,41 @@
+{
+  "sdd_id": "SDD-20260604-SA-LITE-001",
+  "version": "1.0.0",
+  "owner": "产品经理",
+  "stage": "fast_track",
+  "app_code": "sample-app",
+  "track": "fast",
+  "in_scope": ["list-export-task-status"],
+  "out_of_scope": ["new-export-engine", "cross-app-permission"],
+  "api_contracts": [
+    {
+      "id": "API-L01",
+      "path": "/api/export/task/status",
+      "method": "GET",
+      "request": { "taskId": "string" },
+      "response": {
+        "code": "number",
+        "message": "string",
+        "data": { "status": "string", "progress": "number" },
+        "requestId": "string"
+      },
+      "errors": ["400", "404", "500"]
+    }
+  ],
+  "data_model": [
+    {
+      "entity": "export_task",
+      "fields": ["task_id", "status", "progress"]
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "AT-L01",
+      "given": "用户已发起导出",
+      "when": "查看任务状态",
+      "then": "展示进度并在完成或失败时给出明确反馈",
+      "priority": "P0"
+    }
+  ],
+  "rollback_plan": "关闭状态 UI，保留原导出入口"
+}

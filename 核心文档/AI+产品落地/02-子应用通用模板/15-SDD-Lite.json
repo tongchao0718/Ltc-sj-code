@@ -1,0 +1,41 @@
+{
+  "sdd_id": "SDD-YYYYMMDD-001",
+  "version": "1.0.0",
+  "owner": "产品经理",
+  "stage": "fast_track",
+  "app_code": "<app-code>",
+  "track": "fast",
+  "in_scope": ["<范围1>"],
+  "out_of_scope": ["<不做项1>"],
+  "api_contracts": [
+    {
+      "id": "API-01",
+      "path": "/api/<app-code>/<resource>",
+      "method": "GET",
+      "request": {},
+      "response": {
+        "code": "number",
+        "message": "string",
+        "data": "object",
+        "requestId": "string"
+      },
+      "errors": ["400", "500"]
+    }
+  ],
+  "data_model": [
+    {
+      "entity": "<实体>",
+      "fields": ["<字段1>"]
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "AT-01",
+      "given": "<前置>",
+      "when": "<动作>",
+      "then": "<结果>",
+      "priority": "P0"
+    }
+  ],
+  "rollback_plan": "<回滚方案>"
+}

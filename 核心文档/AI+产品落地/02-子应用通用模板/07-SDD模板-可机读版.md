@@ -9,14 +9,16 @@
 - `date`:
 - `app_code`: `<app-code>`
 
-### 1.1 技术与工程约束（建议必填）
+### 1.1 技术与工程约束（必填，无默认栈）
 
-- `backend_stack`: `Java+SpringBoot` / `Python+FastAPI` / `Go`
-- `frontend_stack`: `React` / `Vue`
-- `database`: `MySQL` / `PostgreSQL`
-- `middleware`: `Redis`、`Kafka`（按需）
-- `architecture`: 分层架构
-- `package_layout`: `controller/service/service.impl/repository/entity/dto/vo`
+> 按子应用实际技术填写；禁止留空。示例：`Node+Express` / `Java+SpringBoot` / `Vue3+Arco` 等。
+
+- `backend_stack`:
+- `frontend_stack`:
+- `database`:
+- `middleware`: （按需，如 Redis、Kafka）
+- `architecture`:
+- `package_layout`: （按仓库实际目录，如 `routes/controllers/services` 或 `controller/service/...`）
 
 ## 2. 业务范围
 
@@ -77,7 +79,10 @@
 - `common_columns`: `created_at`、`updated_at`（按需加 `created_by`、`updated_by`）
 - `primary_key_rule`: 主键字段命名使用“`表名_id`”，禁止通用 `id`
 
-## 8. 页面交互与状态机
+## 8. 页面交互与状态机（与 PRD 边界）
+
+> **仅填写与 API/字段/请求生命周期相关的状态**（如筛选触发请求、`loading→success/empty/error` 与接口联动）。  
+> **归 PRD**：纯 UI 动效、文案、布局、组件样式 — 见 `03-PRD设计评审文档`。评审时用 `08-SDD校验清单`「SDD/PRD 越界」项检查。
 
 | 页面 | 触发动作 | 状态流转 | 成功反馈 | 失败反馈 |
 |------|------|------|------|------|

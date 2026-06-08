@@ -1,16 +1,54 @@
 <template>
-  <div class="app-container" :class="{ scrolled: isScrolled }">
-    <header class="app-header">
-      <div class="header-inner">
-        <div class="brand">
+  <div
+    class="app-container"
+    :class="{
+      scrolled: isScrolled,
+      'app-container--embed': isSubAppEmbed,
+      'app-container--immersive': isImmersiveCollapsed
+    }"
+    :style="containerStyle"
+  >
+    <header
+      class="app-header"
+      :class="{
+        'app-header--embed': isSubAppEmbed,
+        'app-header--immersive-collapsed': isImmersiveCollapsed,
+        'app-header--immersive-expanded': isImmersiveExpanded
+      }"
+    >
+      <div class="header-inner" :class="{ 'header-inner--compact': isImmersiveCollapsed }">
+        <router-link to="/dashboard" class="brand brand-link" title="返回主应用首页">
           <img src="/app-icon.png" alt="" class="app-logo" width="36" height="36" aria-hidden="true" />
-          <h1 class="app-title">应用系统</h1>
-        </div>
-        <nav class="app-nav" aria-label="主导航">
+          <h1 v-if="!isImmersiveCollapsed" class="app-title">应用系统</h1>
+        </router-link>
+
+        <nav v-if="!isImmersiveCollapsed" class="app-nav" aria-label="主导航">
           <router-link to="/dashboard" class="nav-link" active-class="nav-link--active">首页</router-link>
           <router-link to="/app-center" class="nav-link" active-class="nav-link--active">应用中心</router-link>
         </nav>
+
         <div class="header-end">
+          <div v-if="isSubAppEmbed" class="embed-controls">
+            <button
+              type="button"
+              class="embed-mode-btn"
+              :title="embedHeaderMode === 'immersive' ? '切换为平台模式（顶栏常驻）' : '切换为沉浸模式（顶栏收缩）'"
+              @click="toggleEmbedHeaderMode"
+            >
+              {{ embedHeaderMode === 'immersive' ? '沉浸' : '平台' }}
+            </button>
+            <button
+              v-if="embedHeaderMode === 'immersive'"
+              type="button"
+              class="embed-toggle-btn"
+              :title="headerPeekExpanded ? '收起平台顶栏' : '展开平台顶栏'"
+              :aria-expanded="headerPeekExpanded"
+              @click="toggleHeaderPeek"
+            >
+              {{ headerPeekExpanded ? '▲' : '▼' }}
+            </button>
+          </div>
+
           <div
             class="user-menu-wrap"
             @mouseenter="onUserMenuEnter"
@@ -19,16 +57,26 @@
             <button
               type="button"
               class="user-trigger"
+              :class="{ 'user-trigger--compact': isImmersiveCollapsed }"
               :aria-expanded="userMenuOpen"
               aria-haspopup="true"
               @click.stop="toggleUserMenu"
             >
               <span class="user-avatar" aria-hidden="true">{{ userInitial }}</span>
-              <span class="user-label">个人中心</span>
-              <span class="menu-arrow" :class="{ rotated: userMenuOpen }">▼</span>
+              <span v-if="!isImmersiveCollapsed" class="user-label">个人中心</span>
+              <span v-if="!isImmersiveCollapsed" class="menu-arrow" :class="{ rotated: userMenuOpen }">▼</span>
             </button>
             <transition name="fade-page">
               <div v-if="userMenuOpen" class="user-dropdown" role="menu" @click.stop>
+                <router-link
+                  v-if="isImmersiveCollapsed"
+                  to="/app-center"
+                  class="dropdown-item"
+                  role="menuitem"
+                  @click="closeUserMenu"
+                >
+                  应用中心
+                </router-link>
                 <router-link to="/profile" class="dropdown-item" role="menuitem" @click="closeUserMenu">
                   个人资料
                 </router-link>
@@ -57,26 +105,47 @@
         </router-view>
       </div>
     </main>
-
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
+import { isSubAppEmbedPath } from './config/subApps.js'
+
+const MAIN_HEADER_HEIGHT = 56
+const MAIN_HEADER_PEEK = 32
+const STORAGE_EMBED_MODE = 'aiep-embed-header-mode'
+const STORAGE_HEADER_PEEK = 'aiep-embed-header-peek'
 
 const route = useRoute()
 const userMenuOpen = ref(false)
 const isScrolled = ref(false)
 const menuCloseTimer = ref(null)
 const userDisplayName = ref('')
+const embedHeaderMode = ref('immersive')
+const headerPeekExpanded = ref(false)
 
-/** 与 SampleApp 一致：主区不自身滚动，高度经 main-fill 交给子应用双栏布局 */
-const SUB_APP_EMBED_PREFIXES = ['/sample-app', '/ai-smart-crm-admin']
+const isSubAppEmbed = computed(() => isSubAppEmbedPath(route.path))
 
-const isSubAppEmbed = computed(() =>
-  SUB_APP_EMBED_PREFIXES.some((prefix) => route.path.startsWith(prefix))
+const isImmersiveCollapsed = computed(
+  () => isSubAppEmbed.value && embedHeaderMode.value === 'immersive' && !headerPeekExpanded.value
 )
+
+const isImmersiveExpanded = computed(
+  () => isSubAppEmbed.value && embedHeaderMode.value === 'immersive' && headerPeekExpanded.value
+)
+
+const headerHeight = computed(() => {
+  if (!isSubAppEmbed.value) return MAIN_HEADER_HEIGHT
+  if (embedHeaderMode.value === 'platform') return MAIN_HEADER_HEIGHT
+  return headerPeekExpanded.value ? MAIN_HEADER_HEIGHT : MAIN_HEADER_PEEK
+})
+
+const containerStyle = computed(() => ({
+  '--main-header-height': `${headerHeight.value}px`,
+  paddingTop: `${headerHeight.value}px`
+}))
 
 const userInitial = computed(() => {
   const n = (userDisplayName.value || '').trim()
@@ -88,12 +157,54 @@ watch(route, () => {
   closeUserMenu()
 })
 
+watch(isSubAppEmbed, (embed) => {
+  if (embed && embedHeaderMode.value === 'immersive') {
+    headerPeekExpanded.value = false
+  }
+})
+
 const toggleUserMenu = () => {
   userMenuOpen.value = !userMenuOpen.value
 }
 
 const closeUserMenu = () => {
   userMenuOpen.value = false
+}
+
+const toggleEmbedHeaderMode = () => {
+  embedHeaderMode.value = embedHeaderMode.value === 'immersive' ? 'platform' : 'immersive'
+  if (embedHeaderMode.value === 'platform') {
+    headerPeekExpanded.value = true
+  } else {
+    headerPeekExpanded.value = false
+  }
+  persistEmbedPrefs()
+}
+
+const toggleHeaderPeek = () => {
+  headerPeekExpanded.value = !headerPeekExpanded.value
+  persistEmbedPrefs()
+}
+
+const persistEmbedPrefs = () => {
+  try {
+    localStorage.setItem(STORAGE_EMBED_MODE, embedHeaderMode.value)
+    localStorage.setItem(STORAGE_HEADER_PEEK, String(headerPeekExpanded.value))
+  } catch {
+    /* ignore */
+  }
+}
+
+const restoreEmbedPrefs = () => {
+  try {
+    const mode = localStorage.getItem(STORAGE_EMBED_MODE)
+    if (mode === 'immersive' || mode === 'platform') {
+      embedHeaderMode.value = mode
+    }
+    headerPeekExpanded.value = localStorage.getItem(STORAGE_HEADER_PEEK) === 'true'
+  } catch {
+    /* ignore */
+  }
 }
 
 const onUserMenuEnter = () => {
@@ -117,6 +228,20 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 8
 }
 
+const onEmbedKeydown = (e) => {
+  if (!isSubAppEmbed.value) return
+  if (e.altKey && (e.key === 'h' || e.key === 'H')) {
+    e.preventDefault()
+    if (embedHeaderMode.value === 'platform') {
+      embedHeaderMode.value = 'immersive'
+      headerPeekExpanded.value = !headerPeekExpanded.value
+    } else {
+      toggleHeaderPeek()
+    }
+    persistEmbedPrefs()
+  }
+}
+
 const syncUserDisplayName = () => {
   try {
     userDisplayName.value = localStorage.getItem('ltc-demo-display-name') || 'LTC'
@@ -130,11 +255,13 @@ const onStorage = (e) => {
 }
 
 onMounted(() => {
+  restoreEmbedPrefs()
   syncUserDisplayName()
   window.addEventListener('scroll', handleScroll, { passive: true })
   document.addEventListener('click', onDocClick)
   window.addEventListener('storage', onStorage)
   window.addEventListener('ltc-profile-updated', syncUserDisplayName)
+  window.addEventListener('keydown', onEmbedKeydown)
 })
 
 onBeforeUnmount(() => {
@@ -142,6 +269,7 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', onDocClick)
   window.removeEventListener('storage', onStorage)
   window.removeEventListener('ltc-profile-updated', syncUserDisplayName)
+  window.removeEventListener('keydown', onEmbedKeydown)
   if (menuCloseTimer.value) clearTimeout(menuCloseTimer.value)
 })
 </script>
@@ -151,7 +279,8 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-top: 56px;
+  padding-top: var(--main-header-height, 56px);
+  transition: padding-top 0.2s ease;
 }
 
 .app-header {
@@ -160,12 +289,13 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 56px;
+  height: var(--main-header-height, 56px);
   flex-shrink: 0;
   background-color: var(--color-bg-2);
   border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-nav);
   transition:
+    height 0.2s ease,
     box-shadow 0.3s ease,
     background-color 0.3s ease;
 }
@@ -176,6 +306,10 @@ onBeforeUnmount(() => {
 
 [data-theme='dark'] .app-container.scrolled .app-header {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.app-header--immersive-collapsed {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 
 .header-inner {
@@ -190,6 +324,12 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
 }
 
+.header-inner--compact {
+  grid-template-columns: auto 1fr auto;
+  max-width: none;
+  padding: 0 12px;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -198,10 +338,65 @@ onBeforeUnmount(() => {
   justify-self: start;
 }
 
+.brand-link {
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-button);
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.brand-link:hover {
+  background-color: var(--color-fill-1);
+}
+
+.brand-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .header-end {
   justify-self: end;
   grid-column: 3;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.embed-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.embed-mode-btn,
+.embed-toggle-btn {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  background: var(--color-bg-2);
+  color: var(--color-text-2);
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.embed-mode-btn:hover,
+.embed-toggle-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.embed-toggle-btn {
+  min-width: 28px;
+  padding: 0 6px;
 }
 
 .app-logo {
@@ -211,6 +406,11 @@ onBeforeUnmount(() => {
   border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.app-header--immersive-collapsed .app-logo {
+  width: 28px;
+  height: 28px;
 }
 
 .app-title {
@@ -282,6 +482,11 @@ onBeforeUnmount(() => {
     box-shadow 0.2s ease;
 }
 
+.user-trigger--compact {
+  height: 28px;
+  padding: 0 6px;
+}
+
 .user-trigger:hover {
   border-color: var(--color-primary);
   box-shadow: var(--shadow-card);
@@ -299,6 +504,12 @@ onBeforeUnmount(() => {
   justify-content: center;
   font-weight: 600;
   flex-shrink: 0;
+}
+
+.user-trigger--compact .user-avatar {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
 }
 
 .menu-arrow {
@@ -343,10 +554,6 @@ onBeforeUnmount(() => {
   color: var(--color-primary);
 }
 
-.dropdown-item--btn {
-  font-family: inherit;
-}
-
 .app-main {
   flex: 1;
   min-height: 0;
@@ -355,7 +562,6 @@ onBeforeUnmount(() => {
   overflow-y: auto;
 }
 
-/* 子应用：主区域不自身滚动，高度交给内层与子应用双栏 */
 .app-main--embed {
   padding: 0;
   overflow: hidden;
@@ -363,7 +569,6 @@ onBeforeUnmount(() => {
   flex-direction: column;
 }
 
-/* 承接 flex 高度链，避免 transition 打断导致整页随内容增高、菜单与正文一起滚 */
 .main-fill--embed {
   flex: 1 1 0;
   min-height: 0;
@@ -373,7 +578,8 @@ onBeforeUnmount(() => {
   flex-direction: column;
 }
 
-.main-fill--embed :deep(.app-layout) {
+.main-fill--embed :deep(.app-layout),
+.main-fill--embed :deep(.marketing-demo-scope) {
   flex: 1 1 0;
   min-height: 0;
   min-width: 0;

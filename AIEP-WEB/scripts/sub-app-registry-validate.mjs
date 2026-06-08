@@ -8,7 +8,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { subApps, getSubAppMetrics } from '../src/config/subApps.js'
+import { subApps, getSubAppMetrics, routePrefixFromTo } from '../src/config/subApps.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const WEB_SRC = path.join(__dirname, '..', 'src')
@@ -25,12 +25,6 @@ function readText(rel) {
   return fs.readFileSync(path.join(WEB_SRC, rel), 'utf8')
 }
 
-function extractEmbedPrefixes(appVueText) {
-  const m = appVueText.match(/SUB_APP_EMBED_PREFIXES\s*=\s*\[([^\]]+)\]/)
-  if (!m) return []
-  return [...m[1].matchAll(/['"]([^'"]+)['"]/g)].map((x) => x[1])
-}
-
 function extractTopLevelRoutePrefixes(routerText) {
   const prefixes = new Set()
   for (const app of subApps) {
@@ -43,11 +37,6 @@ function extractTopLevelRoutePrefixes(routerText) {
     }
   }
   return prefixes
-}
-
-function routePrefixFromTo(to) {
-  const parts = to.split('/').filter(Boolean)
-  return parts.length ? `/${parts[0]}` : ''
 }
 
 function findSubApp(appCode) {
@@ -64,7 +53,17 @@ function validateRegistry({ appCode } = {}) {
   const dashboardText = readText('views/Dashboard.vue')
 
   const routePrefixes = extractTopLevelRoutePrefixes(routerText)
-  const embedPrefixes = extractEmbedPrefixes(appVueText)
+  const expectedEmbedPrefixes = [...new Set(subApps.map((a) => routePrefixFromTo(a.to)).filter(Boolean))]
+
+  if (!appVueText.includes("from './config/subApps.js'") && !appVueText.includes('from "./config/subApps.js"')) {
+    failed.push('App.vue 须从 src/config/subApps.js 导入嵌入检测（如 isSubAppEmbedPath）')
+  }
+  if (!appVueText.includes('isSubAppEmbedPath')) {
+    failed.push('App.vue 须使用 isSubAppEmbedPath 或 getSubAppEmbedPrefixes 判定嵌入模式')
+  }
+  if (/SUB_APP_EMBED_PREFIXES\s*=/.test(appVueText)) {
+    failed.push('App.vue 禁止硬编码 SUB_APP_EMBED_PREFIXES，请使用 subApps.js 导出函数')
+  }
 
   const targets = appCode ? subApps.filter((s) => findSubApp(appCode)?.id === s.id) : subApps
   if (appCode && !targets.length) {
@@ -81,11 +80,11 @@ function validateRegistry({ appCode } = {}) {
     if (!routePrefixes.has(prefix)) {
       failed.push(`[${entry.id}] router/index.js 缺少顶层路由 path: '${prefix}'`)
     }
-    if (!embedPrefixes.includes(prefix)) {
-      failed.push(`[${entry.id}] App.vue SUB_APP_EMBED_PREFIXES 缺少 '${prefix}'`)
-    }
     if (!routerText.includes(`'${prefix}'`) && !routerText.includes(`"${prefix}"`)) {
       failed.push(`[${entry.id}] router/index.js 未引用前缀 ${prefix}`)
+    }
+    if (!entry.designSystem) {
+      warnings.push(`[${entry.id}] 建议声明 designSystem: marketing | arco | ant`)
     }
   }
 
@@ -99,6 +98,11 @@ function validateRegistry({ appCode } = {}) {
     const metrics = getSubAppMetrics()
     if (metrics.appCount !== subApps.length) {
       warnings.push(`getSubAppMetrics().appCount (${metrics.appCount}) 与 subApps.length (${subApps.length}) 不一致`)
+    }
+    for (const prefix of expectedEmbedPrefixes) {
+      if (!routePrefixes.has(prefix)) {
+        failed.push(`注册表前缀 '${prefix}' 在 router/index.js 中无对应顶层路由`)
+      }
     }
   }
 

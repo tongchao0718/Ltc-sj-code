@@ -1,0 +1,29 @@
+---
+description: AI+ 子应用全流程总编排入口（六步、Gate、platform_type）；推进子应用时优先加载 ai-full-process-design Skill
+globs: AIEP-WEB/src/docs/子应用文档/**,AIEP-WEB/src/apps/**,AIEP-WEB/src/skills/**
+alwaysApply: false
+---
+
+# AI+ 全流程设计（项目规则）
+
+推进 **AIEP-DEV 子应用**（新建、补文档、写界面、门禁、发布）时：
+
+1. **先 Read** `.cursor/skills/ai-full-process-design/SKILL.md`（或全局 `~/.cursor/skills/ai-full-process-design/SKILL.md`）
+2. **必跑**（仓库根目录）：`npm run infer:process-step -- --app {app-code} --json`
+3. 输出 **阶段门禁状态块** 后再执行具体编码/写文档
+4. 按推断步骤加载 `AIEP-WEB/src/skills/` 下对应阶段 Skill
+5. 步骤 4：**禁止** Agent 自行 G2-A 签字或 PRD 冻结
+
+## 关键路径
+
+| 项 | 路径 |
+|----|------|
+| 文档根 | `AIEP-WEB/src/docs/子应用文档/{app-code}/` |
+| 代码根（web） | `AIEP-WEB/src/apps/{app-code}/` |
+| G2-A | `01-需求与设计/19-G2-A界面确认记录.md` |
+| G2-B | `01-需求与设计/20-G2-B技术补齐评审记录.md` |
+| 设计文档 | `核心文档/AI+产品落地/01-AI全流程设计/AI+全流程设计-Skill设计文档.md` |
+
+## 步骤 3 硬约束
+
+全量可交互界面 + U1～U6 全过，才可进入步骤 4 客户确认。

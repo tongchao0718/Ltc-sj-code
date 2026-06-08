@@ -47,6 +47,24 @@ export const users = [
   { id: 'u3', account: 'admin', name: '系统管理员', phone: '13700000001', role: '管理员', org: '总部', status: '正常' }
 ]
 
+export const roles = [
+  { id: 'r1', code: 'sales', name: '销售', permissions: '客户/线索/商机读写', userCount: 2, status: '启用' },
+  { id: 'r2', code: 'manager', name: '主管', permissions: '团队数据+审批', userCount: 0, status: '启用' },
+  { id: 'r3', code: 'admin', name: '管理员', permissions: '全量配置', userCount: 1, status: '启用' }
+]
+
+export const orgs = [
+  { id: 'org1', code: 'HQ', name: '总部', parent: '—', leader: '王总', memberCount: 1, status: '正常' },
+  { id: 'org2', code: 'EAST-1', name: '华东一组', parent: '总部', leader: '张明', memberCount: 2, status: '正常' }
+]
+
+export const auditLogs = [
+  { id: 'a1', time: '2026-06-08 10:12', user: 'admin', action: '登录', module: '认证', ip: '192.168.1.10', result: '成功' },
+  { id: 'a2', time: '2026-06-08 10:15', user: 'zhangming', action: '新建客户', module: '客户', ip: '192.168.1.21', result: '成功' },
+  { id: 'a3', time: '2026-06-08 09:40', user: 'lifang', action: '导出报表', module: '报表', ip: '192.168.1.22', result: '成功' },
+  { id: 'a4', time: '2026-06-07 18:02', user: 'admin', action: '修改角色', module: '权限', ip: '192.168.1.10', result: '成功' }
+]
+
 export const appTodos = [
   { id: 't1', type: 'follow', title: '跟进「云服务扩容」', sub: '已 3 天未联系', urgent: true },
   { id: 't2', type: 'lead', title: '新分配线索：官网留资', sub: '公海领取', urgent: false },

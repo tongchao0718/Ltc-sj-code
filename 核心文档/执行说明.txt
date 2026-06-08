@@ -4,104 +4,140 @@
 - 代码工程已完整交付（含源码、配置、文档、脚本）。
 - 你需要“先跑起来，再理解，再扩展”，而不是做全量审计。
 
+【本仓库速记（AIEP-DEV）】
+- 项目类型：**前后端混合**（根目录统一调度 + 子目录独立实现）。
+- 根目录：`<repo-root>`（含根 `package.json`，**不要**只在 `AIEP-WEB/` 下安装）。
+- `AIEP-WEB/`：Vue 3 + Vite 6 前端主工程与子应用源码。
+- `AIEP-SERVER/`：Express 后端（独立 `package-lock.json`）。
+- 包管理器：**npm**（根与 `AIEP-SERVER/` 各有 `package-lock.json`，勿混用 pnpm/yarn）。
+- 默认端口：主前端 **5173** · sample-app 独立 dev **5174** · 后端 **3001**。
+- 子应用示例：`sample-app`、`ai-smart-crm-admin`、`marketing-demo`（各有 `dev:*` / `build:*`）。
+
 【交接目标】
-1. 能在本机完成依赖安装、启动、构建（至少完成一次成功构建）。
+1. 能在本机完成依赖安装、启动、构建（主应用 + 至少一个子应用 + 可选后端）。
 2. 能说明项目整体结构、核心模块和关键流程。
 3. 能指出当前阻塞项、已知风险和后续建议。
+
+【文档冲突处理（强制）】
+- 执行命令与路径：**根 `README.md` > 本文件 > `安装指南.md` / 打包指南**。
+- 若指南与 `package.json` scripts 不一致，以 **`package.json` 为准**，并在报告中标注「文档待同步」。
 
 【执行顺序（必须按顺序）】
 
 ### 第1阶段：快速确认（5~10分钟）
-- 输出你看到的根目录文件与目录列表（可分组展示）。
-- 识别项目类型（前端/后端/混合/桌面应用）和主要构建工具。
-- 重点定位以下文件（若存在）：
-  - `package.json` / `package-lock.json`
-  - `pnpm-lock.yaml` / `yarn.lock`
-  - `requirements.txt` / `pyproject.toml`
-  - `pom.xml` / `build.gradle`
-  - `Dockerfile` / `docker-compose.yml`
-  - `README.md` / `.env.example`
+- 输出根目录 `<repo-root>` 文件与目录列表（可分组展示）。
+- 确认项目类型为前后端混合，构建工具为 **Vite 6 + npm**。
+- 重点定位（本仓库必查）：
+  - 根 `README.md`、`package.json`、`package-lock.json`
+  - `AIEP-WEB/`、`AIEP-SERVER/`、`核心文档/`
+  - `AIEP-WEB/src/config/subApps.js`（子应用注册表）
+- 其他类型项目才需查：Docker / Python / Java 等（本仓库非必需）。
 
 ### 第2阶段：环境与依赖安装
-- 优先阅读并遵循：`核心文档/框架核心文档/安装指南.md`。
-- 检查并记录本机关键环境版本（如 Node、npm、Python、Java、Git 等）。
-- 按项目实际包管理器安装依赖（npm/pnpm/yarn/pip/maven/gradle）。
-- 若安装失败，记录：
-  - 失败命令
-  - 关键报错
-  - 可能原因
-  - 建议修复步骤
+- 先读：根 `README.md` → `核心文档/框架核心文档/安装指南.md`。
+- 检查并记录：Node **>= 18**、npm **>= 8**、Git。
+- 推荐安装（前后端一并）：
+  ```powershell
+  cd <repo-root>
+  npm run install:all
+  ```
+  或仅前端：`npm install`；仅后端：`npm run server:install`。
+- 备选：`npm run install-deps`（自动检测缺失依赖，见安装指南 §6.1）。
+- 若安装失败，记录：失败命令、关键报错、可能原因、建议修复步骤。
 
-### 第3阶段：启动与一键编译验证（核心）
-- 优先阅读并遵循：
+### 第3阶段：启动与编译验证（核心）
+- 先读：
   - `核心文档/框架核心文档/主应用打包指南.md`
   - `核心文档/框架核心文档/子应用打包指南.md`
   - `核心文档/框架核心文档/一键更新指南.md`
-- 执行启动命令和一键编译/打包命令。
+- **必跑验证**（按序，每条记录成功/失败）：
+  1. `npm run dev` — 主前端可访问（5173）
+  2. `npm run build` — 主应用构建成功
+  3. `npm run build:sample-app` — 至少一个子应用构建成功
+  4. `npm test` — 单元测试通过
+- **建议验证**（接手子应用/产品文档时）：
+  - `npm run server:dev` — 后端启动（3001）
+  - `npm run build:ai-smart-crm-admin` 或 `npm run build:marketing-demo`
+- **可选治理脚本**（判断文档/门禁是否齐）：
+  - `npm run infer:process-step -- --app <app-code>`
+  - `npm run validate:sdd -- --app <app-code> --gate G3`
+  - `npm run coverage:acceptance -- --app <app-code>`
 - 必须给出验证结论：
-  - 成功：给出成功命令、产物位置、关键日志摘要。
-  - 失败：给出失败节点、阻塞级别（高/中/低）、临时绕过方案。
+  - 成功：命令、产物位置（如 `AIEP-WEB/dist/`）、关键日志摘要。
+  - 失败：失败节点、阻塞级别（高/中/低）、临时绕过方案。
 
 ### 第4阶段：最小必要理解（面向接手开发）
 - 阅读“必读文档”并做摘要（见下方“文档优先级”）。
 - 扫描主要源码目录，输出：
-  - 入口文件
-  - 核心模块及职责
-  - 关键配置项
-  - 主要依赖关系（模块间调用）
-- 梳理 2~3 条核心流程（例如：启动、路由加载、子应用集成、打包输出）。
+  - 入口：根 scripts → `AIEP-WEB/vite.config.js`、各子应用 `build/vite.*.config.js`
+  - 核心模块：`AIEP-WEB/src/apps/`、`AIEP-SERVER/src/`、`subApps.js`
+  - 关键配置：路由、子应用注册、gate-config（在子应用文档 `04-AI治理与审计/`）
+  - 文档根：`AIEP-WEB/src/docs/子应用文档/{app-code}/`
+- 梳理 2~3 条核心流程：主应用启动、子应用嵌入/独立打包、SDD 门禁校验。
 
 ### 第5阶段：风险与后续建议
-- 输出当前可维护性判断：可直接接手 / 需补齐条件后接手。
-- 至少给出 5 条可执行建议，按优先级标注（高/中/低）。
-- 明确“下一步最小行动清单”（建议 3~7 条）。
+- 输出可维护性判断：可直接接手 / 需补齐条件后接手 / 暂不可接手。
+- 至少 5 条可执行建议（高/中/低）。
+- 明确“下一步最小行动清单”（3~7 条）。
 
 【文档优先级（先读高优先级）】
 - 高优先级（必须）：
+  0. `README.md`（仓库根 · 命令与目录 SOT）
   1. `核心文档/框架核心文档/安装指南.md`
-  2. `核心文档/框架核心文档/系统设计规范.md`
-  3. `核心文档/框架核心文档/创建指南.md`
-  4. `核心文档/框架核心文档/主应用打包指南.md`
-  5. `核心文档/框架核心文档/子应用打包指南.md`
-  6. `核心文档/框架核心文档/一键更新指南.md`
+  2. `核心文档/AI+产品落地/README.md`（AI+ 六步与 Skill 入口）
+  3. `.cursor/skills/ai-full-process-design/SKILL.md`（Agent 全流程编排）
+  4. `核心文档/框架核心文档/主应用子应用接入规范.md`（注册表与嵌入路由）
+  5. `核心文档/框架核心文档/系统设计规范.md`
+  6. `核心文档/框架核心文档/创建指南.md`
+  7. `核心文档/框架核心文档/主应用打包指南.md`
+  8. `核心文档/框架核心文档/子应用打包指南.md`
+  9. `核心文档/框架核心文档/一键更新指南.md`
+  10. `核心文档/框架核心文档/过程规范文档.md`（治理分工与交活检查）
 - 中优先级（建议）：
   1. `核心文档/框架核心文档/框架基线.md`
   2. `核心文档/框架核心文档/更新分发方案.md`
   3. `核心文档/框架核心文档/文档对齐清单.md`
   4. `核心文档/框架核心文档/文档清单.md`
   5. `AIEP-WEB/src/skills/stitch-readme.md`
+  6. `AIEP-WEB/src/docs/系统文档/目录结构说明.md`
 
 【输出模板（交接版）】
 # 项目交接执行报告
 
 ## 1. 执行概览
-- 项目名称：
+- 项目名称：AIEP-DEV
 - 执行时间：
 - 执行人：
 - 结论：可直接接手 / 条件性可接手 / 暂不可接手
 
 ## 2. 环境与依赖结果
-- 环境版本检查结果：
-- 依赖安装结果：
+- Node / npm / Git 版本：
+- 安装命令与结果（install:all 或等价）：
 - 关键问题：
 
 ## 3. 启动与编译结果
-- 启动命令与结果：
-- 一键编译/打包命令与结果：
+- 主前端 dev（5173）：
+- 主应用 build：
+- 子应用 build（注明 app）：
+- npm test：
+- 后端 server:dev（可选，3001）：
+- 治理脚本（可选）：infer / validate:sdd / coverage
 - 产物位置与验证结果：
 
 ## 4. 项目结构与核心模块
-- 根目录结构摘要：
+- 根目录结构摘要（AIEP-WEB / AIEP-SERVER / 核心文档）：
 - 入口与关键配置：
+- 子应用列表（subApps.js）：
 - 核心模块职责：
 
 ## 5. 核心流程理解
-- 流程一：
-- 流程二：
-- 流程三（可选）：
+- 流程一：主应用启动与路由
+- 流程二：子应用嵌入 / 独立打包
+- 流程三（可选）：SDD 门禁与文档路径
 
 ## 6. 风险清单
 - [高/中/低] 风险描述 -> 影响 -> 建议处理
+- 文档与代码不一致项（标注「待确认」）：
 
 ## 7. 下一步最小行动清单
 - [ ] 行动1
@@ -110,33 +146,41 @@
 
 【执行约束】
 - 不要求“完整阅读所有代码和所有 Markdown”，以“可编译、可运行、可接手”为达标标准。
-- 如果文档与代码不一致，必须标记为“待确认”，并给出你采用的执行依据。
-- 二进制文件（图片、构建产物）可忽略，但需在报告中说明已忽略。
+- 文档与代码不一致：标记「待确认」，并写明实际采用的依据（README / package.json）。
+- 二进制与 `dist/` 构建产物可忽略，但需在报告中说明已忽略。
 - 单文件超过 2000 行可做结构化摘要，不强制逐行解读。
 - 报告使用中文，术语可保留英文。
 
 【一句话主执行（优先使用）】
-- 进入项目根目录后，按锁文件选择唯一包管理器执行“安装 -> 启动 -> 构建”（`install && run dev && run build`）；若失败，立即记录报错并按安装/打包指南排障。
+- 在 `<repo-root>` 依次执行：**安装 → 主应用 dev/build → 子应用 build → test**；失败即记录报错并按 README / 安装指南排障。
+- Windows PowerShell 请**分行执行**（旧版不支持 `&&`）；Git Bash / macOS / Linux 可用 `&&` 链接。
 
-【备用展开命令（仅在需要时使用）】
-### A. 包管理器识别与替换规则
-- 若存在 `pnpm-lock.yaml`，优先使用 `pnpm install`、`pnpm run dev`、`pnpm run build`。
-- 若存在 `yarn.lock`，优先使用 `yarn install`、`yarn dev`、`yarn build`。
-- 若仅有 `package-lock.json` 或无其他锁文件，使用 `npm install`、`npm run dev`、`npm run build`。
-- 若同时存在多个锁文件，标记为“待确认”，不混用包管理器。
-
-### B. 最小命令模板（跨平台通用）
-```bash
-cd <project-root>
-<pm> install && <pm> run dev && <pm> run build
+【本仓库最小命令（推荐）】
+### A. Windows PowerShell
+```powershell
+cd <repo-root>
+npm run install:all
+npm run dev
+npm run build
+npm run build:sample-app
+npm test
 ```
-> 说明：`<pm>` 替换为 `npm` / `pnpm` / `yarn`。
 
-### C. 失败时最小记录模板（必须输出）
+### B. Git Bash / macOS / Linux
+```bash
+cd <repo-root>
+npm run install:all && npm run build && npm run build:sample-app && npm test
+```
+
+### C. 包管理器识别（其他 fork 仓库时）
+- 本仓库：仅 **npm** + 根 `package-lock.json`。
+- 若 fork 存在 `pnpm-lock.yaml` / `yarn.lock`：按锁文件选唯一包管理器，不混用。
+
+### D. 失败时最小记录模板（必须输出）
 - 失败命令：
 - 报错摘要（前 20~50 行关键日志）：
-- 可能原因（1~3条）：
-- 临时绕过方案（1~3条）：
-- 是否阻塞交接：是/否（高/中/低）：
+- 可能原因（1~3 条）：
+- 临时绕过方案（1~3 条）：
+- 是否阻塞交接：是/否（高/中/低）
 
 现在开始执行：先输出根目录列表，再进入第1阶段。

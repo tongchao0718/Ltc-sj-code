@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Mock数据
 const mockData = {
-  '/api/user/info': {
+  '/user/info': {
     get: {
       success: true,
       data: {
@@ -13,7 +13,7 @@ const mockData = {
       }
     }
   },
-  '/api/dashboard/data': {
+  '/dashboard/data': {
     get: {
       success: true,
       data: {

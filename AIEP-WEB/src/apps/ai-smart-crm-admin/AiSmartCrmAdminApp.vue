@@ -84,7 +84,10 @@ const menuGroups = [
     children: [
       { to: '/settings/stages', label: '销售阶段' },
       { to: '/settings/pool', label: '公海规则' },
-      { to: '/system/users', label: '用户管理' }
+      { to: '/system/users', label: '用户管理' },
+      { to: '/system/roles', label: '角色权限' },
+      { to: '/system/orgs', label: '组织管理' },
+      { to: '/system/audit', label: '审计日志' }
     ]
   },
   {

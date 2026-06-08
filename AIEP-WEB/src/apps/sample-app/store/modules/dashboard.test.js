@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { setActivePinia, createPinia } from 'pinia'
 import { useDashboardStore } from './dashboard'
 import apiService from '../../api/apiService'
 
@@ -14,9 +15,8 @@ describe('useDashboardStore', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    setActivePinia(createPinia())
     store = useDashboardStore()
-    // Reset store state
-    store.$reset()
   })
 
   describe('state', () => {

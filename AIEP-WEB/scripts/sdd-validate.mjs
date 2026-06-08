@@ -80,6 +80,50 @@ function validateAcceptanceMapping(sdd, failed, warnings) {
   }
 }
 
+function validateMappingTableExists(mappingPath, failed) {
+  if (!fs.existsSync(mappingPath)) {
+    failed.push(`映射表不存在: ${mappingPath}`)
+    return false
+  }
+  const text = fs.readFileSync(mappingPath, 'utf8')
+  if (text.trim().length < 100) {
+    failed.push('映射表内容过短，可能未填写')
+    return false
+  }
+  return true
+}
+
+function validateG2ARecord(g2aPath, failed) {
+  if (!fs.existsSync(g2aPath)) {
+    failed.push(`G2-A 确认记录不存在: ${g2aPath}`)
+    return
+  }
+  const text = fs.readFileSync(g2aPath, 'utf8')
+  if (!/\*\*通过\*\*|结论[\s\S]{0,30}通过/.test(text)) {
+    failed.push('19-G2-A 未找到 PO/客户「通过」结论')
+  }
+  if (/待确认|blocked|Agent 自行/i.test(text) && !/PO[\s\S]{0,200}\*\*通过\*\*/.test(text)) {
+    failed.push('19-G2-A 仍为待确认状态，须人工签字')
+  }
+}
+
+function validatePrdFrozen(prdPath, failed) {
+  if (!fs.existsSync(prdPath)) {
+    failed.push(`PRD 文档不存在: ${prdPath}`)
+    return
+  }
+  const text = fs.readFileSync(prdPath, 'utf8')
+  if (!/冻结/.test(text)) {
+    failed.push('03-PRD 未标注冻结状态（Gate-3 要求 PRD 冻结）')
+  }
+}
+
+function validateG2BRecord(g2bPath, warnings) {
+  if (!fs.existsSync(g2bPath)) {
+    warnings.push(`G2-B 评审记录不存在（建议补齐）: ${g2bPath}`)
+  }
+}
+
 function validateMappingTable(mappingPath, sdd, failed, warnings) {
   if (!fs.existsSync(mappingPath)) {
     failed.push(`映射表不存在: ${mappingPath}`)
@@ -169,8 +213,35 @@ function main() {
   }
 
   if (gate === 'G3') {
-    warnings.push('G3 自动校验当前仅检查 SDD 存在与 G2 字段；提交 sdd_id、用例覆盖需 CI/人工补充')
+    const g3 = config.g3_rules || {}
     if (sdd) validateRequiredFields(sdd, ['sdd_id', 'acceptance'], failed, warnings)
+
+    if (g3.require_g2a_record !== false && config.paths?.g2a_record) {
+      validateG2ARecord(resolveDocPath(config.paths.g2a_record), failed)
+    } else if (g3.require_g2a_record !== false) {
+      failed.push('gate-config 缺少 paths.g2a_record（G3 必填）')
+    }
+
+    if (g3.require_prd_frozen !== false && config.paths?.prd_doc) {
+      validatePrdFrozen(resolveDocPath(config.paths.prd_doc), failed)
+    } else if (g3.require_prd_frozen !== false) {
+      warnings.push('gate-config 未配置 paths.prd_doc，跳过 PRD 冻结检查')
+    }
+
+    if (g3.require_mapping_table !== false && config.paths?.mapping_table) {
+      validateMappingTableExists(resolveDocPath(config.paths.mapping_table), failed)
+    }
+
+    if (config.paths?.g2b_record) {
+      validateG2BRecord(resolveDocPath(config.paths.g2b_record), warnings)
+    }
+
+    if (g3.require_traceability_matrix) {
+      warnings.push('追溯矩阵完整性需结合 coverage:acceptance 与人工审查')
+    }
+    if (g3.require_gwt_executable) {
+      warnings.push('GWT 可执行性需结合 coverage:acceptance 脚本')
+    }
   }
 
   const status = failed.length ? 'failed' : warnings.length ? 'passed' : 'passed'

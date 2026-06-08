@@ -18,6 +18,9 @@ const routes = [
   { path: '/settings/stages', component: () => import('./views/settings/StageConfigPage.vue') },
   { path: '/settings/pool', component: () => import('./views/settings/PoolConfigPage.vue') },
   { path: '/system/users', component: () => import('./views/system/UserListPage.vue') },
+  { path: '/system/roles', component: () => import('./views/system/RoleListPage.vue') },
+  { path: '/system/orgs', component: () => import('./views/system/OrgListPage.vue') },
+  { path: '/system/audit', component: () => import('./views/system/AuditLogPage.vue') },
   { path: '/mobile/preview', component: () => import('./views/mobile/AppMobilePreviewPage.vue') }
 ]
 

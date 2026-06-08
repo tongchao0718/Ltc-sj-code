@@ -4,6 +4,9 @@ import {
   leads as initLeads,
   opportunities as initOpportunities,
   users as initUsers,
+  roles as initRoles,
+  orgs as initOrgs,
+  auditLogs as initAuditLogs,
   stages as initStages,
   dashboardStats as initStats,
   funnelStages as initFunnel
@@ -22,6 +25,9 @@ export const crmStore = reactive({
   leads: cloneList(initLeads),
   opportunities: cloneList(initOpportunities),
   users: cloneList(initUsers),
+  roles: cloneList(initRoles),
+  orgs: cloneList(initOrgs),
+  auditLogs: cloneList(initAuditLogs),
   stages: cloneList(initStages),
   poolConfig: { reclaimDays: 7, dailyLimit: 5, protectDays: 3 },
   stats: cloneList(initStats),
@@ -156,6 +162,47 @@ export function updateUser(id, patch) {
 
 export function resetUserPassword(id) {
   return crmStore.users.find((u) => u.id === id)
+}
+
+// —— 角色 ——
+export function addRole(payload) {
+  const row = {
+    id: genId('r'),
+    code: payload.code,
+    name: payload.name,
+    permissions: payload.permissions || '',
+    userCount: 0,
+    status: '启用'
+  }
+  crmStore.roles.unshift(row)
+  return row
+}
+
+export function updateRole(id, patch) {
+  const row = crmStore.roles.find((r) => r.id === id)
+  if (row) Object.assign(row, patch)
+  return row
+}
+
+// —— 组织 ——
+export function addOrg(payload) {
+  const row = {
+    id: genId('org'),
+    code: payload.code,
+    name: payload.name,
+    parent: payload.parent || '总部',
+    leader: payload.leader || '',
+    memberCount: 0,
+    status: '正常'
+  }
+  crmStore.orgs.unshift(row)
+  return row
+}
+
+export function updateOrg(id, patch) {
+  const row = crmStore.orgs.find((o) => o.id === id)
+  if (row) Object.assign(row, patch)
+  return row
 }
 
 // —— 阶段 ——

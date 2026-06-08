@@ -1,0 +1,10 @@
+{
+  "gate": "G3",
+  "status": "passed",
+  "failed_items": [],
+  "warnings": [
+    "追溯矩阵完整性需结合 coverage:acceptance 与人工审查",
+    "GWT 可执行性需结合 coverage:acceptance 脚本"
+  ],
+  "checked_at": "2026-06-08T02:16:33.027Z"
+}

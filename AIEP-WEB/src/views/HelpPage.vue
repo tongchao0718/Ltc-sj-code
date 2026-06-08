@@ -93,7 +93,7 @@
 <script setup>
 import { subApps } from '../config/subApps.js'
 
-const systemVersion = 'V1.2.1'
+const systemVersion = 'V2.1.0'
 </script>
 
 <style scoped>

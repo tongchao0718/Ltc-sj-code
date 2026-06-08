@@ -6,7 +6,11 @@
   "paths": {
     "sdd_json": "docs/子应用文档/<app-code>/01-需求与设计/SDD-v1.0.json",
     "mapping_table": "docs/子应用文档/<app-code>/01-需求与设计/页面-路由-接口-数据表映射表.md",
-    "acceptance_cases": "docs/子应用文档/<app-code>/02-研发与测试/验收脚本-GWT.md"
+    "acceptance_cases": "docs/子应用文档/<app-code>/02-研发与测试/验收脚本-GWT.md",
+    "g2a_record": "docs/子应用文档/<app-code>/01-需求与设计/19-G2-A界面确认记录.md",
+    "g2b_record": "docs/子应用文档/<app-code>/01-需求与设计/20-G2-B技术补齐评审记录.md",
+    "prd_doc": "docs/子应用文档/<app-code>/01-需求与设计/03-PRD设计评审文档.md",
+    "requirements_doc": "docs/子应用文档/<app-code>/01-需求与设计/01-需求说明书.md"
   },
   "g2_rules": {
     "require_customer_confirmation": true,
@@ -25,6 +29,9 @@
     "reject_placeholders": true
   },
   "g3_rules": {
+    "require_g2a_record": true,
+    "require_prd_frozen": true,
+    "require_mapping_table": true,
     "require_sdd_id_in_commit": true,
     "require_traceability_matrix": true,
     "require_gwt_executable": true,

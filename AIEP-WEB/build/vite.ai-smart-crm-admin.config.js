@@ -1,39 +1,13 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve, dirname } from 'path'
-import fs from 'fs'
 import { fileURLToPath } from 'url'
+import { createSubAppCopyHtmlPlugin } from './sub-app-copy-html-plugin.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const copyHtmlPlugin = () => ({
-  name: 'copy-html-crm-admin',
-  closeBundle() {
-    const distPath = resolve(__dirname, '../dist/ai-smart-crm-admin')
-    const buildPath = resolve(distPath, 'build')
-    const writePair = (html) => {
-      html = html.replace(/\.\.\/assets\//g, './assets/')
-      fs.writeFileSync(resolve(distPath, 'ai-smart-crm-admin.html'), html)
-      fs.writeFileSync(resolve(distPath, 'index.html'), html)
-    }
-
-    if (fs.existsSync(buildPath)) {
-      const srcHtml = resolve(buildPath, 'ai-smart-crm-admin.html')
-      if (fs.existsSync(srcHtml)) {
-        writePair(fs.readFileSync(srcHtml, 'utf8'))
-        fs.rmSync(buildPath, { recursive: true, force: true })
-      }
-    } else {
-      const direct = resolve(distPath, 'ai-smart-crm-admin.html')
-      if (fs.existsSync(direct)) {
-        writePair(fs.readFileSync(direct, 'utf8'))
-      }
-    }
-  }
-})
-
 export default defineConfig({
-  plugins: [vue(), copyHtmlPlugin()],
+  plugins: [vue(), createSubAppCopyHtmlPlugin('ai-smart-crm-admin')],
   base: './',
   root: resolve(__dirname, '..'),
   build: {

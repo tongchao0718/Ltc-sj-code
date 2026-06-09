@@ -1,17 +1,19 @@
 ---
-description: AI+ 子应用全流程总编排入口（六步、Gate、platform_type）；推进子应用时优先加载 ai-full-process-design Skill
-globs: AIEP-WEB/src/docs/子应用文档/**,AIEP-WEB/src/apps/**,AIEP-WEB/src/skills/**
+description: AI+ 子应用全流程总编排（六步、Gate、platform_type）；与 agent-skills-auto-exec 联动自动加载
+globs: AIEP-WEB/src/docs/子应用文档/**,AIEP-WEB/src/apps/**,AIEP-WEB/src/skills/**,.cursor/skills/**,核心文档/AI+产品落地/**
 alwaysApply: false
 ---
 
 # AI+ 全流程设计（项目规则）
 
-推进 **AIEP-DEV 子应用**（新建、补文档、写界面、门禁、发布）时：
+> **自动执行**：见 `.cursor/rules/agent-skills-auto-exec.mdc`（`alwaysApply: true`）。勿要求用户手动 sync 或 `/skill-name`。
 
-1. **先 Read** `.cursor/skills/ai-full-process-design/SKILL.md`（或全局 `~/.cursor/skills/ai-full-process-design/SKILL.md`）
+推进 **AIEP-DEV 子应用**（新建、补文档、写界面、门禁、发布）时 Agent **必须**：
+
+1. **先 Read** `.cursor/skills/ai-full-process-design/SKILL.md`
 2. **必跑**（仓库根目录）：`npm run infer:process-step -- --app {app-code} --json`
-3. 输出 **阶段门禁状态块** 后再执行具体编码/写文档
-4. 按推断步骤加载 `AIEP-WEB/src/skills/` 下对应阶段 Skill
+3. **自动 Read** 当前步骤阶段 Skill + platform_type 形态 Skill（见 auto-exec 规则表）
+4. 输出 **阶段门禁状态块** 后再执行具体编码/写文档
 5. 步骤 4：**禁止** Agent 自行 G2-A 签字或 PRD 冻结
 
 ## 关键路径
@@ -26,4 +28,16 @@ alwaysApply: false
 
 ## 步骤 3 硬约束
 
-全量可交互界面 + U1～U6 全过，才可进入步骤 4 客户确认。
+全量可交互界面 + U1～U6 + R1～R5 全过 + `design-review-pre-g2a` pass，才可进入步骤 4 客户确认。
+
+## 子应用打包（自动加载）
+
+用户 **导出 / 导入 / 交接** 子应用、**export:sub-app** / **import:sub-app** 时：Read `AIEP-WEB/src/skills/export-import-sub-app/SKILL.md`。说法与 export/pack/update 区分见《子应用打包指南》§9.0。
+
+用户 **打包 / build:{app} / pack:sub-app** 时：Read `AIEP-WEB/src/skills/pack-sub-app/SKILL.md`，优先 `npm run pack:sub-app -- --app {app-code}`。
+
+## 工作流 Skill（步骤 3～4，自动加载）
+
+- `sub-app-resources` → `_resources/`
+- `design-review-pre-g2a` → `G2-A预审报告.md`
+- `project-memory` → `00-项目记忆.md`

@@ -39,8 +39,7 @@ npm run infer:process-step -- --app {app-code} [--json]
 ## Web 附加（步骤 3）
 
 ```bash
-npm run validate:sub-app-registry -- --app {app-code}
-npm run build:{app-code}   # 须先在 package.json 注册
+npm run pack:sub-app -- --app {app-code}   # 含注册表 + build + P1～P8（见 pack-sub-app Skill）
 ```
 
 ## 步骤 5

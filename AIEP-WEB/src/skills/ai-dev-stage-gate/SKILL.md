@@ -12,11 +12,11 @@ description: >-
 ## 阶段顺序（六步）
 
 1. 需求生成 → `requirements-clarification`
-2. 需求确认 → SDD（07/11）+ `20-G2-B` + `17-需求确认单`（**非** prd-design-generation 代 SDD）
+2. 需求确认 → **`sdd-generation`** + SDD（07/11 或 15-Lite）+ `20-G2-B` + `17-需求确认单`（**非** prd-design-generation 代 SDD）
 3. 界面生成 → `ui-generation` **step3** + 全量原型
 4. 界面确认 → `ui-generation` **step4** + `19-G2-A` 人工确认
 5. 开发测试 → `code-development` + `test-validation`（入口复检 Gate-2/3）
-6. 发布上线 → Gate-4
+6. 发布上线 → **`release-deployment`** + Gate-4
 
 ## Gate 映射
 

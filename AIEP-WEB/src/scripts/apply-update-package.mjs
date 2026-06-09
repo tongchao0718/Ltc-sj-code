@@ -667,6 +667,11 @@ function printPostUpdateOnboarding(repoRoot) {
   console.log('  npm run validate:sub-app-registry')
   console.log('  npm run validate:sdd -- --app <appCode> --gate G2')
 
+  console.log('\n【Agent Skills（自动，无需人工）】')
+  console.log('  · postinstall 已同步 Cursor 全局 + Trae .trae/skills/')
+  console.log('  · .cursor/rules/agent-skills-auto-exec.mdc 自动加载总编排与阶段 Skill')
+  console.log('  · 直接描述任务即可，例如「推进 sample-app 步骤 3」')
+
   console.log('\n【一句话】写代码看框架核心文档 + subApps.js；写需求看 AI+产品落地/02-模板；交活前跑校验。')
   console.log(`\n完整说明: ${full('框架核心文档', '更新分发方案.md')} §12`)
 }
@@ -817,7 +822,9 @@ async function main() {
     '核心文档/框架核心文档',
     '核心文档/AI+产品落地',
     '核心文档/执行说明.txt',
-    'AIEP-SERVER'
+    'AIEP-SERVER',
+    '.cursor',
+    'scripts'
   ]
   const backupTargets = backupRelPaths.map((rel) => path.join(repoRoot, rel))
 
@@ -920,6 +927,25 @@ async function main() {
       fs.mkdirSync(serverRoot, { recursive: true })
       mergeServerTree(serverFrom, serverRoot, frameworkMeta)
       console.log('  ✓ 合并 AIEP-SERVER（保留用户自建后端子应用）')
+    }
+
+    const cursorMerge = [
+      ['.cursor/skills', '.cursor/skills'],
+      ['.cursor/rules', '.cursor/rules']
+    ]
+    for (const [relFrom, relTo] of cursorMerge) {
+      const s = path.join(FILES_DIR, relFrom)
+      const d = path.join(repoRoot, relTo)
+      if (fs.existsSync(s)) {
+        mergeDirectory(s, d)
+        console.log(`  ✓ 合并 ${relTo}（Agent Skills / Rules）`)
+      }
+    }
+
+    const scriptsFrom = path.join(FILES_DIR, 'scripts')
+    if (fs.existsSync(scriptsFrom)) {
+      mergeDirectory(scriptsFrom, path.join(repoRoot, 'scripts'))
+      console.log('  ✓ 合并 scripts/（含 sync-skills postinstall 自动同步）')
     }
 
     console.log('\n清理废弃文档（1.0 遗留，必须删除）...')

@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "platform_type": "<web-admin|web-marketing|web-mobile-h5>",
+  "source": "核心文档/框架核心文档/<系统设计规范.md|营销设计规范.md|系统设计规范-ant.md>",
+  "colors": {
+    "primary": "#165DFF",
+    "success": "#00B42A",
+    "warning": "#FF7D00",
+    "danger": "#F53F3F",
+    "text_primary": "#1D2129",
+    "text_secondary": "#4E5969",
+    "border": "#E5E6EB",
+    "background": "#F2F3F5"
+  },
+  "spacing": {
+    "page": "24px",
+    "section": "16px",
+    "form_item": "16px"
+  },
+  "typography": {
+    "font_family": "system-ui, -apple-system, sans-serif",
+    "title_lg": "20px",
+    "title_md": "16px",
+    "body": "14px",
+    "caption": "12px",
+    "line_height_body": 1.5
+  },
+  "radius": {
+    "button": "4px",
+    "card": "4px",
+    "modal": "4px"
+  }
+}

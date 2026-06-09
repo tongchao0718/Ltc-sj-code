@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "platform_type": "web-marketing",
+  "shared_from": "marketing-demo/components",
+  "entries": [
+    { "name": "MdQueryLayout", "use_for": ["标准查询页壳层"], "import": "./components/MdQueryLayout.vue" },
+    { "name": "MdCrudLayout", "use_for": ["列表+操作页"], "import": "./components/MdCrudLayout.vue" },
+    { "name": "MdFilterForm", "use_for": ["列表查询区"], "import": "./components/MdFilterForm.vue" },
+    { "name": "MdModal", "use_for": ["弹窗表单/详情"], "import": "./components/MdModal.vue" },
+    { "name": "MdDetailModal", "use_for": ["详情弹窗"], "import": "./components/MdDetailModal.vue" },
+    { "name": "MdDetailView", "use_for": ["详情只读展示"], "import": "./components/MdDetailView.vue" },
+    { "name": "MdFormView", "use_for": ["表单编辑"], "import": "./components/MdFormView.vue" },
+    { "name": "MdDescriptions", "use_for": ["描述列表"], "import": "./components/MdDescriptions.vue" },
+    { "name": "MdPagination", "use_for": ["分页"], "import": "./components/MdPagination.vue" },
+    { "name": "MdBreadcrumb", "use_for": ["面包屑"], "import": "./components/MdBreadcrumb.vue" },
+    { "name": "MdSectionTitle", "use_for": ["区块标题"], "import": "./components/MdSectionTitle.vue" },
+    { "name": "MdModalSection", "use_for": ["弹窗内分区"], "import": "./components/MdModalSection.vue" },
+    { "name": "MdConfirmModal", "use_for": ["确认对话框"], "import": "./components/MdConfirmModal.vue" },
+    { "name": "MdMessage", "use_for": ["全局消息"], "import": "./components/MdMessage.vue" },
+    { "name": "MdLineChart", "use_for": ["分析图表"], "import": "./components/MdLineChart.vue" }
+  ]
+}

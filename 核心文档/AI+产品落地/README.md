@@ -18,7 +18,8 @@
 | `01-AI全流程设计/AI+产品全流程执行手册-治理版.md` | 红线与 Gate |
 | `01-AI全流程设计/01-规范与模板索引.md` | 全部规范与模板索引 |
 | `01-AI全流程设计/AI+全流程设计-Skill设计文档.md` | Agent 编排权威细则（V0.4） |
-| `.cursor/skills/ai-full-process-design/` | **Agent 默认入口**（步骤推断、Gate、脚本） |
+| `.cursor/rules/agent-skills-auto-exec.mdc` | **Agent 自动加载**（postinstall 同步 Skill，禁止人工 sync） |
+| `.cursor/skills/ai-full-process-design/` | 六步总编排（由规则自动 Read） |
 | `02-子应用通用模板/` | 项目填报模板（PRD、SDD、门禁、21 脱敏、22 AI 审批） |
 
 ## 本目录其他参考（03-其他过程文档-参考/）

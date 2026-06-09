@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "platform_type": "<web-admin|web-marketing|web-mobile-h5>",
+  "shared_from": "<sample-app|marketing-demo>",
+  "entries": [
+    {
+      "name": "ExampleListLayout",
+      "use_for": ["标准列表页壳层"],
+      "import": "./components/ExampleListLayout.vue",
+      "notes": "步骤 3 替换为实际组件路径"
+    }
+  ]
+}

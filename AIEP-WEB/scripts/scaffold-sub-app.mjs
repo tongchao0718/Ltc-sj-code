@@ -160,9 +160,124 @@ function specMeta(spec) {
   }
 }
 
+function generateResourcesFiles({ folder, spec }) {
+  const isMarketing = spec === 'marketing'
+  const platformType = isMarketing ? 'web-marketing' : 'web-admin'
+  const sourceDoc = isMarketing
+    ? '核心文档/框架核心文档/营销设计规范.md'
+    : '核心文档/框架核心文档/系统设计规范.md'
+  const sharedFrom = isMarketing ? 'marketing-demo' : 'sample-app'
+  const theme = isMarketing
+    ? {
+        version: '1.0.0',
+        platform_type: 'web-marketing',
+        source: sourceDoc,
+        colors: {
+          primary: '#3A96FE',
+          header: '#124F9A',
+          success: '#00B42A',
+          warning: '#FF7D00',
+          danger: '#F53F3F',
+          text_primary: '#1D2129',
+          text_secondary: '#4E5969',
+          border: '#E5E6EB',
+          background: '#F2F3F5'
+        },
+        spacing: { page: '24px', section: '16px', form_item: '16px' },
+        typography: {
+          font_family: 'system-ui, -apple-system, sans-serif',
+          title_lg: '20px',
+          title_md: '16px',
+          body: '14px',
+          caption: '12px',
+          line_height_body: 1.5
+        },
+        radius: { button: '4px', card: '4px', modal: '4px' }
+      }
+    : {
+        version: '1.0.0',
+        platform_type: 'web-admin',
+        source: sourceDoc,
+        colors: {
+          primary: '#165DFF',
+          success: '#00B42A',
+          warning: '#FF7D00',
+          danger: '#F53F3F',
+          text_primary: '#1D2129',
+          text_secondary: '#4E5969',
+          border: '#E5E6EB',
+          background: '#F2F3F5'
+        },
+        spacing: { page: '24px', section: '16px', form_item: '16px' },
+        typography: {
+          font_family: 'system-ui, -apple-system, sans-serif',
+          title_lg: '20px',
+          title_md: '16px',
+          body: '14px',
+          caption: '12px',
+          line_height_body: 1.5
+        },
+        radius: { button: '4px', card: '4px', modal: '4px' }
+      }
+  const manifest = {
+    version: '1.0.0',
+    platform_type: platformType,
+    shared_from: sharedFrom,
+    entries: isMarketing
+      ? [
+          { name: 'MdFilterForm', use_for: ['列表查询区'], import: '参考 marketing-demo/components/MdFilterForm.vue' },
+          { name: 'MdCrudLayout', use_for: ['标准列表页'], import: '参考 marketing-demo/components/MdCrudLayout.vue' },
+          { name: 'MdModal', use_for: ['弹窗表单'], import: '参考 marketing-demo/components/MdModal.vue' }
+        ]
+      : [
+          { name: 'Arco Layout', use_for: ['页面壳层'], import: '@arco-design/web-vue' },
+          { name: 'a-table', use_for: ['数据列表'], import: '@arco-design/web-vue' }
+        ]
+  }
+
+  writeFile(
+    `src/apps/${folder}/_resources/README.md`,
+    `# ${folder} 资源库
+
+> **起步提示**（新子应用）
+> - 对 Agent 说：**推进 ${folder}** 或 **推进 {app-code}**（与 gate-config 中 app-code 一致）
+> - 步骤 3 前由 \`sub-app-resources\` 校验/补全本目录；勿跳过 \`_resources/\`
+> - 一任务一新对话；改界面时附带截图或页面上下文
+> - AIEP 使用 Cursor/TRAE 订阅模型，**无需自选 LLM 型号**
+
+> 规范：\`核心文档/AI+产品落地/01-AI全流程设计/子应用资源库规范.md\`
+> 维护 Skill：\`sub-app-resources\`
+> 新人指引：\`核心文档/框架核心文档/新手入门.md\`
+
+## 权威来源
+
+- **platform_type**：\`${platformType}\`
+- **设计规范**：\`${sourceDoc}\`
+- **参考实现**：\`${sharedFrom}\`
+
+## 更新记录
+
+| 日期 | 版本 | 变更摘要 |
+|------|------|----------|
+| ${new Date().toISOString().slice(0, 10)} | 1.0.0 | 脚手架初始化 |
+`
+  )
+  writeFile(`src/apps/${folder}/_resources/theme.json`, `${JSON.stringify(theme, null, 2)}\n`)
+  writeFile(`src/apps/${folder}/_resources/components-manifest.json`, `${JSON.stringify(manifest, null, 2)}\n`)
+  writeFile(
+    `src/apps/${folder}/_resources/mock-data/README.md`,
+    `# Mock 数据
+
+字段名须与 SDD 数据模型一致。步骤 3 由 \`sub-app-resources\` / \`ui-generation\` 按实体补充 JSON 文件。
+`
+  )
+}
+
 function generateAppFiles({ folder, title, spec, pascal, camel, port }) {
   const embedPrefix = `/${folder}`
   const isMarketing = spec === 'marketing'
+
+  generateResourcesFiles({ folder, spec })
 
   writeFile(
     `src/apps/${folder}/${pascal}App.vue`,
@@ -439,37 +554,13 @@ const demoRef = '${isMarketing ? 'marketing-demo' : 'sample-app'}'
     `import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve, dirname } from 'path'
-import fs from 'fs'
 import { fileURLToPath } from 'url'
+import { createSubAppCopyHtmlPlugin } from './sub-app-copy-html-plugin.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const copyHtmlPlugin = () => ({
-  name: 'copy-html-${folder}',
-  closeBundle() {
-    const distPath = resolve(__dirname, '../dist/${folder}')
-    const buildPath = resolve(distPath, 'build')
-    const writePair = (html) => {
-      html = html.replace(/\\.\\.\\/assets\\//g, './assets/')
-      fs.writeFileSync(resolve(distPath, '${folder}.html'), html)
-      fs.writeFileSync(resolve(distPath, 'index.html'), html)
-    }
-
-    if (fs.existsSync(buildPath)) {
-      const srcHtml = resolve(buildPath, '${folder}.html')
-      if (fs.existsSync(srcHtml)) {
-        writePair(fs.readFileSync(srcHtml, 'utf8'))
-        fs.rmSync(buildPath, { recursive: true, force: true })
-      }
-    } else {
-      const direct = resolve(distPath, '${folder}.html')
-      if (fs.existsSync(direct)) writePair(fs.readFileSync(direct, 'utf8'))
-    }
-  }
-})
-
 export default defineConfig({
-  plugins: [vue(), copyHtmlPlugin()],
+  plugins: [vue(), createSubAppCopyHtmlPlugin('${folder}')],
   base: './',
   root: resolve(__dirname, '..'),
   build: {

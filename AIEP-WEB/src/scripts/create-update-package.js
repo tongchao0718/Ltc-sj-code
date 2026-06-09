@@ -193,6 +193,24 @@ async function createUpdatePackage() {
     console.log('  ✓ AIEP-SERVER（仅含框架子应用后端，保留用户自建服务）')
   }
 
+  const cursorTargets = [
+    { src: path.join(REPO_ROOT, '.cursor', 'skills'), dest: '.cursor/skills' },
+    { src: path.join(REPO_ROOT, '.cursor', 'rules'), dest: '.cursor/rules' }
+  ]
+  for (const { src, dest } of cursorTargets) {
+    if (!fs.existsSync(src)) continue
+    copyDirectory(src, path.join(filesDir, dest))
+    console.log(`  ✓ ${dest}（Agent Skills / Rules）`)
+  }
+
+  const rootScripts = ['sync-skills.mjs', 'sync-cursor-skills.mjs', 'sync-trae-skills.mjs']
+  for (const f of rootScripts) {
+    const s = path.join(REPO_ROOT, 'scripts', f)
+    if (!fs.existsSync(s)) continue
+    copyFile(s, path.join(filesDir, 'scripts', f))
+    console.log(`  ✓ scripts/${f}`)
+  }
+
   fs.writeFileSync(
     path.join(filesDir, 'framework-meta.json'),
     JSON.stringify({ frameworkAppFolders, frameworkDocFolders }, null, 2)
@@ -265,6 +283,9 @@ node update.js --project .. --yes
 - 框架接入：\`主应用子应用接入规范.md\`、\`执行说明.txt\`
 - 产品填报：\`核心文档/AI+产品落地/02-子应用通用模板/\`
 - 校验：\`validate:sub-app-registry\`、\`validate:sdd\`
+- **Agent Skills**（`npm install` / `update.js` 后 **postinstall 自动同步**，规则自动加载，无需人工）：
+  - 规范：`.cursor/rules/agent-skills-auto-exec.mdc`
+  - 直接对话：「推进 {app-code} 步骤 N」即可
 
 ## 回滚
 

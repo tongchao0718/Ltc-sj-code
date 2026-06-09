@@ -61,6 +61,10 @@ npm install
 npm run install:all
 ```
 
+`npm install` 会自动同步 Agent Skills（Cursor 全局 + Trae `.trae/skills/`），无需手工 sync。
+
+**首次上手**：阅读 [`核心文档/框架核心文档/新手入门.md`](核心文档/框架核心文档/新手入门.md)（对 Agent 说「推进 {app-code}」即可启动全流程）。
+
 ### 2) 启动开发环境
 
 启动前端主系统（默认端口 5173）：

@@ -32,12 +32,15 @@ export const marketingDemoRoutes = [
   { path: 'performance/assessment', name: 'MdPerfAssessment', component: () => import('./views/performance/AssessmentPage.vue'), meta: { title: '能力评估' } }
 ]
 
-/** 独立 Hash 路由（无前缀） */
+/** 独立 Hash 路由（无前缀；路径须以 / 开头，否则生产构建 Vue Router 会抛 Invalid path） */
 export function standaloneRoutes() {
   return [
     { path: '/', redirect: '/dashboard' },
     ...marketingDemoRoutes
       .filter((r) => r.path !== '')
-      .map((r) => ({ ...r, path: r.path.startsWith('/') ? r.path.slice(1) : r.path }))
+      .map((r) => ({
+        ...r,
+        path: r.path.startsWith('/') ? r.path : `/${r.path}`
+      }))
   ]
 }

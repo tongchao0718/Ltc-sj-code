@@ -10,7 +10,8 @@
 
 | 范围 | 路径 |
 |------|------|
-| 总编排 `ai-full-process-design` | 项目 `.cursor/skills/` **与** 全局 `~/.cursor/skills/`（内容同步） |
+| 总编排 `ai-full-process-design` | 项目 `.cursor/skills/`；**postinstall 自动**同步至 `~/.cursor/skills/` |
+| 自动加载规范 | `.cursor/rules/agent-skills-auto-exec.mdc`（`alwaysApply: true`，禁止人工 `/skill-name`） |
 | 六步阶段 Skill | `AIEP-WEB/src/skills/` |
 | 域/移动 Skill | 项目 `.cursor/skills/` |
 
@@ -21,26 +22,42 @@
 | **`ai-full-process-design`** | **总入口** | `.cursor/skills/ai-full-process-design/SKILL.md`（项目 + 全局 `~/.cursor/skills/` 同步） | 六步编排、platform_type、Gate、落盘 |
 | `ai-dev-stage-gate` | 主线 | `AIEP-WEB/src/skills/ai-dev-stage-gate/SKILL.md` | 门禁 pass/fail/blocked |
 
-## 二、AI 驱动开发核心阶段（标准六步）
+## 二、AI 驱动开发核心阶段（标准六步 + 立项）
 
 | Skill | 步骤 | 路径 |
 |-------|------|------|
+| **`scaffold-sub-app`** | **0 立项** | `AIEP-WEB/src/skills/scaffold-sub-app/SKILL.md` · [checklist](scaffold-sub-app/references/post-scaffold-checklist.md) · [路径验证 Prompt](scaffold-sub-app/references/project-verify-prompt.md) |
 | `requirements-clarification` | 1～2 | `AIEP-WEB/src/skills/requirements-clarification/SKILL.md` |
-| SDD（07/11 模板，非独立 Skill） | 2 | `核心文档/AI+产品落地/02-子应用通用模板/` |
-| `prd-design-generation` | **3～4**（03-PRD） | `AIEP-WEB/src/skills/prd-design-generation/SKILL.md` |
+| **`sdd-generation`** | **2** | `AIEP-WEB/src/skills/sdd-generation/SKILL.md` · [examples](sdd-generation/examples.md)（模板 07/11/15 见 `02-子应用通用模板/`） |
+| `prd-design-generation` | **3～4**（step3-draft / step4-freeze） | `AIEP-WEB/src/skills/prd-design-generation/SKILL.md` · [examples](prd-design-generation/examples.md) |
 | `ui-generation` | **3～4**（step3/step4 模式） | `AIEP-WEB/src/skills/ui-generation/SKILL.md` |
 | `code-development` | 5 | `AIEP-WEB/src/skills/code-development/SKILL.md` |
+| **`server-api-development`** | **5**（有真实后端时） | `AIEP-WEB/src/skills/server-api-development/SKILL.md` |
 | `test-validation` | 5～6 | `AIEP-WEB/src/skills/test-validation/SKILL.md` |
+| **`release-deployment`** | **6** | `AIEP-WEB/src/skills/release-deployment/SKILL.md` |
+| **`pack-sub-app`** | **横切**（步骤 3 U5、6、按需） | `AIEP-WEB/src/skills/pack-sub-app/SKILL.md` · [examples](pack-sub-app/examples.md) · [checklist](pack-sub-app/references/post-pack-checklist.md) |
+| **`export-import-sub-app`** | **横切**（无 Git 交接、导出/导入） | `AIEP-WEB/src/skills/export-import-sub-app/SKILL.md` · [examples](export-import-sub-app/examples.md) · [checklist](export-import-sub-app/references/handoff-checklist.md) |
 
 ## 三、移动端与域规范（`.cursor/skills/`）
 
 | Skill | platform_type | 路径 |
 |-------|---------------|------|
 | `marketing-design-yxui` | web-marketing | `.cursor/skills/marketing-design-yxui/SKILL.md` |
+| **`arco-admin-design`** | **web-admin** | **`.cursor/skills/arco-admin-design/SKILL.md`** |
 | `ui-ux-pro-max` | web-mobile-h5（推荐） | `.cursor/skills/ui-ux-pro-max/SKILL.md` |
 | `mobile-android-design` | native-android | `.cursor/skills/mobile-android-design/SKILL.md` |
 | `mobile-ios-design` | native-ios | `.cursor/skills/mobile-ios-design/SKILL.md` |
 | `prd-page-annotation` | 可选 | **`.cursor/skills/prd-page-annotation/SKILL.md`** |
+
+## 三-B、工作流 Skill（借鉴 Axhub Make，步骤 3～4）
+
+| Skill | 步骤 | 路径 |
+|-------|------|------|
+| `sub-app-resources` | 3 入口 | `.cursor/skills/sub-app-resources/SKILL.md` |
+| `design-review-pre-g2a` | 3→4 | `.cursor/skills/design-review-pre-g2a/SKILL.md` |
+| `project-memory` | 启动 + 3/4 | `.cursor/skills/project-memory/SKILL.md` |
+
+规范：`核心文档/AI+产品落地/01-AI全流程设计/子应用资源库规范.md`
 
 ## 四、专项技能（Web / Stitch）
 
@@ -53,9 +70,10 @@
 ## 五、推荐调用顺序
 
 1. **`ai-full-process-design`**（推断步骤、platform_type、加载形态 Skill）
-2. **`ai-dev-stage-gate`**（步首/步末）
-3. 当前步阶段 Skill（见上表）
-4. 步末跑 [gates.md](../../.cursor/skills/ai-full-process-design/gates.md) 脚本
+2. **`project-memory`**（启动读取 `00-项目记忆.md`）
+3. **`ai-dev-stage-gate`**（步首/步末）
+4. 当前步阶段 Skill + 工作流 Skill（见上表）
+5. 步末跑 [gates.md](../../.cursor/skills/ai-full-process-design/gates.md) 脚本
 
 ## 六、关键落盘文件（门禁）
 
@@ -66,3 +84,5 @@
 | `gate-config.json` | 4-AI治理与审计 |
 
 设计文档：`核心文档/AI+产品落地/01-AI全流程设计/AI+全流程设计-Skill设计文档.md`
+
+**编写规范**：`SKILL-STANDARD.md`（对齐 [agentskills.io](https://agentskills.io) 开放标准）

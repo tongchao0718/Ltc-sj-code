@@ -686,3 +686,34 @@ description: >-
 | 步骤 4 目标 | 客户在 **375px 视口或真机** 走查确认 |
 
 原生 Android / iOS 试跑基准待立项后按附录 B 同结构补充。
+
+---
+
+## 附录 C：Axhub Make 借鉴（V0.1，2026-06-08）
+
+| 借鉴项 | AIEP 落地 | 不照搬项 |
+|--------|-----------|----------|
+| resources 三层产物 | `AIEP-WEB/src/apps/{app}/_resources/` | 不以 HTML 原型为终点 |
+| 工作流 Skill 颗粒度 | `sub-app-resources`、`design-review-pre-g2a`、`project-memory` | 不引入 30+ 通用 Skills 全量 |
+| 原型即 PRD | `prd-page-annotation` 反向同步 `03-PRD` | 保留 SDD 契约与 Gate |
+| 项目记忆 | `04-AI治理与审计/00-项目记忆.md` | — |
+| G2-A 前预审 | `G2-A预审报告.md` + R1～R5 | 预审不替代人工 G2-A |
+
+权威细则：`子应用资源库规范.md`
+
+---
+
+## 附录 C-2：Axhub 体验层借鉴（V0.1，2026-06-08）
+
+> **边界**：AIEP **不规定 LLM 型号**（使用 Cursor / TRAE 订阅模型）；不借鉴 Axhub「选对模型 / 反 Auto」章节。
+
+| 借鉴项 | AIEP 落地 | 不照搬项 |
+|--------|-----------|----------|
+| 新手分章教程 | `核心文档/框架核心文档/新手入门.md`（5 章，无模型章） | 独立 React 教程站 |
+| 路径验证 Prompt | `scaffold-sub-app/references/project-verify-prompt.md` | — |
+| 空子应用起步提示 | 脚手架 `_resources/README.md` 顶部 tips | Admin placeholder UI |
+| 每步完成 checklist | 各阶段 Skill「本章完成标准」 | — |
+| Agent 工具对比 | `安装指南.md` §10 Cursor vs TRAE | LLM 推荐表 |
+| 练习 Prompt | 后续可扩 `examples.md` | — |
+
+与附录 C（工作流颗粒度）互补；Admin SPA / Axure 导出 / 80+ 主题库 **不纳入** AIEP 路线。

@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+/**
+ * 将项目 .cursor/skills/ 同步到 .trae/skills/（Trae IDE 项目级 Skill 目录）
+ * 用法: npm run sync:trae-skills
+ */
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const REPO_ROOT = path.join(__dirname, '..')
+const SRC = path.join(REPO_ROOT, '.cursor', 'skills')
+const DEST = path.join(REPO_ROOT, '.trae', 'skills')
+const quiet = process.argv.includes('--quiet')
+
+function copyDir(src, dest) {
+  fs.mkdirSync(dest, { recursive: true })
+  for (const ent of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, ent.name)
+    const d = path.join(dest, ent.name)
+    if (ent.isDirectory()) copyDir(s, d)
+    else {
+      fs.copyFileSync(s, d)
+      if (!quiet) console.log(`  ✓ ${ent.name} → ${path.relative(DEST, d)}`)
+    }
+  }
+}
+
+function main() {
+  if (!fs.existsSync(SRC)) {
+    if (!quiet) {
+      console.error(`源目录不存在: ${SRC}`)
+      console.error('请先确保项目含 .cursor/skills/（Git 克隆或离线更新包安装后应有）')
+    }
+    process.exit(quiet ? 0 : 1)
+  }
+  const skills = fs.readdirSync(SRC, { withFileTypes: true }).filter((e) => e.isDirectory())
+  if (!skills.length) {
+    if (!quiet) console.error('无 Skill 目录可同步')
+    process.exit(quiet ? 0 : 1)
+  }
+
+  if (!quiet) {
+    console.log(`同步 ${skills.length} 个 Skill 到 Trae 项目目录：\n  源: ${SRC}\n  目标: ${DEST}\n`)
+  }
+  fs.mkdirSync(DEST, { recursive: true })
+
+  for (const ent of skills) {
+    if (!quiet) console.log(`[${ent.name}]`)
+    copyDir(path.join(SRC, ent.name), path.join(DEST, ent.name))
+    if (!quiet) console.log('')
+  }
+
+  if (!quiet) console.log('完成。Trae 打开本项目根目录后由规则自动加载 Skill。')
+}
+
+main()

@@ -1,0 +1,80 @@
+---
+description: Agent Skills 自动同步与自动加载（禁止要求用户手动 sync 或 /skill-name）
+alwaysApply: true
+---
+
+# Agent Skills 自动执行规范
+
+本仓库 **Skill 同步与调用由规范自动触发**，禁止让用户手工执行 `sync:cursor-skills`、`sync:trae-skills` 或输入 `/ai-full-process-design`。
+
+## 自动同步（无需人工）
+
+| 时机 | 行为 |
+|------|------|
+| `npm install` / `npm run install:all` | `postinstall` → `scripts/sync-skills.mjs --quiet` |
+| `node update.js --yes` 成功后的 `npm install` | 同上 |
+| Git 克隆后首次 `npm install` | 同上 |
+
+同步结果：`.cursor/skills/` → `~/.cursor/skills/` + `.trae/skills/`（Trae 用户）。
+
+## 自动加载（Agent 必做）
+
+当用户消息或当前编辑涉及 **子应用、PRD、SDD、界面、Gate、发布、打包、build、独立包、AI+全流程**，或 **导出子应用 / 导入子应用 / 交接 / 移交 / 无 Git / bundle**，或路径含 `src/apps/`、`子应用文档/`、`dist/`、`src/skills/`、`.cursor/skills/` 时：
+
+1. **立即 Read** `.cursor/skills/ai-full-process-design/SKILL.md`（勿等待用户 `/skill-name`）
+2. **立即执行** `npm run infer:process-step -- --app {app-code} --json`（能从上下文推断 app-code 时）
+3. **按推断步骤自动 Read 阶段 Skill**（下表），并加载 **platform_type 形态 Skill**
+4. 输出 **阶段门禁状态块** 后再编码/写文档
+5. **禁止**要求用户「请先运行 sync」或「请先输入 /ai-full-process-design」
+
+## 步骤 → 阶段 Skill（自动 Read）
+
+| 步骤 | 自动加载 |
+|------|----------|
+| 0（新建子应用） | `AIEP-WEB/src/skills/scaffold-sub-app/SKILL.md` |
+| 1 | `AIEP-WEB/src/skills/requirements-clarification/SKILL.md` |
+| 2 | `AIEP-WEB/src/skills/sdd-generation/SKILL.md` |
+| 3 | `sub-app-resources` → `ui-generation` → `prd-design-generation`（step3）→ 可选 `design-review-pre-g2a` |
+| 4 | `design-review-pre-g2a` → `ui-generation`（step4）→ `prd-design-generation`（step4-freeze） |
+| 5 | `code-development` +（SDD 含真实 API 时）`server-api-development` + `test-validation` |
+| 6 | `release-deployment` + `pack-sub-app` + `ai-dev-stage-gate` |
+
+## 横切：子应用打包（自动 Read）
+
+当用户要求 **打包 / build:{folder} / pack:sub-app / 独立静态包 / dist / 导出静态页 / 给客户看演示** 时：
+
+1. **立即 Read** `AIEP-WEB/src/skills/pack-sub-app/SKILL.md`
+2. **优先执行** `npm run pack:sub-app -- --app {app-code}`（勿仅跑裸 `build:{folder}` 而跳过产物校验）
+3. 若用户同时出现「源码」「交给同事继续开发」→ **改走**下方「导出 / 集成」Skill，勿用 pack
+4. 输出 **子应用打包摘要**（见 Skill 输出模板）
+
+步骤 3 验证 U5、步骤 6 发布构建均走同一 Skill。
+
+## 横切：子应用导出 / 集成（自动 Read）
+
+当用户要求 **导出子应用 / 导入子应用 / 导出 / 导入 / 交接 / 移交** 子应用、**export:sub-app** / **import:sub-app**、**无 Git** / **U 盘** / **bundle** / **integrate.mjs** 时，或自然语言如 **「导出子应用 {app-code}」**、**「导入子应用 {app-code}」**、**「把 xxx 子应用交给同事（源码）」** 时：
+
+1. **立即 Read** `AIEP-WEB/src/skills/export-import-sub-app/SKILL.md`
+2. **歧义消解**：仅「导出」且语境像演示/部署 → 先问清或走 `pack-sub-app`；明确「源码 / 继续开发 / 集成到另一仓库」→ 本 Skill
+3. **导出**：`npm run export:sub-app -- --app {app-code}`（可选 `--zip`）
+4. **导入**：先 `--dry-run`，再 `--yes`；或 `node bundle/integrate.mjs --yes`（bundle 路径可让用户指定，或从 `dist/sub-app-bundles/` 推断最新 `{app-code}-bundle-*`）
+5. 输出 **子应用交接摘要**（见 Skill 输出模板）
+
+**规范真值**：`核心文档/框架核心文档/子应用打包指南.md` §9.0
+
+## platform_type → 形态 Skill（自动 Read）
+
+| platform_type | Skill |
+|---------------|-------|
+| `web-admin` | `.cursor/skills/arco-admin-design/SKILL.md` |
+| `web-marketing` | `.cursor/skills/marketing-design-yxui/SKILL.md` |
+| `web-mobile-h5` | `.cursor/skills/ui-ux-pro-max/SKILL.md` |
+| `native-android` | `.cursor/skills/mobile-android-design/SKILL.md` |
+| `native-ios` | `.cursor/skills/mobile-ios-design/SKILL.md` |
+
+## 红线（与总编排一致）
+
+- 步骤 4：无 PO/客户 G2-A「通过」→ `blocked`；禁止 Agent 自行冻结 PRD
+- 步骤 2：禁止用 `prd-design-generation` 代替 SDD
+
+详细路径见 `.cursor/rules/ai-full-process-design.mdc` 与 `AIEP-WEB/src/skills/SKILLS-DIRECTORY.md`。

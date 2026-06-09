@@ -4,7 +4,7 @@
 
 | platform_type | 设计规范 | 必加载形态 Skill |
 |---------------|----------|------------------|
-| `web-admin` | `系统设计规范.md` | 可选 `ui-styling` |
+| `web-admin` | `系统设计规范.md` | **`arco-admin-design`** |
 | `web-marketing` | `营销设计规范.md` | `marketing-design-yxui` |
 | `web-mobile-h5` | `系统设计规范-ant.md` §九 | `ui-ux-pro-max`（推荐） |
 | `native-android` | Material Design 3 | `mobile-android-design` |
@@ -20,10 +20,22 @@
 | U2 | 可访问 | 入口可达全部页面，无 404/占位 |
 | U3 | 主流程 | 每条 P0 用户故事可演示 |
 | U4 | 四态 | 关键页 loading/empty/error |
-| U5 | 可构建 | `npm run build:{app}` 成功 |
+| U5 | 可构建 | `npm run pack:sub-app -- --app {app}` all_pass（P1～P8） |
 | U6 | 文档一致 | PRD 页面数与代码路由一致 |
 
 任一项未过 → **blocked**，退回步骤 3。
+
+## R1～R5（资源库，步骤 3→4 强制）
+
+| # | 检查项 | 机读 |
+|---|--------|------|
+| R1 | `_resources/theme.json` + platform_type 一致 | `infer:process-step` → `resources_check.R1` |
+| R2 | `components-manifest.json` entries 非空 | `resources_check.R2` |
+| R3 | Mock 可追溯 mock-data 或 mock/ | `resources_check.R3` |
+| R4 | `G2-A预审报告.md` 已落盘 | `resources_check.R4` |
+| R5 | `00-项目记忆.md` 已存在 | `resources_check.R5` |
+
+全量界面已齐但 R 未全过 → 推断仍为 **步骤 3**（`resources_check.all_pass: false`）。
 
 ## UM1～UM5（移动/原生追加）
 
@@ -55,7 +67,8 @@
 - **推断依据**：{infer:process-step evidence}
 - **Gate-2**：pass/fail/blocked · **Gate-3**：…
 - **门禁总评**：pass / fail / blocked
-- **U1～U6**：… · **UM1～UM5**：N/A 或 …
+- **U1～U6**：… · **R1～R5**：… · **UM1～UM5**：N/A 或 …
+- **resources_check**：`infer:process-step --json` → `all_pass` / `checks`
 - **缺失项**：…
 - **下一动作**：…
 - **形态 Skill**：{已加载列表}

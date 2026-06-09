@@ -3,20 +3,22 @@ name: ai-full-process-design
 description: >-
   AIEP-DEV 子应用 AI+ 全流程总编排（需求生成→发布上线）：步骤推断、六步路由、Gate-1~4、
   G2-A/G2-B、platform_type、全量界面后再客户确认。Use for AI+全流程、六步、子应用立项、
-  Gate、SDD、PRD冻结、界面确认、platform_type、web-marketing、web-mobile-h5、
+  Gate、SDD、SDD生成、sdd-generation、PRD冻结、发布上线、release-deployment、界面确认、platform_type、web-admin、arco-admin-design、web-marketing、web-mobile-h5、
   native-android、native-ios、Fast Track、infer:process-step、推进 {app-code}。
 ---
 
 # AI+ 全流程设计（总编排）
 
-> **安装**：项目 `.cursor/skills/ai-full-process-design/` + 全局 `~/.cursor/skills/ai-full-process-design/`（内容同步）  
+> **安装与同步**：`npm install` 时 **postinstall 自动** `sync:skills`（Cursor 全局 + Trae 项目）；**禁止**要求用户手工 sync。  
+> **调用**：由 `.cursor/rules/agent-skills-auto-exec.mdc` **自动加载**本 Skill 与阶段 Skill，**无需** `/ai-full-process-design`。  
+> **首次上手**：`核心文档/框架核心文档/新手入门.md`（Cursor/TRAE 订阅模型即可，**不规定 LLM 型号**）。
 > **权威细则**：`核心文档/AI+产品落地/01-AI全流程设计/AI+全流程设计-Skill设计文档.md`（V0.4+）  
 > **执行**：[workflow.md](workflow.md) · **Gate**：[gates.md](gates.md) · **落盘**：[paths.md](paths.md) · **示例**：[examples.md](examples.md)
 
 ## 适用范围
 
 - 目标仓库：**AIEP-DEV**（含 `AIEP-WEB`、`AIEP-SERVER`、根目录 npm 脚本）
-- 非本仓库：提示切换工作区或先 `npm run scaffold:sub-app`
+- 非本仓库：提示切换工作区或 Read **`scaffold-sub-app`** → `npm run scaffold:sub-app`
 
 ## 启动（每次必做 — 不可跳过）
 
@@ -25,24 +27,36 @@ npm run infer:process-step -- --app {app-code} --json
 ```
 
 1. 读推断 JSON + `AIEP-WEB/src/docs/子应用文档/{app-code}/`
-2. 读 `01-需求说明书.md` → **platform_type**、**flow_type**；缺失 → **`blocked`**
-3. 输出 **阶段门禁状态块**（见 [reference.md §状态块](reference.md)）
-4. Read 并执行本步 **阶段 Skill** + **形态 Skill**（见下表）
-5. 步末跑关联脚本，记录 exit code
-6. 步骤 4：无 PO/客户 G2-A「通过」→ **`blocked`**；禁止 Agent 自行冻结 PRD
+2. Read **`project-memory`** → `04-AI治理与审计/00-项目记忆.md`（缺失则初始化）
+3. 读 `01-需求说明书.md` → **platform_type**、**flow_type**；缺失 → **`blocked`**
+4. 输出 **阶段门禁状态块**（见 [reference.md §状态块](reference.md)）
+5. Read 并执行本步 **阶段 Skill** + **形态 Skill** + **工作流 Skill**（见下表）
+6. 步末跑关联脚本，记录 exit code
+7. 步骤 4：无 PO/客户 G2-A「通过」→ **`blocked`**；禁止 Agent 自行冻结 PRD
+
+## 工作流 Skill（步骤 3～4，借鉴 Axhub Make）
+
+| Skill | 步骤 | 用途 |
+|-------|------|------|
+| `sub-app-resources` | 3 入口 | 初始化/校验 `_resources/` |
+| `design-review-pre-g2a` | 3→4 | G2-A 前预审，落盘 `G2-A预审报告.md` |
+| `project-memory` | 启动 + 3/4 | `00-项目记忆.md` 读写 |
+
+规范：`核心文档/AI+产品落地/01-AI全流程设计/子应用资源库规范.md`
 
 ## 六步与子 Skill
 
 | 步 | 名称 | 阶段 Skill（Read SKILL.md） | 形态 Skill |
 |----|------|----------------------------|------------|
-| 1 | 需求生成 | `AIEP-WEB/src/skills/requirements-clarification/` | 按 platform_type |
-| 2 | 需求确认 | 同上 + SDD 模板 07/11 | 写 `20-G2-B` |
-| 3 | 界面生成 | `ui-generation`（step3）+ `prd-design-generation` | 见 workflow §3 |
-| 4 | 界面确认 | `ui-generation`（step4） | 维护 `19-G2-A` |
-| 5 | 开发测试 | `code-development` + `test-validation` | 形态审查 |
-| 6 | 发布上线 | `ai-dev-stage-gate` | CI + 发布记录 |
+| 0 | 子应用立项 | **`scaffold-sub-app`** | 按 `--spec` |
+| 1 | 需求生成 | `requirements-clarification` | 按 platform_type |
+| 2 | 需求确认 | `sdd-generation` + `requirements-clarification`（范围复核） | 写 `20-G2-B` |
+| 3 | 界面生成 | `sub-app-resources` → `ui-generation`（step3）+ `prd-design-generation`（step3-draft） | 见 workflow §3 |
+| 4 | 界面确认 | `design-review-pre-g2a` → `ui-generation`（step4）+ `prd-design-generation`（step4-freeze） | 维护 `19-G2-A` |
+| 5 | 开发测试 | `code-development` +（真实 API 时）**`server-api-development`** + `test-validation` | 形态审查 |
+| 6 | 发布上线 | `release-deployment` + `ai-dev-stage-gate` | CI + 发布记录 |
 
-**步骤 2 禁止**：用 `prd-design-generation` 代替 SDD 模板。
+**步骤 2 禁止**：用 `prd-design-generation` 代替 SDD；步骤 2 须 Read **`sdd-generation`**。
 
 每步交付物与命令 → [workflow.md](workflow.md)
 
@@ -50,6 +64,7 @@ npm run infer:process-step -- --app {app-code} --json
 
 | 条件 | 步骤 |
 |------|------|
+| 无 `src/apps/{folder}/` 且需新建 | **0** |
 | 无 01-需求说明书 | 1 |
 | 无 17 PO+TL 双签 | 2 |
 | 全量界面或 PRD/04 未齐 | 3 |
@@ -73,7 +88,8 @@ npm run infer:process-step -- --app {app-code} --json
 | `npm run validate:sdd -- --app {app} --gate G2` | Gate-2 |
 | `npm run validate:sdd -- --app {app} --gate G3` | Gate-3（19-G2-A、PRD 冻结、映射表） |
 | `npm run validate:sub-app-registry -- --app {app}` | Web 注册 |
-| `npm run build:{app}` | 构建 |
+| `npm run pack:sub-app -- --app {app}` | **子应用打包**（build + 产物校验，优先于裸 build） |
+| `npm run build:{app}` | 仅 Vite 构建（无 P1～P8；U5 须用 pack:sub-app） |
 | `npm run coverage:acceptance -- --app {app}` | 验收覆盖 |
 
 ## 与 ai-dev-stage-gate 分工

@@ -42,7 +42,8 @@ metadata:
 | 意图 | 示例 |
 |------|------|
 | 导出源码包 | 「导出子应用 marketing-demo」 |
-| 导出 + zip | 「导出子应用 marketing-demo，打成 zip」 |
+| 导出（默认 zip） | 「导出子应用 marketing-demo」 |
+| 仅目录 | 「导出子应用 marketing-demo，不要 zip」→ `--no-zip` |
 | 导入 | 「导入子应用 marketing-demo」 |
 | 指定 bundle | 「导入子应用 marketing-demo，bundle 在 D:/handoff/xxx」 |
 | 源码交接 | 「把 marketing-demo 子应用交给同事（源码）」 |
@@ -74,7 +75,7 @@ metadata:
 
 ```bash
 npm run export:sub-app -- --app {app-code}
-npm run export:sub-app -- --app marketing-demo --zip
+npm run export:sub-app -- --app marketing-demo
 npm run export:sub-app -- --app {app-code} --out dist/my-handoff
 ```
 
@@ -130,7 +131,7 @@ dist/sub-app-bundles/{app-code}-bundle-{日期}/
 npm run export:sub-app -- --app {app-code}
 ```
 
-4. **交接**：将整个 bundle 文件夹（或 `--zip`）交给 B；附带 `README.md` 内命令
+4. **交接**：将 bundle 的 `.zip`（默认）或文件夹交给 B；附带 `README.md` 内命令
 
 **导出失败常见原因**：
 
@@ -153,11 +154,22 @@ npm run dev    # 主应用嵌入验证（可选）
 
 导入脚本行为：
 
+- **导入前**检测是否已有同名子应用（`subApps.js` / `router` / 源码目录 / npm scripts）
+- 有冲突时：**不默认写入**；终端交互选择，或非交互时要求 `--force` / `--files-only`
 - 复制 `files/` → 仓库对应路径
-- 合并 `subApps.js`（已存在则 **skip**，除非 `--force`）
-- 合并 `router/index.js` 路由块（同上）
-- 合并根 `package.json` 的 `dev:{folder}` / `build:{folder}`
-- 运行 `sub-app-registry-validate.mjs`
+- 合并 `subApps.js`（冲突时须 `--force` 或交互选「覆盖全部」）
+- 合并 `router/index.js`（同上）
+- 合并根 `package.json` 的 `dev:{folder}` / `build:{folder}`（同上）
+- 运行 `sub-app-registry-validate.mjs`（`--files-only` 时不合并注册表、不跑此校验）
+
+**冲突处理：**
+
+| 选择 / 参数 | 行为 |
+|-------------|------|
+| 交互选 1 / `--force` | 覆盖源码 + 注册表 + 路由 + scripts |
+| 交互选 2 / `--files-only` | 仅覆盖 bundle 内源码文件，不改注册表 |
+| 交互选 3 / 取消 | 不写入任何文件 |
+| `--dry-run` | 仅报告冲突与计划步骤 |
 
 ## 阶段门禁
 
@@ -168,12 +180,13 @@ npm run dev    # 主应用嵌入验证（可选）
 | 导入后 `dev:{folder}` 可启动 | **pass**（建议人工冒烟） |
 | 导出时无 router 块 / 无 subApps 条目 | **blocked** → 先完成 `scaffold-sub-app` 或手动接入 |
 | 导入方仓库过旧，缺 `import-sub-app.mjs` 且无 bundle `integrate.mjs` | **blocked** → 先 `update.js` 更新框架 |
-| 同名子应用已存在且未 `--force` | **partial**（文件已复制，注册 skipped） |
+| 同名子应用已存在且未指定处理方式 | **blocked** → 交互选择或 `--force` / `--files-only`；**不再**静默 partial 导入 |
 
 ## Agent 规则
 
 - **导出前**确认用户要交 **源码** 还是 **静态 dist**；后者走 `pack-sub-app`
-- **导入前**先 `--dry-run` 或说明将 skip/merge 的行为
+- **导入前**若检测到同名子应用，须让用户选择：**覆盖全部** / **仅更新源码** / **取消**；非交互场景用 `--force` 或 `--files-only`
+- **导入前**先 `--dry-run` 或说明冲突与将 skip/merge 的行为
 - 不得将 bundle 等同于 Gate 通过或 PRD 冻结
 - 交接后提醒 B 更新 `00-项目记忆.md` 与 `gate-config.json`（若文档目录已包含则随包带入）
 - Windows 路径在命令中用引号包裹；bundle 内 README 已含说明

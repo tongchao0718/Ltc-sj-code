@@ -5,6 +5,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
+import { isAiepRepoRoot, isFlatWebRoot, walkUpForRepoRoot, resolveProjectLayoutAt } from '../src/scripts/repo-root-detect.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export const WEB_ROOT = path.join(__dirname, '..')
@@ -12,25 +13,16 @@ export const WEB_SRC = path.join(WEB_ROOT, 'src')
 export const REPO_ROOT = path.join(WEB_ROOT, '..')
 
 export function isLtcDemoRoot(dir) {
-  const pkgPath = path.join(dir, 'package.json')
-  if (!fs.existsSync(pkgPath)) return false
-  try {
-    const j = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
-    return j.name === 'ltc-demo' && fs.existsSync(path.join(dir, 'AIEP-WEB'))
-  } catch {
-    return false
-  }
+  return isAiepRepoRoot(dir) || isFlatWebRoot(dir)
 }
 
 export function findRepoRoot(startDir = process.cwd()) {
-  let dir = path.resolve(startDir)
-  for (let i = 0; i < 14; i++) {
-    if (isLtcDemoRoot(dir)) return dir
-    const parent = path.dirname(dir)
-    if (parent === dir) break
-    dir = parent
-  }
-  return null
+  return (
+    walkUpForRepoRoot(startDir) ||
+    walkUpForRepoRoot(REPO_ROOT) ||
+    resolveProjectLayoutAt(startDir)?.repoRoot ||
+    null
+  )
 }
 
 export function copyFile(src, dest) {
@@ -181,6 +173,34 @@ export function mergeSubAppEntry(subAppsPath, entry, { force = false } = {}) {
   return { action: 'appended' }
 }
 
+export function findRoutesArrayCloseIndex(routerText) {
+  const m = routerText.match(/const\s+routes\s*=\s*\[/)
+  const arrayStart = m ? m.index + m[0].length - 1 : -1
+  if (arrayStart === -1) return routerText.lastIndexOf(']')
+
+  let depth = 0
+  for (let i = arrayStart; i < routerText.length; i++) {
+    if (routerText[i] === '[') depth++
+    else if (routerText[i] === ']') {
+      depth--
+      if (depth === 0) return i
+    }
+  }
+  return -1
+}
+
+export function appendRouteBlocksToRouterText(routerText, blocks) {
+  const list = (Array.isArray(blocks) ? blocks : [blocks]).map((b) => String(b).trim()).filter(Boolean)
+  if (!list.length) return routerText
+
+  const closeIdx = findRoutesArrayCloseIndex(routerText)
+  if (closeIdx === -1) throw new Error('无法在 router/index.js 定位 routes 数组结束位置')
+
+  let before = routerText.slice(0, closeIdx).trimEnd()
+  if (!before.endsWith('[') && !before.endsWith(',')) before += ','
+  return `${before}\n  ${list.join(',\n  ')}\n${routerText.slice(closeIdx)}`
+}
+
 export function mergeRouterBlock(routerPath, routerBlock, prefix, { force = false } = {}) {
   let text = fs.readFileSync(routerPath, 'utf8')
   const exists =
@@ -198,9 +218,9 @@ export function mergeRouterBlock(routerPath, routerBlock, prefix, { force = fals
     return { action: 'updated' }
   }
 
-  const closeIdx = text.lastIndexOf(']')
+  const closeIdx = findRoutesArrayCloseIndex(text)
   if (closeIdx === -1) throw new Error('router/index.js 结构异常')
-  text = `${text.slice(0, closeIdx)},\n${routerBlock.trim()}\n${text.slice(closeIdx)}`
+  text = appendRouteBlocksToRouterText(text, routerBlock.trim())
   fs.writeFileSync(routerPath, text)
   return { action: 'appended' }
 }
@@ -242,4 +262,179 @@ export function copyBundleFilesToRepo(bundleFilesDir, repoRoot) {
     }
   }
   return copied
+}
+
+function subAppsTextHasEntry(text, { folder, appCode, id }) {
+  const needles = [
+    folder && `folder: '${folder}'`,
+    folder && `folder: "${folder}"`,
+    appCode && `appCode: '${appCode}'`,
+    appCode && `appCode: "${appCode}"`,
+    id && `id: '${id}'`,
+    id && `id: "${id}"`
+  ].filter(Boolean)
+  return needles.some((n) => text.includes(n))
+}
+
+/** 列出 bundle files/ 在目标仓库中已存在的路径（相对 repoRoot） */
+export function listExistingBundleDestPaths(bundleFilesDir, repoRoot) {
+  const existing = []
+  if (!fs.existsSync(bundleFilesDir)) return existing
+
+  function walk(relDir) {
+    const abs = path.join(bundleFilesDir, relDir)
+    for (const ent of fs.readdirSync(abs, { withFileTypes: true })) {
+      const rel = relDir ? `${relDir}/${ent.name}` : ent.name
+      const dest = path.join(repoRoot, rel)
+      if (ent.isDirectory()) {
+        if (fs.existsSync(dest)) existing.push(`${rel}/`)
+        walk(rel)
+      } else if (fs.existsSync(dest)) {
+        existing.push(rel)
+      }
+    }
+  }
+  walk('')
+  return existing
+}
+
+/**
+ * 导入前检测是否与仓库中已有子应用冲突
+ * @returns {{ hasConflicts: boolean, subApps: boolean, router: boolean, packageScripts: string[], existingPaths: string[] }}
+ */
+export function detectImportConflicts(repoRoot, manifest, bundleFilesDir) {
+  const { appCode, folder, subAppEntry, packageScripts, routerPrefix } = manifest
+  const conflicts = {
+    hasConflicts: false,
+    subApps: false,
+    router: false,
+    packageScripts: [],
+    existingPaths: []
+  }
+
+  const subAppsPath = path.join(repoRoot, 'AIEP-WEB/src/config/subApps.js')
+  if (fs.existsSync(subAppsPath)) {
+    const text = fs.readFileSync(subAppsPath, 'utf8')
+    if (subAppsTextHasEntry(text, { folder, appCode, id: subAppEntry?.id })) {
+      conflicts.subApps = true
+      conflicts.hasConflicts = true
+    }
+  }
+
+  const routerPath = path.join(repoRoot, 'AIEP-WEB/src/router/index.js')
+  if (routerPrefix && fs.existsSync(routerPath)) {
+    const routerText = fs.readFileSync(routerPath, 'utf8')
+    if (
+      routerText.includes(`path: '${routerPrefix}'`) ||
+      routerText.includes(`path: "${routerPrefix}"`)
+    ) {
+      conflicts.router = true
+      conflicts.hasConflicts = true
+    }
+  }
+
+  const pkgPath = path.join(repoRoot, 'package.json')
+  if (fs.existsSync(pkgPath) && packageScripts) {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
+    for (const key of Object.keys(packageScripts)) {
+      if (pkg.scripts?.[key]) {
+        conflicts.packageScripts.push(key)
+        conflicts.hasConflicts = true
+      }
+    }
+  }
+
+  conflicts.existingPaths = listExistingBundleDestPaths(bundleFilesDir, repoRoot)
+  if (conflicts.existingPaths.length) {
+    conflicts.hasConflicts = true
+  }
+
+  return conflicts
+}
+
+export function formatImportConflictReport(conflicts, manifest) {
+  const { appCode, folder, subAppEntry } = manifest
+  const lines = [
+    `检测到仓库中已存在同名子应用「${subAppEntry?.name || appCode}」（${appCode} / ${folder}）：`
+  ]
+  if (conflicts.subApps) lines.push('  · subApps.js 已注册该子应用（应用中心 / 首页指标）')
+  if (conflicts.router) lines.push(`  · router/index.js 已有路由 ${manifest.routerPrefix}`)
+  if (conflicts.packageScripts.length) {
+    lines.push(`  · package.json 已有 scripts: ${conflicts.packageScripts.join(', ')}`)
+  }
+  if (conflicts.existingPaths.length) {
+    const preview = conflicts.existingPaths.slice(0, 8)
+    lines.push(`  · 已有 ${conflicts.existingPaths.length} 个文件/目录将被覆盖，例如:`)
+    preview.forEach((p) => lines.push(`      ${p}`))
+    if (conflicts.existingPaths.length > 8) {
+      lines.push(`      … 另有 ${conflicts.existingPaths.length - 8} 项`)
+    }
+  }
+  return lines.join('\n')
+}
+
+/**
+ * 解析导入模式：full（含注册表）| files-only | cancel | blocked
+ * @param {{ skipConflictReport?: boolean }} opts
+ */
+export async function resolveImportMode(args, conflicts, manifest, opts = {}) {
+  if (!conflicts.hasConflicts) {
+    return { mode: 'full', force: false }
+  }
+  if (args.force) return { mode: 'full', force: true }
+  if (args.filesOnly) return { mode: 'files-only', force: false }
+
+  const canPrompt = process.stdin.isTTY && !process.env.CI
+  if (canPrompt) {
+    const readline = await import('readline/promises')
+    if (!opts.skipConflictReport) {
+      console.log('\n' + formatImportConflictReport(conflicts, manifest))
+    }
+    console.log('\n请选择：')
+    console.log('  1) 覆盖全部（源码 + subApps + router + npm scripts）')
+    console.log('  2) 仅更新源码文件（不改注册表与路由）')
+    console.log('  3) 取消导入\n')
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+    try {
+      while (true) {
+        const answer = (await rl.question('输入 1 / 2 / 3: ')).trim()
+        if (answer === '1') return { mode: 'full', force: true }
+        if (answer === '2') return { mode: 'files-only', force: false }
+        if (answer === '3') return { mode: 'cancel', force: false }
+        console.log('无效输入，请输入 1、2 或 3')
+      }
+    } finally {
+      rl.close()
+    }
+  }
+
+  return { mode: 'blocked', force: false }
+}
+
+export function printImportConflictBlocked(conflicts, manifest, bundleDir, { skipReport = false } = {}) {
+  if (!skipReport) {
+    console.error('\n' + formatImportConflictReport(conflicts, manifest))
+  }
+  console.error('\n未写入任何文件。请指定处理方式后重试：')
+  console.error(`  覆盖全部: npm run import:sub-app -- --bundle "${bundleDir}" --yes --force`)
+  console.error(`  仅更新源码: npm run import:sub-app -- --bundle "${bundleDir}" --yes --files-only`)
+  console.error('\n或在终端交互运行（不加 --force/--files-only）以出现选择菜单。')
+  const conflictsSummary = {
+    ...conflicts,
+    existingPaths: conflicts.existingPaths.slice(0, 12),
+    existingPathCount: conflicts.existingPaths.length
+  }
+  console.error(
+    JSON.stringify(
+      {
+        status: 'conflict',
+        appCode: manifest.appCode,
+        folder: manifest.folder,
+        conflicts: conflictsSummary,
+        options: { overwrite: '--yes --force', filesOnly: '--yes --files-only' }
+      },
+      null,
+      2
+    )
+  )
 }

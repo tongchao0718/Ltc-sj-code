@@ -49,13 +49,15 @@
 | `mobile-ios-design` | native-ios | `.cursor/skills/mobile-ios-design/SKILL.md` |
 | `prd-page-annotation` | 可选 | **`.cursor/skills/prd-page-annotation/SKILL.md`** |
 
-## 三-B、工作流 Skill（借鉴 Axhub Make，步骤 3～4）
+## 三-B、工作流 Skill（借鉴 Axhub Make，步骤 3～6）
 
 | Skill | 步骤 | 路径 |
 |-------|------|------|
 | `sub-app-resources` | 3 入口 | `.cursor/skills/sub-app-resources/SKILL.md` |
 | `design-review-pre-g2a` | 3→4 | `.cursor/skills/design-review-pre-g2a/SKILL.md` |
+| **`ui-acceptance-review`** | **4 / 5** | **`.cursor/skills/ui-acceptance-review/SKILL.md`** · [checklist](../../.cursor/skills/ui-acceptance-review/references/checklist.md) · [模板](../../.cursor/skills/ui-acceptance-review/references/report-template.md) |
 | `project-memory` | 启动 + 3/4 | `.cursor/skills/project-memory/SKILL.md` |
+| **`release-readiness-review`** | **6** | **`.cursor/skills/release-readiness-review/SKILL.md`** · [checklist](../../.cursor/skills/release-readiness-review/references/checklist.md) · [模板](../../.cursor/skills/release-readiness-review/references/report-template.md) |
 
 规范：`核心文档/AI+产品落地/01-AI全流程设计/子应用资源库规范.md`
 

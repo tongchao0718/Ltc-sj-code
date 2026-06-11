@@ -22,6 +22,7 @@ function parseArgs(argv) {
     dryRun: argv.includes('--dry-run'),
     yes: argv.includes('--yes'),
     force: argv.includes('--force'),
+    filesOnly: argv.includes('--files-only'),
     bundle: (() => {
       const i = argv.indexOf('--bundle')
       return i !== -1 && argv[i + 1] ? path.resolve(argv[i + 1]) : BUNDLE_DIR
@@ -107,6 +108,7 @@ async function main() {
 
   const childArgs = ['--bundle', bundleDir, '--yes']
   if (args.force) childArgs.push('--force')
+  if (args.filesOnly) childArgs.push('--files-only')
 
   const r = spawnSync(process.execPath, [importScript, ...childArgs], {
     cwd: repoRoot,

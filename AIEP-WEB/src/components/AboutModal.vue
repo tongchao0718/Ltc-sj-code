@@ -9,8 +9,8 @@
         <div class="about-section">
           <div class="app-info">
             <h4>系统信息</h4>
-            <p><strong>系统名称：</strong>应用系统</p>
-            <p><strong>当前版本：</strong>V1.1.0</p>
+            <p><strong>系统名称：</strong>设计应用系统</p>
+            <p><strong>当前版本：</strong>V2.2.0</p>
             <p><strong>开发框架：</strong>Vue 3 + Vite</p>
           </div>
           <div class="app-description">
@@ -35,7 +35,7 @@
           </div>
           <div class="copyright">
             <h4>版权信息</h4>
-            <p>© 2024 应用系统. 保留所有权利.</p>
+            <p>© 2024 设计应用系统. 保留所有权利.</p>
             <p>本系统仅供内部使用，未经授权不得用于其他用途。</p>
           </div>
         </div>

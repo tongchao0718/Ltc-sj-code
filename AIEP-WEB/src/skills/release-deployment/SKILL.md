@@ -9,6 +9,7 @@ description: >-
 
 > **总编排**：`.cursor/skills/ai-full-process-design/SKILL.md`  
 > **门禁 Skill**：`ai-dev-stage-gate`（Gate-4）  
+> **审计 Skill**：`release-readiness-review`（发布前须审计 pass，见 `.cursor/skills/release-readiness-review/SKILL.md`）  
 > **前置**：步骤 5 `test-validation` 结论 go/conditional go；Gate-2 + Gate-3 已 pass
 
 ## 必要输入

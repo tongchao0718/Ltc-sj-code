@@ -55,6 +55,7 @@
 |-------|------|
 | `--zip`（export） | 额外生成 bundle.zip |
 | `--out`（export） | 自定义输出目录 |
-| `--dry-run`（import） | 仅预览，不写文件 |
+| `--dry-run`（import） | 检测冲突并预览计划，不写文件 |
 | `--yes`（import / integrate.mjs） | 确认写入 |
-| `--force`（import） | 覆盖已有 subApps / router 注册 |
+| `--force`（import） | 覆盖已有 subApps / router / 源码 |
+| `--files-only`（import） | 仅更新 bundle 源码，不改注册表 |

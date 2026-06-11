@@ -4,11 +4,10 @@
  *
  * 用法:
  *   npm run export:sub-app -- --app marketing-demo
- *   npm run export:sub-app -- --app marketing-demo --zip
+ *   npm run export:sub-app -- --app marketing-demo --no-zip
  */
 import fs from 'fs'
 import path from 'path'
-import { execSync } from 'child_process'
 import {
   REPO_ROOT,
   WEB_ROOT,
@@ -22,13 +21,15 @@ import {
   getPackageScriptsForFolder,
   routePrefixFromTo
 } from './sub-app-bundle-shared.mjs'
+import { zipDirectory } from './zip-directory.mjs'
 
 function parseArgs(argv) {
-  const out = { app: '', zip: false, out: '' }
+  const out = { app: '', zip: true, out: '' }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--app' && argv[i + 1]) out.app = argv[++i]
     else if (a === '--zip') out.zip = true
+    else if (a === '--no-zip') out.zip = false
     else if (a === '--out' && argv[i + 1]) out.out = argv[++i]
     else if (!a.startsWith('-') && !out.app) out.app = a
   }
@@ -38,7 +39,7 @@ function parseArgs(argv) {
 async function main() {
   const args = parseArgs(process.argv.slice(2))
   if (!args.app) {
-    console.error('用法: npm run export:sub-app -- --app <app-code> [--zip] [--out dist/xxx]')
+    console.error('用法: npm run export:sub-app -- --app <app-code> [--no-zip] [--out dist/xxx]')
     process.exit(1)
   }
 
@@ -146,9 +147,10 @@ npm run dev:${folder}
 
 ## 选项
 
-\`integrate.mjs --dry-run\` 仅预览  
-\`integrate.mjs --yes\` 确认写入  
-\`integrate.mjs --force\` 覆盖已有同名子应用注册
+\`integrate.mjs --dry-run\` 检测冲突并预览  
+\`integrate.mjs --yes\` 确认写入（有同名子应用时终端会提示选择）  
+\`integrate.mjs --yes --force\` 覆盖全部（源码 + 注册表）  
+\`integrate.mjs --yes --files-only\` 仅更新源码，不改 subApps/router
 `
   fs.writeFileSync(path.join(bundleDir, 'README.md'), readme)
 
@@ -160,17 +162,7 @@ npm run dev:${folder}
   console.log(`\nAgent：请 Read export-import-sub-app Skill 并按 handoff-checklist 交接。`)
 
   if (args.zip) {
-    const zipPath = `${bundleDir}.zip`
-    if (process.platform === 'win32') {
-      execSync(
-        `powershell -NoProfile -Command "Compress-Archive -Path '${bundleDir.replace(/'/g, "''")}' -DestinationPath '${zipPath.replace(/'/g, "''")}' -Force"`,
-        { stdio: 'inherit' }
-      )
-    } else {
-      execSync(`cd "${path.dirname(bundleDir)}" && zip -r "${path.basename(zipPath)}" "${path.basename(bundleDir)}"`, {
-        stdio: 'inherit'
-      })
-    }
+    const zipPath = zipDirectory(bundleDir, `${bundleDir}.zip`)
     console.log(`\n✓ 已压缩: ${zipPath}`)
   }
 }

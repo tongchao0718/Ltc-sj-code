@@ -3,7 +3,7 @@
     <div class="dashboard-header">
       <div class="dashboard-intro">
         <h1 class="page-title">工作台</h1>
-        <p class="page-subtitle">系统概览与快速入口（产品设计文档 · 仪表盘）</p>
+        <p class="page-subtitle">AIEP 主应用 · 框架 v2.2.0 · 子应用统一入口与运行概览</p>
       </div>
     </div>
 
@@ -18,23 +18,16 @@
     <div class="section">
       <h2 class="section-title">快速访问</h2>
       <div class="quick-links">
-        <router-link to="/app-center" class="quick-link ds-card">
-          <span class="link-icon" aria-hidden="true">🗂️</span>
-          <div>
-            <div class="link-text">应用中心</div>
-            <div class="link-sub">从应用中心进入子应用</div>
-          </div>
-        </router-link>
         <router-link
-          v-for="app in subApps"
-          :key="app.id"
-          :to="app.to"
+          v-for="item in quickLinks"
+          :key="item.key"
+          :to="item.to"
           class="quick-link ds-card"
         >
-          <span class="link-icon" aria-hidden="true">{{ app.icon }}</span>
+          <span class="link-icon" aria-hidden="true">{{ item.icon }}</span>
           <div>
-            <div class="link-text">{{ app.name }}</div>
-            <div class="link-sub">{{ app.folder }}</div>
+            <div class="link-text">{{ item.name }}</div>
+            <div class="link-sub">{{ item.sub }}</div>
           </div>
         </router-link>
       </div>
@@ -60,15 +53,28 @@
 
 <script setup>
 import { computed } from 'vue'
-import { subApps, getSubAppMetrics } from '../config/subApps.js'
+import { subApps, getSubAppMetrics, MAIN_PAGE_COUNT } from '../config/subApps.js'
+
+const QUICK_LINK_LIMIT = 3
 
 const metrics = computed(() => getSubAppMetrics())
 
+/** 首页快速入口：仅展示 3 个子应用（应用中心见顶栏导航） */
+const quickLinks = computed(() =>
+  subApps.slice(0, QUICK_LINK_LIMIT).map((app) => ({
+    key: app.id,
+    to: app.to,
+    icon: app.icon,
+    name: app.name,
+    sub: app.desc
+  }))
+)
+
 const stats = computed(() => [
-  { title: '已接入子应用', value: String(metrics.value.appCount), desc: '可扩展为多应用架构' },
-  { title: '今日访问（演示）', value: '—', desc: '接入统计服务后展示' },
-  { title: '构建状态', value: '正常', desc: '主应用 + 子应用独立构建' },
-  { title: '文档完备度', value: '基线', desc: '随业务迭代同步更新' }
+  { title: '已接入子应用', value: String(metrics.value.appCount), desc: '注册表 subApps.js 驱动' },
+  { title: '路由页面合计', value: String(metrics.value.pageCount), desc: `主系统 ${MAIN_PAGE_COUNT} 页 + 子应用路由` },
+  { title: '框架版本', value: 'v2.2.0', desc: '离线更新包 · Agent Skills 已同步' },
+  { title: '构建状态', value: '正常', desc: '主应用与子应用独立构建' }
 ])
 </script>
 
@@ -124,8 +130,14 @@ const stats = computed(() => [
 
 .quick-links {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .quick-links {
+    grid-template-columns: 1fr;
+  }
 }
 
 .quick-link {

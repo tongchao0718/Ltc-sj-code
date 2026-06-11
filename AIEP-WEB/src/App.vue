@@ -19,7 +19,7 @@
       <div class="header-inner" :class="{ 'header-inner--compact': isImmersiveCollapsed }">
         <router-link to="/dashboard" class="brand brand-link" title="返回主应用首页">
           <img src="/app-icon.png" alt="" class="app-logo" width="36" height="36" aria-hidden="true" />
-          <h1 v-if="!isImmersiveCollapsed" class="app-title">应用系统</h1>
+          <h1 v-if="!isImmersiveCollapsed" class="app-title">设计应用系统</h1>
         </router-link>
 
         <nav v-if="!isImmersiveCollapsed" class="app-nav" aria-label="主导航">

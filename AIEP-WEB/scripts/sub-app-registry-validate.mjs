@@ -9,9 +9,11 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { subApps, getSubAppMetrics, routePrefixFromTo } from '../src/config/subApps.js'
+import { validateAllSubAppsHealth } from './sub-app-route-health.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const WEB_SRC = path.join(__dirname, '..', 'src')
+const WEB_ROOT = path.join(__dirname, '..')
+const WEB_SRC = path.join(WEB_ROOT, 'src')
 
 function parseArgs(argv) {
   const args = { app: null }
@@ -103,6 +105,17 @@ function validateRegistry({ appCode } = {}) {
       if (!routePrefixes.has(prefix)) {
         failed.push(`注册表前缀 '${prefix}' 在 router/index.js 中无对应顶层路由`)
       }
+    }
+
+    const health = validateAllSubAppsHealth(WEB_ROOT, subApps)
+    failed.push(...health.failed)
+    warnings.push(...health.warnings)
+  } else {
+    const entry = findSubApp(appCode)
+    if (entry) {
+      const health = validateAllSubAppsHealth(WEB_ROOT, [entry])
+      failed.push(...health.failed)
+      warnings.push(...health.warnings)
     }
   }
 

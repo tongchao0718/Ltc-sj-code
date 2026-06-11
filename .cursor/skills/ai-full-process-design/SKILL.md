@@ -40,7 +40,9 @@ npm run infer:process-step -- --app {app-code} --json
 |-------|------|------|
 | `sub-app-resources` | 3 入口 | 初始化/校验 `_resources/` |
 | `design-review-pre-g2a` | 3→4 | G2-A 前预审，落盘 `G2-A预审报告.md` |
+| `ui-acceptance-review` | 4 / 5 | 走查辅助与界面回归，落盘 `界面验收审核报告.md` |
 | `project-memory` | 启动 + 3/4 | `00-项目记忆.md` 读写 |
+| `release-readiness-review` | 6 | 发布前审计，落盘 `发布审核报告.md` |
 
 规范：`核心文档/AI+产品落地/01-AI全流程设计/子应用资源库规范.md`
 
@@ -52,9 +54,9 @@ npm run infer:process-step -- --app {app-code} --json
 | 1 | 需求生成 | `requirements-clarification` | 按 platform_type |
 | 2 | 需求确认 | `sdd-generation` + `requirements-clarification`（范围复核） | 写 `20-G2-B` |
 | 3 | 界面生成 | `sub-app-resources` → `ui-generation`（step3）+ `prd-design-generation`（step3-draft） | 见 workflow §3 |
-| 4 | 界面确认 | `design-review-pre-g2a` → `ui-generation`（step4）+ `prd-design-generation`（step4-freeze） | 维护 `19-G2-A` |
-| 5 | 开发测试 | `code-development` +（真实 API 时）**`server-api-development`** + `test-validation` | 形态审查 |
-| 6 | 发布上线 | `release-deployment` + `ai-dev-stage-gate` | CI + 发布记录 |
+| 4 | 界面确认 | `design-review-pre-g2a` → `ui-acceptance-review` → `ui-generation`（step4）+ `prd-design-generation`（step4-freeze） | 维护 `19-G2-A` |
+| 5 | 开发测试 | `code-development` +（真实 API 时）**`server-api-development`** + `test-validation` + 可选 `ui-acceptance-review`（regression） | 形态审查 |
+| 6 | 发布上线 | `release-readiness-review` → `release-deployment` + `ai-dev-stage-gate` | CI + 发布记录 |
 
 **步骤 2 禁止**：用 `prd-design-generation` 代替 SDD；步骤 2 须 Read **`sdd-generation`**。
 

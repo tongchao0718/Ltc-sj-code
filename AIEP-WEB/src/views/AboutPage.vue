@@ -7,8 +7,8 @@
     <div class="ds-card content-block">
       <div class="block">
         <h2 class="section-h">系统信息</h2>
-        <p><strong>系统名称：</strong>应用系统</p>
-        <p><strong>当前版本：</strong>V2.1.0</p>
+        <p><strong>系统名称：</strong>设计应用系统</p>
+        <p><strong>当前版本：</strong>V2.2.0</p>
         <p><strong>开发框架：</strong>Vue 3 + Vite</p>
       </div>
       <div class="block">
@@ -33,7 +33,7 @@
       </div>
       <div class="block">
         <h2 class="section-h">版权信息</h2>
-        <p>© 2024 应用系统. 保留所有权利.</p>
+        <p>© 2024 设计应用系统. 保留所有权利.</p>
         <p>本系统仅供内部使用，未经授权不得用于其他用途。</p>
       </div>
     </div>

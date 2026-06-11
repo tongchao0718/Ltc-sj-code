@@ -35,9 +35,9 @@ alwaysApply: true
 | 1 | `AIEP-WEB/src/skills/requirements-clarification/SKILL.md` |
 | 2 | `AIEP-WEB/src/skills/sdd-generation/SKILL.md` |
 | 3 | `sub-app-resources` → `ui-generation` → `prd-design-generation`（step3）→ 可选 `design-review-pre-g2a` |
-| 4 | `design-review-pre-g2a` → `ui-generation`（step4）→ `prd-design-generation`（step4-freeze） |
-| 5 | `code-development` +（SDD 含真实 API 时）`server-api-development` + `test-validation` |
-| 6 | `release-deployment` + `pack-sub-app` + `ai-dev-stage-gate` |
+| 4 | `design-review-pre-g2a` → `ui-acceptance-review` → `ui-generation`（step4）→ `prd-design-generation`（step4-freeze） |
+| 5 | `code-development` +（SDD 含真实 API 时）`server-api-development` + `test-validation` + 可选 `ui-acceptance-review`（regression） |
+| 6 | `release-readiness-review` → `release-deployment` + `pack-sub-app` + `ai-dev-stage-gate` |
 
 ## 横切：子应用打包（自动 Read）
 
@@ -50,17 +50,47 @@ alwaysApply: true
 
 步骤 3 验证 U5、步骤 6 发布构建均走同一 Skill。
 
+## 横切：界面验收审核（自动 Read）
+
+当用户要求 **界面审核 / 界面验收 / G2-A走查 / 走查辅助 / 界面回归 / UI acceptance review** 时：
+
+1. **立即 Read** `.cursor/skills/ui-acceptance-review/SKILL.md`
+2. **模式**：走查前 → `pre-walkthrough`；走查记录 → `walkthrough-record`；步骤 5 后 → `regression`
+3. **前置**：步骤 3 收尾预审仍走 `design-review-pre-g2a`（不替代）
+4. **落盘**：`04-AI治理与审计/界面验收审核报告.md`
+5. **禁止**代签 `19-G2-A` 或 PRD 冻结
+
+## 横切：发布就绪审计（自动 Read）
+
+当用户要求 **发布审核 / 发布就绪 / 上线前检查 / release review / Gate-4审计 / 发布后冒烟** 时：
+
+1. **立即 Read** `.cursor/skills/release-readiness-review/SKILL.md`
+2. **模式**：构建前 → `pre-release`；dist 已生成 → `post-verify`
+3. **审计 pass** 后再建议执行 `release-deployment`（执行与签字仍走该 Skill）
+4. **落盘**：`03-发布与复盘/发布审核报告.md`
+5. **禁止**代签发布记录单放行
+
 ## 横切：子应用导出 / 集成（自动 Read）
 
 当用户要求 **导出子应用 / 导入子应用 / 导出 / 导入 / 交接 / 移交** 子应用、**export:sub-app** / **import:sub-app**、**无 Git** / **U 盘** / **bundle** / **integrate.mjs** 时，或自然语言如 **「导出子应用 {app-code}」**、**「导入子应用 {app-code}」**、**「把 xxx 子应用交给同事（源码）」** 时：
 
 1. **立即 Read** `AIEP-WEB/src/skills/export-import-sub-app/SKILL.md`
 2. **歧义消解**：仅「导出」且语境像演示/部署 → 先问清或走 `pack-sub-app`；明确「源码 / 继续开发 / 集成到另一仓库」→ 本 Skill
-3. **导出**：`npm run export:sub-app -- --app {app-code}`（可选 `--zip`）
-4. **导入**：先 `--dry-run`，再 `--yes`；或 `node bundle/integrate.mjs --yes`（bundle 路径可让用户指定，或从 `dist/sub-app-bundles/` 推断最新 `{app-code}-bundle-*`）
+3. **导出**：`npm run export:sub-app -- --app {app-code}`（默认生成 `.zip`；`--no-zip` 仅目录）
+4. **导入**：先 `--dry-run` 看冲突；有同名子应用时**让用户选**覆盖/仅源码/取消，或 `--force` / `--files-only`；或 `node bundle/integrate.mjs --yes`（bundle 路径可让用户指定，或从 `dist/sub-app-bundles/` 推断最新 `{app-code}-bundle-*`）
 5. 输出 **子应用交接摘要**（见 Skill 输出模板）
 
 **规范真值**：`核心文档/框架核心文档/子应用打包指南.md` §9.0
+
+## 横切：框架更新分发包（自动 Read）
+
+当用户要求 **生成更新分发包 / 创建离线更新包 / 更新框架 / 安装更新包 / update.js / create-update-package** 时：
+
+1. **Read** `核心文档/框架核心文档/更新分发方案.md` §2.0（自然语言）与 §2.1（命令）
+2. **维护方**：`npm run create-update-package` → 产物 `dist/ltc-demo-update-v{version}/`
+3. **用户方**：Agent **仅可**代跑 `node .../update.js --dry-run`；**禁止**在 Agent 内代跑 `--yes` / `--rollback`（会拦截）；须提示用户 **双击 `安装更新.bat`** 或 IDE **终端→新建终端** 执行 `--yes`（不必单独开 PowerShell）
+4. **歧义**：「更新子应用 xxx」可能是 **import bundle**，不是框架 update.js
+5. 规范真值：《更新分发方案》· 勿与 `pack-sub-app` / `export-import-sub-app` 混用
 
 ## platform_type → 形态 Skill（自动 Read）
 

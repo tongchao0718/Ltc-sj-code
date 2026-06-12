@@ -1,8 +1,9 @@
 .prd-anchor {
   position: relative;
-  display: inline-block;
-  vertical-align: top;
+  display: block;
+  width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
 }
 
 button.prd-badge,
@@ -12,28 +13,36 @@ button.prd-badge,
   justify-content: center;
   vertical-align: top;
   position: absolute;
-  top: -8px;
-  right: -4px;
+  top: -6px;
+  right: -6px;
   z-index: 9998;
-  width: auto !important;
-  min-width: 0;
-  max-width: fit-content;
-  height: 14px;
-  min-height: 14px;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
   box-sizing: border-box;
   flex: none;
   background: rgb(250, 173, 20);
   color: #fff;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  line-height: 14px;
-  padding: 0 4px;
-  border-radius: 2px;
-  border: none;
+  line-height: 1;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
   cursor: pointer;
   user-select: none;
-  white-space: nowrap;
-  overflow: visible;
+  overflow: hidden;
+}
+
+.prd-badge--compact {
+  font-size: 8px;
+}
+
+.prd-badge--active {
+  box-shadow: 0 0 0 2px #165dff;
 }
 
 .prd-badge--fixed {
@@ -46,7 +55,9 @@ button.prd-badge,
   z-index: 9999;
   width: 450px;
   max-height: 70vh;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: #f0efef;
   border-radius: 4px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
@@ -55,34 +66,72 @@ button.prd-badge,
   box-sizing: border-box;
 }
 
-.prd-tooltip__close {
+.prd-tooltip__header {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 2;
+  background: #f0efef;
+}
+
+.prd-tooltip__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prd-tooltip__toolbar {
   position: absolute;
-  top: 8px;
-  right: 10px;
-  cursor: pointer;
-  line-height: 1;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.prd-tooltip__tool-btn {
+  min-width: 28px;
+  height: 22px;
+  padding: 0 6px;
   border: none;
-  background: transparent;
-  font-size: 14px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  line-height: 22px;
   color: #666;
-  padding: 0;
+  cursor: pointer;
+}
+
+.prd-tooltip__tool-btn:hover {
+  color: #165dff;
+  background: #fff;
 }
 
 .prd-tooltip__head {
-  padding-right: 24px;
+  padding-right: 88px;
+  cursor: move;
+  user-select: none;
 }
 
 .prd-tooltip__badge {
-  display: inline-block;
-  vertical-align: top;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
   background: rgb(250, 173, 20);
   color: #fff;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  line-height: 14px;
-  padding: 0 4px;
-  border-radius: 2px;
+  line-height: 1;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
   margin-right: 6px;
+  flex-shrink: 0;
 }
 
 .prd-tooltip__title {
@@ -94,7 +143,12 @@ button.prd-badge,
 .prd-tooltip__divider {
   height: 1px;
   background: #e8e8e8;
-  margin: 8px 0 12px;
+  margin: 8px 0 0;
+}
+
+.prd-tooltip__scroll .prd-tooltip__body,
+.prd-tooltip__scroll .prd-tooltip__form {
+  padding-top: 12px;
 }
 
 .prd-tooltip__body {
@@ -151,4 +205,210 @@ button.prd-badge,
 
 .prd-dot--orange {
   background: #faad14;
+}
+
+.prd-tooltip--edit {
+  max-height: 85vh;
+}
+
+.prd-tooltip__actions,
+.prd-tooltip__sync-msg {
+  flex-shrink: 0;
+}
+
+.prd-tooltip--fullscreen {
+  border-radius: 0;
+  max-height: 100vh !important;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px 20px;
+  overflow: hidden;
+}
+
+.prd-tooltip--fullscreen .prd-tooltip__header {
+  flex-shrink: 0;
+}
+
+.prd-tooltip--fullscreen .prd-tooltip__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.prd-tooltip--fullscreen .prd-tooltip__hint,
+.prd-tooltip--fullscreen .prd-tooltip__actions,
+.prd-tooltip--fullscreen .prd-tooltip__sync-msg {
+  flex-shrink: 0;
+}
+
+/* 全屏 + 编辑：四段 textarea 分区拉高，占满剩余视口 */
+.prd-tooltip--fullscreen.prd-tooltip--edit .prd-tooltip__scroll {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.prd-tooltip--fullscreen.prd-tooltip--edit .prd-tooltip__form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 12px;
+  padding-top: 12px;
+  overflow: hidden;
+}
+
+.prd-tooltip--fullscreen.prd-tooltip--edit .prd-field--section {
+  flex: 1;
+  min-height: 0;
+}
+
+.prd-tooltip--fullscreen.prd-tooltip--edit .prd-field--section .prd-textarea {
+  flex: 1;
+  min-height: 120px;
+  resize: vertical;
+  font-size: 14px;
+  line-height: 1.55;
+  padding: 8px 10px;
+}
+
+.prd-tooltip--fullscreen.prd-tooltip--edit .prd-input {
+  font-size: 14px;
+  padding: 8px 10px;
+}
+
+.prd-tooltip__meta {
+  display: block;
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: 4px;
+}
+
+.prd-section {
+  margin-bottom: 12px;
+}
+
+.prd-section__label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #595959;
+}
+
+.prd-section__content {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.prd-section__empty {
+  color: #8c8c8c;
+  font-size: 13px;
+}
+
+.prd-tooltip__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #595959;
+}
+
+.prd-input,
+.prd-textarea {
+  font-size: 13px;
+  padding: 6px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.prd-textarea {
+  resize: vertical;
+  min-height: 56px;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+.prd-tooltip__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.prd-tooltip__actions--dual {
+  flex-wrap: nowrap;
+}
+
+.prd-tooltip__actions--dual .prd-btn {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.prd-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  color: #333;
+}
+
+.prd-btn--primary {
+  background: rgb(250, 173, 20);
+  border-color: rgb(250, 173, 20);
+  color: #fff;
+}
+
+.prd-tooltip__hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #8c8c8c;
+  line-height: 1.4;
+}
+
+.prd-tooltip__sync-msg {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #389e0d;
+  line-height: 1.4;
+}
+
+.prd-tooltip__sync-msg.is-error {
+  color: #cf1322;
+}
+
+.prd-visibility-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9997;
+  padding: 6px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #333;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.prd-visibility-toggle:hover {
+  color: #165dff;
+  border-color: #165dff;
 }

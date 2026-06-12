@@ -1,0 +1,13 @@
+git_team: YOUR-ORG/team-crm
+codeowners_teams:
+  - YOUR-ORG/team-crm
+  - YOUR-ORG/team-leads
+# 内网无 Git Team 时：用 maintainers 名单，MR 手工指定 Reviewer
+maintainers:
+  - git_username: REPLACE_CRM_LEAD
+  - git_username: REPLACE_CRM_DEV
+default_role: developer
+apps:
+  - app_code: ai-smart-crm
+    folder: ai-smart-crm-admin
+    doc_path: AIEP-WEB/src/docs/子应用文档/ai-smart-crm

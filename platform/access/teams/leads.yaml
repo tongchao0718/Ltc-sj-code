@@ -1,0 +1,5 @@
+# 跨子应用管理者（内网无 Git Team 时使用）
+# 对应 GitHub 的 team-leads；MR 指定本名单成员之一 + 对应 app maintainers 即可 approve
+maintainers:
+  - git_username: REPLACE_LEAD_A
+  - git_username: REPLACE_LEAD_B

@@ -40,6 +40,7 @@ alwaysApply: false
 
 - `sub-app-resources` → `_resources/`
 - `design-review-pre-g2a` → `G2-A预审报告.md`
+- `ui-docs-reverse-sync` → `界面文档同步报告.md`（**人工触发**：preview → 确认 → apply）
 - `ui-acceptance-review` → `界面验收审核报告.md`（走查 / 回归）
 - `release-readiness-review` → `发布审核报告.md`（步骤 6 审计）
 - `project-memory` → `00-项目记忆.md`

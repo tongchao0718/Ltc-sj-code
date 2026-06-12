@@ -5,7 +5,10 @@
 
 export const SAMPLE_APP_ANNOTATIONS = {
   1: {
-    moduleName: '仪表盘工作台（M01 / SA-1）',
+    featureId: 'SA-1',
+    featureName: '工作台指标与图表',
+    moduleName: 'M01 仪表盘工作台',
+    pageRoute: '/sample-app/dashboard/workplace',
     markdown: `## 需求来源
 
 **需求编号：SA-1** | **模块：M01** | **页面：WorkplacePage** | **路由：** \`/sample-app/dashboard/workplace\`
@@ -38,33 +41,19 @@ export const SAMPLE_APP_ANNOTATIONS = {
 **非功能（NFR-1）**：1366×768 与 1920×1080 布局可用，图表区域可横向滚动或自适应缩放。`
   },
   2: {
-    moduleName: '列表筛选与查询（M02 / SA-2）',
-    markdown: `## 需求来源
-
-**需求编号：SA-2** | **模块：M02** | **页面：SearchTablePage** | **路由：** \`/sample-app/list/search-table\`
-
-### 显示样式
-
-- 筛选区字段：集合编号、集合名称、内容体裁、筛选方式、创建时间（区间）、状态（全部/已上线/已下线）。
-- 操作按钮：**查询**（主按钮）、**重置**（次按钮）。
-- 筛选区与表格区以分割线区分。
-
-### 交互与排序
-
-1. **查询**：根据当前筛选条件请求 \`GET /api/list/query\`，入参 \`keyword, status, pageNo, pageSize\` 等。
-2. **重置**：清空所有筛选字段并触发查询。
-3. **筛选条件变更后分页重置为第一页**（强制，产品设计文档 §3.1）。
-4. 支持分页、排序（接口契约）；当前演示为前端 Mock 行数据。
-5. 请求失败：展示错误提示，不静默失败（NFR-3）。
-
-### 业务定义
-
-- 读写表：\`sample_list_item\`。
-- 状态枚举：\`online\` 已上线、\`offline\` 已下线。
-
-### 备注
-
-> 验收（AT-02）：Given 用户设置筛选条件，When 执行查询并翻页，Then 结果按条件返回且分页重置规则正确。`
+    featureId: 'SA-2',
+    featureName: '列表筛选与查询',
+    moduleName: 'M02 列表查询',
+    pageRoute: '/sample-app/list/search-table',
+    sections: {
+      functional:
+        '筛选区字段：集合编号、集合名称、内容体裁、筛选方式、创建时间（区间）、状态（全部/已上线/已下线）。操作按钮：查询（主按钮）、重置（次按钮）。筛选区与表格区以分割线区分。',
+      interaction:
+        '1. 查询：根据当前筛选条件请求 GET /api/list/query，入参 keyword, status, pageNo, pageSize 等。\n2. 重置：清空所有筛选字段并触发查询。\n3. 筛选条件变更后分页重置为第一页（产品设计文档 §3.1）。\n4. 请求失败：展示错误提示，不静默失败（NFR-3）。',
+      dataModel:
+        '表：sample_list_item。状态枚举 online / offline。接口契约见 SDD §列表查询；标准编码见 03-PRD 第七章。',
+      other: '验收 AT-02：Given 用户设置筛选条件，When 执行查询并翻页，Then 结果按条件返回且分页重置规则正确。'
+    }
   },
   3: {
     moduleName: '列表表格与行操作（M02 / SA-2）',

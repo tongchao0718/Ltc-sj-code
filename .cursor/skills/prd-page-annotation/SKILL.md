@@ -1,144 +1,162 @@
 ---
 name: prd-page-annotation
 description: >-
-  深度解析 prd.md，将需求以模块化角标与详实浮窗挂载到 UI 页面，支持初始化标注与增量更新，并反向写入需求编号。
-  在用户提及 PRD 标注、页面标注、初始化标注、标注更新、prd.md 角标/浮窗、需求编号反向写入时使用。
+  按功能点将 PRD 以角标浮窗挂到 UI：四段式（功能说明/交互逻辑/数据模型与标准编码/其他说明）；
+  支持初始化、增量更新、浮窗内编辑（开发态）。落盘 03-PRD 与 annotations/*.js。
+  Use for PRD标注、页面标注、功能点标注、初始化标注、标注更新、浮窗编辑、需求编号反向写入。
+compatibility: AIEP-DEV；Node>=18；sample-app PrdAnnotation 为参考实现
+metadata:
+  aiep-step: "3-4"
+  aiep-gate: none
 ---
 
-# PRD 页面标注
+# PRD 页面标注（prd-page-annotation）
 
-> 来源：[飞书 · PRD标注Agent提示词【完整版】](https://my.feishu.cn/wiki/NWx2wqgEnilM7tkUCwSceAu7nWb)  
-> 仓库副本：`AIEP-WEB/src/skills/prd-page-annotation/`（与本文档同步维护）
+> **参考实现**：`AIEP-WEB/src/apps/sample-app/components/PrdAnnotation/`  
+> **数据文件**：`AIEP-WEB/src/apps/{app}/annotations/{app}Annotations.js`  
+> **仓库副本**：`AIEP-WEB/src/skills/prd-page-annotation/`（与 `.cursor/skills/` 同步）
 
-## Role
+## 定位
 
-你是一位拥有严谨逻辑的资深产品经理与前端工程专家。你的目标是实现页面与需求的模块化解耦，并能根据用户需求执行**【初始化标注】或【增量更新】**，让研发人员通过页面标注即可获得完整、无需二次确认的开发指令。
+将 **功能点**（非整页）以角标 + 浮窗挂到 UI 锚点，研发/客户走查时无需翻 PRD。  
+**不替代** `03-PRD设计评审文档.md` 冻结与 `19-G2-A` 人工签字。
 
-## Task
+## AIEP 落盘路径（禁止仅用 prd.md）
 
-深度解析 `prd.md`，将所有需求点以模块化聚合的形式挂载到 UI 页面。根据用户的明确指令，选择并执行以下两个工作流之一。
+| 用途 | 路径 |
+|------|------|
+| PRD 主文档 | `01-需求与设计/03-PRD设计评审文档.md` |
+| SA 锚定 | `01-需求与设计/01-需求说明书.md` |
+| 映射表 | `页面-路由-接口-数据表映射表.md`（Gate-3） |
+| 契约 | `SDD-v*.json` / `SDD-Lite*.json` |
+| 标注数据 | `src/apps/{app}/annotations/{app}Annotations.js` |
+| 反向写入 | 在 01 / 03 表格或章节用 `[n]` 或 `SA-xx` 关联功能点；**一键复制**片段含 `app-code`（仅注释，UI 不展示） |
 
-**核心指标：** 研发人员通过浮窗获取的信息必须足够详实，足以完全替代阅读原始 PRD 文档。
+## 编号规则（三层）
 
-## 必要输入
+| 层 | 格式 | 用途 |
+|----|------|------|
+| 角标显示 | `SA-xx` 数字部分或顺序 `id` | UI 角标文字 |
+| 文档追溯 | `SA-xx`、`Mxx` | 需求说明书、PRD 模块 |
+| 代码 `id` | 1～999 | `PrdAnnotationAnchor :id`、annotations 键 |
 
-| 工作流 | 必需 |
-|--------|------|
-| Workflow A | `prd.md` + 目标页面实现（Vue/React 等源文件路径） |
-| Workflow B | 现有标注实现 + 调整后的 `prd.md` 和/或页面实现 |
+**禁止**自造与 01 不一致的 SA 编号。同一 **功能点** 一个角标；**同一页面可有多个功能点**（多个角标）。
 
-可选：产品设计文档、页面路由映射表（用于确认模块边界）。
+## 浮窗四段式（强制结构）
 
-## 与正式 PRD / SDD 对齐（强制）
+每条标注 `sections` 四字段（空段可不展示）：
 
-- 角标与浮窗标题中的**需求编号**须与 `01-需求说明书.md` 中 SA-xx（或项目约定编号）一致，禁止自造编号。
-- 契约类描述（接口路径、字段、错误码）以 **`SDD-v*.json` / `SDD-Lite*.json`** 为准；页面交互以 **`03-PRD设计评审文档.md`** 为准。
-- **PRD 冻结前**：将页面标注中的需求描述合并进 `03-PRD设计评审文档` 对应模块章节，避免研发只依赖页面浮窗。
-- 映射关系见 `页面-路由-接口-数据表映射表.md`（Gate-3 必须）。
+| 字段 key | 标题 | 写什么 |
+|----------|------|--------|
+| `functional` | 功能说明 | 展示内容、字段、状态、权限、四态 |
+| `interaction` | 交互逻辑 | 点击/提交/校验/分页/联动/异常提示 |
+| `dataModel` | 数据模型与标准编码引用 | 表名、接口（详见 SDD §x）、枚举、PRD 第七章编码 |
+| `other` | 其他说明 | 验收 AT、NFR、走查备注 |
 
-## Task Decision（任务判定）
+数据示例见 [reference.md](reference.md)。旧版 `markdown` 仍支持，加载时自动拆分为四段。
 
-在执行任何操作前，你必须首先判定用户的意图。
+## 标注粒度：按功能点（非按整页）
 
-- **如果指令不明确：** 严禁擅自执行。你必须主动向用户提问：“请问您是需要执行【Workflow A:初始化标注】（针对新页面/新文档），还是执行【Workflow B: 标注内容更新】（针对已有标注的增量修改）？”
-- **如果指令明确：** 请严格按照下方对应的工作流执行。
+| 策略 | 说明 |
+|------|------|
+| **推荐** | 每个可独立验收的功能点一个角标（如：筛选区、表格区、行操作、分页） |
+| 锚点 | 该功能点 UI 容器右上角 |
+| **禁止** | 在同一按钮上叠多个角标（行内「编辑」「删除」合并为「行操作」一个功能点） |
+| 整页 | 仅当整页只有一个功能点时才一页一角标 |
 
-## Workflow A：初始化标注 (Initialization)
+同页多角标示例：`SearchTablePage` 上 `[2]` 筛选、`[3]` 表格 — 见 [examples.md](examples.md)。
 
-**触发场景：** 用户提供 `prd.md` 和页面实现内容，要求开始标注。
+## 浮窗内直接编辑（开发态）
 
-### 1. 模块化需求聚合 (Modular Aggregation)
+参考实现已支持（`sample-app`）：
 
-- **组件归一化：** 严禁在同一个组件或紧密关联的模块上标记多个角标。
-- **整合逻辑：** 在标注前，必须先对 `prd.md` 的需求点进行逻辑分组，将属于同一功能区域的需求整合至一个需求编号及一个浮窗内。
-- **示例 A（行操作）：** 将“编辑、删除、查看、权限控制”等所有行内操作需求整合，标注在列表行标题栏的“操作”标题处。
-- **示例 B（筛选模块）：** 将所有输入框、下拉框、查询/重置按钮的需求整合，标注在筛选模块整体的右上角。
-- **示例 C（Tab/容器）：** 将所有标签页切换逻辑整合，标注在 Tabs 栏目整体的右上角。
-- **零丢失提取：** 整合后的浮窗必须包含该模块下所有原始描述、业务逻辑、前置条件及异常流程，严禁概括或删减细节。
+1. 开发模式或 `VITE_PRD_ANNOTATION_EDIT=true` 时，悬停角标即查看；浮窗底部 **编辑** / **保存**（两态切换）与 **一键复制**
+2. **人工编辑为纯文本**：四段式字段直接写中文，换行分段；条目可用 `1. ` 或 `- ` 开头。**无需**写 `##`、`**` 等 Markdown。进入编辑时会把历史 Markdown 自动去符号转为可读纯文本。
+3. 修改四段式字段 → **保存**（`localStorage` 暂存）
+4. **一键复制** → 复制当前功能点 JS 片段（头部含 `@aiep-prd-annotation app-code=…`，**界面不展示**）→ Cursor 按 `target` 路径打开对应子应用 `annotations/*.js` 整段替换 → Git 提交（**无需 dev**）
+5. 角标为 **16px 圆形数字**（原型标注样式）
+6. 生产构建默认关闭编辑（`VITE_PRD_ANNOTATION_EDIT=false`）
+7. **隐藏/显示标注**：布局挂载 `PrdAnnotationToggle`，右下角一键切换；偏好写入 `localStorage`
 
-更多聚合示例见 [examples.md](examples.md)。
+Agent 批量初始化仍走 Workflow A/B；**Agent 写入 sections 时也应用纯文本**（勿依赖 Markdown 标题/加粗）。人工微调可用浮窗编辑。
 
-### 2. 交互浮窗：全量信息架构 (Comprehensive Tooltip)
+## Task Decision
 
-浮窗内容排版规范见 [reference.md](reference.md) 中「浮窗信息架构」与「Markdown 渲染」。
+指令不明确时询问：
 
-要点：
+- **Workflow A**：新页面/新功能点初始化标注  
+- **Workflow B**：已有标注增量更新  
+- **Workflow C**（可选）：仅浮窗内人工编辑，不改 Vue 锚点
 
-- **【顶部标题栏】：** 需求编号 + “需求描述：[模块名称]”。下方有一条浅灰色细分割线。需求编号的样式与角标样式要完全一致。
-- **【Markdown 深度渲染】：** 段落行高 1.6、段间距 12px；1:1 还原加粗与斜体；保留列表层级；引用块以浅灰左边框展示。
-- **【核心板块】：** 采用“小标题：内容”排版，涵盖：显示样式、交互与排序、业务定义、备注等。
-- **【视觉增强】：** 涉及状态色时，在文字前加上对应彩色圆点图标。
+## Workflow A：初始化标注
 
-### 3. 标注与定位规范 (Positioning & Layout)
+1. 从 `03-PRD` + `01-需求说明书` + SDD 列出 P0 **功能点清单**（非仅页面清单）
+2. 为每个功能点分配 `id`、`featureId`（SA-xx）、`featureName`
+3. 填写四段式 `sections`（契约细节写「详见 SDD §x」，勿在浮窗展开全文）
+4. 在页面用 `PrdAnnotationAnchor :id="n"` 挂锚点（复用 sample-app 组件）
+5. 反向写入：在 01/03 用 `[n]` 或 SA 列关联功能点；人工复制落盘时**必须先核对**复制头中的 `app-code`，避免写入错误子应用
+6. **PRD 冻结前**：合并进 `03-PRD` 对应模块（`prd-design-generation` step4-freeze）
 
-- **非侵入式：** 使用 `position: absolute`，严禁干扰原页面 DOM 布局、宽高及间距。
-- **角标定位：** 悬浮于组件或模块的右上方（`top: -8px; right: -4px;`）。
-- **层级管理：**
-  - 角标可见性保障：必须确保角标不被任何页面元素遮挡。若目标组件存在 `overflow: hidden`，需将角标挂载至 `body` 根节点并计算全局坐标。
-  - 浮窗层级：`z-index: 9999;`（确保在最顶层）。
-- **智能避让与边界：** 浮窗默认出现在角标的左下方（间距 8px）。若临近页面边缘导致溢出视口，需自动反向调整位置。
+## Workflow B：增量更新
 
-### 4. 视觉与交互规范 (Design System)
+1. diff `03-PRD` / 功能点清单 / `annotations/*.js`
+2. **样式锁**：不改角标 CSS 与浮窗尺寸
+3. 新增功能点 → 新 `id` + 新锚点；删除 → 移除角标与映射；修改 → 只改 `sections`
 
-角标、浮窗、多浮窗交互的精确 CSS 与行为见 [reference.md](reference.md)「设计系统」。
+## 实现指引
 
-要点：
+1. **复制** `sample-app/components/PrdAnnotation/` + `annotations/annotationFormat.js`、`annotationStore.js`、`annotationAppMeta.js`（**必改** `appCode` / `appFolder` / 文件名）
+2. `annotations/{app}Annotations.js` 结构：
 
-- 角标：数字 1–999；背景 `rgb(250, 173, 20)`；10px 粗体白字；`padding: 0 4px`；`border-radius: 2px`。
-- 浮窗：宽 450px；背景 `#f0efef`；右上角 X 关闭；Hover 角标打开；仅 X 可关闭；可拖拽；事件隔离；同编号仅一个浮窗，不同编号可同时打开。
+```javascript
+export const APP_ANNOTATIONS = {
+  2: {
+    featureId: 'SA-2',
+    featureName: '列表筛选与查询',
+    moduleName: 'M02 列表查询',
+    pageRoute: '/sample-app/list/search-table',
+    sections: {
+      functional: '…',
+      interaction: '…',
+      dataModel: '表 xxx；接口详见 SDD §3.2；标准编码见 PRD 第七章',
+      other: '验收 AT-02 …'
+    }
+  }
+}
+```
 
-### 5. 双向追溯与反向写入 (Bidirectional Writing)
+3. 环境变量：`VITE_PRD_ANNOTATION`（显隐）、`VITE_PRD_ANNOTATION_EDIT`（编辑）
 
-- **反向注入：** 将生成的 1–999 需求编号反向写入 `prd.md` 对应需求描述起始位置（格式：`[1]`，样式与角标一致）。
-- **逻辑同步：** 确保页面标注编号与文档内编号严格一一对应。
+技术细节：[reference.md](reference.md) · 聚合示例：[examples.md](examples.md)
 
-## Workflow B：标注内容更新 (Incremental Update)
+## 自检清单
 
-**触发场景：** 用户提供调整后的 `prd.md` 或页面实现内容，要求更新现有标注。
+- [ ] 按 **功能点** 而非仅按页面标注；同页多角标合理
+- [ ] 四段式齐全或空段有理由
+- [ ] SA-xx 与 01 一致；契约引用 SDD 而非浮窗臆造
+- [ ] 同功能区域无重复角标
+- [ ] 反向写入 01/03 或 annotations 已提交
+- [ ] 浮窗：拖拽、仅 X 关闭、450px 宽、Teleport 防裁剪
 
-1. **差异识别：** 对比标注与调整后 `prd.md` 文档/页面实现，识别需求的“新增、修改、删除”变化。
-2. **样式锁定 (Style Lock)：** 严禁修改任何视觉样式参数。保持角标颜色、尺寸、浮窗背景及偏移坐标等完全不变。
-3. **精准内容替换：** 仅针对受影响的需求编号，更新其浮窗内的 Markdown 文本。
-   - **除项：** 移除对应编号的角标。
-   - **新增项：** 按既定样式规范生成新编号及角标，确保编号逻辑连续。
-   - **修改项：** 仅替换浮窗内容，不改动角标位置（除非组件位置发生变化）
+## 阶段门禁
 
-## 实现指引（前端）
+| 结论 | 条件 |
+|------|------|
+| pass | P0 功能点均有锚点 + 四段式可读 + SA 一致 |
+| fail | 缺 P0 功能点或 SA 冲突 |
+| blocked | 无 03-PRD 草案 / 无页面实现 |
 
-在目标页面或共享层实现标注能力时：
-
-1. **优先复用：** 若子应用已有 `PrdAnnotation` / composable，扩展而非重写。
-2. **推荐结构：**
-   - 角标锚点：包裹目标模块根节点，`position: relative`，内嵌角标或 `Teleport` 到 `body`。
-   - 浮窗：`Teleport` + `fixed` 坐标；`pointer-events` 与 `@mousedown.stop` / `@click.stop` 隔离下层事件。
-   - 内容：将 PRD 片段存为编号 → Markdown 映射；浮窗内用 Markdown 渲染器输出 HTML。
-3. **编号映射文件（建议）：** 同目录或 `composables/usePrdAnnotation.js` 维护 `badgeId → { moduleName, markdown, anchorSelector }`，便于 Workflow B 做 diff。
-4. **完成标准：** 页面可交互预览中，研发仅读浮窗即可实现该模块，无需打开 `prd.md`。
-
-技术细节与 CSS 常量见 [reference.md](reference.md)。
-
-## Execution & Self-Correction（强制自检）
-
-任务完成后，必须自检并修正：
-
-- [ ] **指令对齐：** 我执行的是【初始化】还是【更新】？
-- [ ] **聚合自检：** 同一组件/模块是否只有一个角标？
-- [ ] **完整性自检：** 浮窗信息是否详实到可以完全替代 PRD 文档？是否有需求缺失？
-- [ ] **交互自检：** 浮窗是否支持拖拽？是否只能通过 X 按钮关闭？点击浮窗是否隔离了页面事件？
-- [ ] **样式自检：** 角标是否符合 10px 粗体规范？层级是否正确（不遮挡蒙层，但浮窗在最顶层）？浮窗是否完美保留了原文档的 Markdown 层级与重点？
-- [ ] **样式锁自检：** （Workflow B）视觉参数是否 100% 一致？
-- [ ] **反向写入自检：** 编号是否已正确写回 `prd.md`？
-
-未通过项必须修复后再交付。
-
-## 交付清单
-
-1. 页面源码中的角标锚点与浮窗实现（或共享组件接入）
-2. 编号 → 内容映射（代码或数据文件）
-3. 已反向写入编号的 `prd.md`（Workflow A 必做；Workflow B 按 diff 更新）
-4. 自检结果摘要（通过了哪些项、修复了哪些项）
+本 Skill **不判定** G2-A / PRD 冻结。
 
 ## 关联技能
 
-- 上游：`prd-design-generation`（产出 PRD）、`ui-generation`（页面结构）
-- 下游：`code-development`（研发按浮窗实现）
+- 上游：`ui-generation`、`prd-design-generation`（step3-draft）
+- 预审：`design-review-pre-g2a`（D4 标注 SA 一致）
+- 走查：`ui-acceptance-review`
+- 冻结：`prd-design-generation`（step4-freeze 合并浮窗进 PRD）
+
+## 禁止
+
+- 代签 `19-G2-A` 或标 PRD「冻结版」
+- 浮窗编造接口字段（须引用 SDD）
+- 生产环境默认开启浮窗编辑

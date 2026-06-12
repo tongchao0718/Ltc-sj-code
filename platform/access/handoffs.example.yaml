@@ -1,0 +1,19 @@
+# 部分子应用临时接管登记（示例）
+# 复制条目到 manifest.yaml 的 user_grants，或本文件作留痕（与 MR 标题 [临时接管 app-code] 一致）
+# 粒度：仅 listed app_code，不含同 Team 其他 app
+
+handoffs:
+  - user: git_username:zhangsan          # 接管人 A
+    app_code: marketing-demo             # 仅这一个子应用
+    owner_team: team-marketing           # 归属团队（Review 仍找该 app maintainers）
+    role: developer                      # 业务角色；Git 项目角色可仍为 Developer
+    grant_type: allow
+    reason: partial-temporary-handoff    # 部分接管，非整 Team
+    expires_at: 2026-07-31               # 可选；到期移除条目并停止代提 MR
+    approved_by: git_username:li-lead    # B 方 Maintainer 确认
+
+# MR 约定（执行层，不写入 Git 角色）：
+# - 分支：handoff/marketing-demo-<简述>-zhangsan
+# - 路径：仅 apps/marketing-demo/、docs/.../marketing-demo/、对应 build 配置
+# - Reviewer：team-marketing.yaml 中 marketing-demo 的 maintainers
+# - 禁止：同 MR 修改 B 团队其他 app 或 subApps.js（须单独 MR + 框架 Maintainer）

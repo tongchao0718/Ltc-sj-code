@@ -8,7 +8,7 @@
       <div class="block">
         <h2 class="section-h">系统信息</h2>
         <p><strong>系统名称：</strong>设计应用系统</p>
-        <p><strong>当前版本：</strong>V2.2.0</p>
+        <p><strong>当前版本：</strong>V2.3.0</p>
         <p><strong>开发框架：</strong>Vue 3 + Vite</p>
       </div>
       <div class="block">

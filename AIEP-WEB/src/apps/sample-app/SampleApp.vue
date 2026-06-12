@@ -32,6 +32,7 @@
     <main class="app-content">
       <router-view />
     </main>
+    <PrdAnnotationToggle />
   </div>
 </template>
 
@@ -39,7 +40,7 @@
 import { computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import './styles/sample-arco.css'
-import { PrdAnnotationAnchor, PRD_ANNOTATION_ENABLED } from './components/PrdAnnotation/index.js'
+import { PrdAnnotationAnchor, PrdAnnotationToggle, PRD_ANNOTATION_ENABLED } from './components/PrdAnnotation/index.js'
 
 const prdAnnotationEnabled = PRD_ANNOTATION_ENABLED
 

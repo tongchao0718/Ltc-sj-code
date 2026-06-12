@@ -3,7 +3,7 @@
     <div class="dashboard-header">
       <div class="dashboard-intro">
         <h1 class="page-title">工作台</h1>
-        <p class="page-subtitle">AIEP 主应用 · 框架 v2.2.0 · 子应用统一入口与运行概览</p>
+        <p class="page-subtitle">AIEP 主应用 · 框架 v2.3.0 · 子应用统一入口与运行概览</p>
       </div>
     </div>
 
@@ -73,7 +73,7 @@ const quickLinks = computed(() =>
 const stats = computed(() => [
   { title: '已接入子应用', value: String(metrics.value.appCount), desc: '注册表 subApps.js 驱动' },
   { title: '路由页面合计', value: String(metrics.value.pageCount), desc: `主系统 ${MAIN_PAGE_COUNT} 页 + 子应用路由` },
-  { title: '框架版本', value: 'v2.2.0', desc: '离线更新包 · Agent Skills 已同步' },
+  { title: '框架版本', value: 'v2.3.0', desc: '离线更新包 · Agent Skills 已同步' },
   { title: '构建状态', value: '正常', desc: '主应用与子应用独立构建' }
 ])
 </script>

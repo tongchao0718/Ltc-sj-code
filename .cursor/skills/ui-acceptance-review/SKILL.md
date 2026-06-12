@@ -28,7 +28,7 @@ metadata:
 
 | 模式 | 触发 | 前置 |
 |------|------|------|
-| **pre-walkthrough** | 预审 pass 后、客户走查前 | `G2-A预审报告.md` 为 pass |
+| **pre-walkthrough** | 预审 pass 后、客户走查前 | `G2-A预审报告.md` 为 pass；建议开启 `VITE_PRD_ANNOTATION` 按功能点走查 |
 | **walkthrough-record** | 走查进行中/结束后 | 步骤 4；有走查反馈或需整理议题 |
 | **regression** | 步骤 5 开发后、发布前 | PRD 已冻结 + `19-G2-A` 人工通过 |
 

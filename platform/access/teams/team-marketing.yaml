@@ -1,0 +1,11 @@
+git_team: YOUR-ORG/team-marketing
+codeowners_teams:
+  - YOUR-ORG/team-marketing
+  - YOUR-ORG/team-leads
+maintainers:
+  - git_username: REPLACE_MKT_LEAD
+default_role: developer
+apps:
+  - app_code: marketing-demo
+    folder: marketing-demo
+    doc_path: AIEP-WEB/src/docs/子应用文档/marketing-demo

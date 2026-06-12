@@ -103,6 +103,7 @@ Gate-1 + Gate-2 均 pass 才可进步骤 3。
 2. `ui-generation`（**step3 模式**）
 3. `prd-design-generation`（**step3-draft**，模板 03，非 SDD）
 4. 可选：`prd-page-annotation`（原型即 PRD，标注反向同步 03-PRD）
+5. 界面迭代后（**须用户人工说「回写文档」**）：`ui-docs-reverse-sync` preview → 确认 → apply
 
 **步骤 3→4 前置：U1～U6 全 ✅ + R1～R5 全 ✅ + 预审 pass**
 

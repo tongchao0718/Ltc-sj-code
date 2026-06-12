@@ -7,7 +7,7 @@ function escapeHtml(text) {
 }
 
 /**
- * 轻量 Markdown → HTML（浮窗用，覆盖 PRD 常见格式）
+ * 浮窗正文渲染：纯文本（换行、空行）+ 常见条目写法，兼容历史 Markdown 存量
  */
 export function renderPrdMarkdown(md) {
   if (!md) return '';
@@ -65,22 +65,22 @@ export function renderPrdMarkdown(md) {
       out.push(`<h3 class="prd-md-h3">${inline(line.replace(/^##\s+/, ''))}</h3>`);
       continue;
     }
-    if (/^-\s+/.test(line)) {
+    if (/^[-*·•]\s+/.test(line)) {
       if (!inUl) {
         closeLists();
         out.push('<ul class="prd-md-ul">');
         inUl = true;
       }
-      out.push(`<li>${inline(line.replace(/^-\s+/, ''))}</li>`);
+      out.push(`<li>${inline(line.replace(/^[-*·•]\s+/, ''))}</li>`);
       continue;
     }
-    if (/^\d+\.\s+/.test(line)) {
+    if (/^\d+[.．、]\s*/.test(line)) {
       if (!inOl) {
         closeLists();
         out.push('<ol class="prd-md-ol">');
         inOl = true;
       }
-      out.push(`<li>${inline(line.replace(/^\d+\.\s+/, ''))}</li>`);
+      out.push(`<li>${inline(line.replace(/^\d+[.．、]\s*/, ''))}</li>`);
       continue;
     }
     closeLists();

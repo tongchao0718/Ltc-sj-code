@@ -13,6 +13,12 @@
 
 子应用：`<app-code>`
 
+## 路径与 Code Owners（防错改）
+
+- [ ] 变更仅在本人团队路径内（或已获对应 Code Owner approve）
+- [ ] **新建子应用**时已更新 `.github/CODEOWNERS` 与 `platform/access/teams/*.yaml`（见 `platform/access/README.md`）
+- [ ] 若改 `subApps.js` / `router` / 根 `package.json` → 须 **framework-maintainers** review
+
 ## 门禁（本地可跑）
 
 ```bash

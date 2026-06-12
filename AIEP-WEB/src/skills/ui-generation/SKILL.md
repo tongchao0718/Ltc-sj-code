@@ -18,6 +18,18 @@ description: >-
 
 **禁止**：step3 仅 MVP 子集；step4 大规模新建页面；Agent 自签 G2-A。
 
+## 模板调用要求（强制）
+
+1. 从 `{TEMPLATE_REPO_PATH}` **复制**模板后填写（默认：`核心文档/AI+产品落地/02-子应用通用模板/`）。  
+2. 本阶段必用模板：  
+   - `04-界面设计文档`：无独立母版；**须含** `## 文档信息`、`## 页面清单`（或 `## 一、页面清单`）、`## 变更记录`（样例见 `sample-app`、`marketing-demo`）  
+   - `02-产品设计文档模板.md`（可选轻量产出）  
+   - `03-PRD` 由 **`prd-design-generation`（step3-draft）** 负责，本 Skill 不代写  
+   - step4：`19-G2-A界面确认记录模板.md`  
+3. 模板不可读 → 输出 **`blocked`**；**禁止**自行发明章节结构。  
+4. 未按模板章节输出，阶段门禁判定为 `fail`；须跑 `npm run validate:doc-template -- --app {app-code} --gate G3`。  
+5. 输出结果须回填子应用目录，不得改写模板母版。
+
 ## step3-prototype
 
 ### 必要输入
@@ -27,12 +39,6 @@ description: >-
 - `01-需求说明书` 中的 **platform_type** 与页面/屏幕清单
 - **`_resources/`**（由 `sub-app-resources` 先行初始化/校验）
 - 设计规范：Arco / 营销 YXUI / Ant 移动 §九 / 原生 Skill
-
-### 模板
-
-1. `04-界面设计文档`（体验细节真值，步骤 3 主写）  
-2. `02-产品设计文档`（轻量：架构、风格策略）  
-3. `03-PRD` 由 **`prd-design-generation`（step3-draft）** 在界面草案对齐后产出  
 
 ### 必交付物
 

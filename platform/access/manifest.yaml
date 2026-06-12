@@ -1,0 +1,18 @@
+# AIEP Git 权限登记（场景 A：防错改）
+# 真值：Git Team + .github/CODEOWNERS；本文件供对账与跨团队例外留痕
+
+version: 1
+
+super_admins:
+  - github: REPLACE_WITH_ORG_OWNER
+
+user_grants: []
+  # 部分子应用临时接管示例（仅 app 粒度，见 handoffs.example.yaml）：
+  # - user: git_username:zhangsan
+  #   app_code: marketing-demo
+  #   role: developer
+  #   grant_type: allow
+  #   reason: partial-temporary-handoff
+  #   expires_at: 2026-07-31
+  #   owner_team: team-marketing
+  #   approved_by: git_username:li-lead

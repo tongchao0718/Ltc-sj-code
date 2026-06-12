@@ -1,7 +1,7 @@
 {
   "name": "ltc-demo",
   "private": true,
-  "version": "2.2.0",
+  "version": "2.3.0",
   "type": "module",
   "scripts": {
     "dev": "cd AIEP-WEB && vite --config vite.config.js",
@@ -22,6 +22,7 @@
     "test:watch": "cd AIEP-WEB && vitest watch --config vite.config.test.js",
     "test:coverage": "cd AIEP-WEB && vitest run --config vite.config.test.js --coverage",
     "validate:sdd": "node AIEP-WEB/scripts/sdd-validate.mjs",
+    "validate:doc-template": "node AIEP-WEB/scripts/doc-template-validate.mjs",
     "infer:process-step": "node AIEP-WEB/scripts/infer-process-step.mjs",
     "postinstall": "node scripts/sync-skills.mjs --quiet",
     "sync:skills": "node scripts/sync-skills.mjs",
@@ -34,6 +35,7 @@
     "import:sub-app": "node AIEP-WEB/scripts/import-sub-app.mjs",
     "validate:sub-app-pack": "node AIEP-WEB/scripts/validate-sub-app-pack.mjs",
     "coverage:acceptance": "node AIEP-WEB/scripts/acceptance-coverage.mjs",
+    "apply:prd-annotations": "node AIEP-WEB/scripts/apply-prd-annotation-overrides.mjs",
     "server:dev": "cd AIEP-SERVER && npm run dev",
     "server:start": "cd AIEP-SERVER && npm start",
     "server:test": "cd AIEP-SERVER && npm test",

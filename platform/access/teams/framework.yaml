@@ -1,0 +1,11 @@
+git_team: YOUR-ORG/framework-maintainers
+codeowners_teams:
+  - YOUR-ORG/framework-maintainers
+maintainers:
+  - git_username: REPLACE_FRAMEWORK_LEAD
+default_role: maintainer
+apps:
+  - app_code: sample-app
+    folder: sample-app
+    doc_path: AIEP-WEB/src/docs/子应用文档/sample-app
+notes: 主应用壳、subApps.js、router、根 package.json 由本 Team 负责 review

@@ -1,0 +1,52 @@
+# AIEP 防错改 — Code Owners（场景 A，见 核心文档/框架核心文档/平台化方案.md §4.11）
+#
+# 使用前：将 @YOUR-ORG 替换为 GitHub Organization 名（如 @acme-corp）
+# 并在 GitHub Org 创建对应 Teams，开启 main 分支：Require review from Code Owners
+#
+# Teams（建议）：
+#   framework-maintainers — 主平台、subApps.js、router、根脚本
+#   team-leads            — 跨子应用管理者（§4.11.8 方式 2，可与各 app team 任一 approve）
+#   team-crm              — ai-smart-crm-admin
+#   team-marketing        — marketing-demo
+#
+# 新建子应用：在本文件追加 apps/<folder>/、docs、build 三处路径，见 platform/access/README.md
+
+# 默认：框架组兜底
+* @YOUR-ORG/framework-maintainers
+
+# ── 主应用壳（防误改全局入口）────────────────────────
+/AIEP-WEB/src/App.vue @YOUR-ORG/framework-maintainers
+/AIEP-WEB/src/main.js @YOUR-ORG/framework-maintainers
+/AIEP-WEB/src/router/ @YOUR-ORG/framework-maintainers
+/AIEP-WEB/src/config/subApps.js @YOUR-ORG/framework-maintainers
+/AIEP-WEB/src/views/ @YOUR-ORG/framework-maintainers
+/AIEP-WEB/src/components/ @YOUR-ORG/framework-maintainers
+/AIEP-WEB/src/store/ @YOUR-ORG/framework-maintainers
+/AIEP-WEB/vite.config.js @YOUR-ORG/framework-maintainers
+/AIEP-WEB/index.html @YOUR-ORG/framework-maintainers
+
+# 主应用接入：注册表变更须框架组；各 app 团队可被 @ 以便知晓（GitHub 默认任一 owner approve 即可 merge）
+/package.json @YOUR-ORG/framework-maintainers
+
+# ── 示例子应用（框架维护，或改为 @YOUR-ORG/team-demo）──
+/AIEP-WEB/src/apps/sample-app/ @YOUR-ORG/framework-maintainers
+/AIEP-WEB/src/docs/子应用文档/sample-app/ @YOUR-ORG/framework-maintainers
+/AIEP-WEB/build/vite.sample-app.config.js @YOUR-ORG/framework-maintainers
+/AIEP-WEB/build/sample-app.html @YOUR-ORG/framework-maintainers
+
+# ── AI 智能 CRM ─────────────────────────────────────
+/AIEP-WEB/src/apps/ai-smart-crm-admin/ @YOUR-ORG/team-crm @YOUR-ORG/team-leads
+/AIEP-WEB/src/docs/子应用文档/ai-smart-crm/ @YOUR-ORG/team-crm @YOUR-ORG/team-leads
+/AIEP-WEB/build/vite.ai-smart-crm-admin.config.js @YOUR-ORG/team-crm @YOUR-ORG/team-leads
+/AIEP-WEB/build/ai-smart-crm-admin.html @YOUR-ORG/team-crm @YOUR-ORG/team-leads
+
+# ── 营销系统 Demo ───────────────────────────────────
+/AIEP-WEB/src/apps/marketing-demo/ @YOUR-ORG/team-marketing @YOUR-ORG/team-leads
+/AIEP-WEB/src/docs/子应用文档/marketing-demo/ @YOUR-ORG/team-marketing @YOUR-ORG/team-leads
+/AIEP-WEB/build/vite.marketing-demo.config.js @YOUR-ORG/team-marketing @YOUR-ORG/team-leads
+/AIEP-WEB/build/marketing-demo.html @YOUR-ORG/team-marketing @YOUR-ORG/team-leads
+
+# ── 框架文档与权限配置 ─────────────────────────────
+/核心文档/框架核心文档/ @YOUR-ORG/framework-maintainers
+/platform/access/ @YOUR-ORG/framework-maintainers @YOUR-ORG/team-leads
+/.github/ @YOUR-ORG/framework-maintainers

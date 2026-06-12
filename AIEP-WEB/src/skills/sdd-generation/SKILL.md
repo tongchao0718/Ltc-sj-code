@@ -39,6 +39,12 @@ description: >-
 
 **禁止**改写模板母版；从模板复制到子应用目录后填写。
 
+## 模板调用要求（强制）
+
+1. 从 `核心文档/AI+产品落地/02-子应用通用模板/` **复制** SDD / 17 / 20-G2-B / 08 / 13 等模板后填写。  
+2. 模板不可读 → 输出 **`blocked`**；**禁止**自行发明 SDD 章节结构。  
+3. 步骤 2 完成后须跑 `npm run validate:sdd -- --app {app-code} --gate G2`（内嵌 `validate:doc-template` 章节校验）。
+
 ## 执行步骤
 
 1. 读 `01-需求说明书.md`，确认 `flow_type` 选 standard / fast_track 模板分支。

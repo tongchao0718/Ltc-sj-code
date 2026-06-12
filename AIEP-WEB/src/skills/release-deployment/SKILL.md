@@ -12,6 +12,14 @@ description: >-
 > **审计 Skill**：`release-readiness-review`（发布前须审计 pass，见 `.cursor/skills/release-readiness-review/SKILL.md`）  
 > **前置**：步骤 5 `test-validation` 结论 go/conditional go；Gate-2 + Gate-3 已 pass
 
+## 模板调用要求（强制）
+
+1. 从 `{TEMPLATE_REPO_PATH}` **复制**模板后填写（默认：`核心文档/AI+产品落地/02-子应用通用模板/`）。  
+2. 本阶段必用模板：`06-应用操作说明书模板.md`；发布记录单结构参考 `marketing-demo/03-发布与复盘/发布记录单.md`。  
+3. 模板不可读 → 输出 **`blocked`**；**禁止**自行发明章节结构。  
+4. Gate-4 前须跑 `npm run validate:doc-template -- --app {app-code}`（操作说明书存在时校验 `前置条件`、`功能操作说明` 等节）。  
+5. 不得改写模板母版。
+
 ## 必要输入
 
 - `02-研发与测试/` 测试验收结论（`验收脚本-GWT.md` 执行证据、`G2-G3关卡自动门禁检查.md`）

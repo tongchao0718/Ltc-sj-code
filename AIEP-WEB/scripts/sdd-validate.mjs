@@ -7,6 +7,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { validateRegistry } from './sub-app-registry-validate.mjs'
+import { validateDocTemplates } from './doc-template-shared.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const WEB_SRC = path.join(__dirname, '..', 'src')
@@ -182,6 +183,13 @@ function main() {
     } catch (e) {
       failed.push(`SDD JSON 解析失败: ${e.message}`)
     }
+  }
+
+  const docGate = gate === 'G2' || gate === 'G3' ? gate : null
+  if (docGate) {
+    const docResult = validateDocTemplates({ app, gate: docGate })
+    failed.push(...docResult.failed)
+    warnings.push(...docResult.warnings.map((w) => `[doc-template] ${w}`))
   }
 
   if (gate === 'G2' && sdd) {

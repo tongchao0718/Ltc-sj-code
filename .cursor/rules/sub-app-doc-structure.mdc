@@ -33,6 +33,8 @@ alwaysApply: false
 
 模板来源：`核心文档/AI+产品落地/02-子应用通用模板/`（复制后去「模板」后缀、替换 `<app-code>` 等占位符）。
 
+**章节结构**（非仅目录）：见 `.cursor/rules/sub-app-doc-template.mdc`；机读校验 `npm run validate:doc-template -- --app {app-code}`。
+
 ## 执行要求
 
 1. 先 `mkdir` 四个阶段目录，再写入文档；不得跳过目录直接在 `<app-code>/` 下建文件。

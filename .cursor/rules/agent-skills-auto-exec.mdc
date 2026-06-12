@@ -27,6 +27,8 @@ alwaysApply: true
 4. 输出 **阶段门禁状态块** 后再编码/写文档
 5. **禁止**要求用户「请先运行 sync」或「请先输入 /ai-full-process-design」
 
+**写/补子应用文档时**（含需求说明书、PRD、SDD、界面设计、详细设计、操作说明书等）：**立即 Read** `.cursor/rules/sub-app-doc-template.mdc`；落盘后跑 `npm run validate:doc-template -- --app {app-code}`（G2/G3 已内嵌于 `validate:sdd`）。
+
 ## 步骤 → 阶段 Skill（自动 Read）
 
 | 步骤 | 自动加载 |
@@ -49,6 +51,28 @@ alwaysApply: true
 4. 输出 **子应用打包摘要**（见 Skill 输出模板）
 
 步骤 3 验证 U5、步骤 6 发布构建均走同一 Skill。
+
+## 横切：界面改后文档回写（**仅人工触发**）
+
+当用户 **明确**要求 **界面改后同步文档 / 回改文档 / 回写文档 / UI回写文档 / 文档回写 / 预览文档差异 / 确认回写 / /ui-docs-reverse-sync** 时：
+
+1. **立即 Read** `.cursor/skills/ui-docs-reverse-sync/SKILL.md`
+2. **默认 preview**：扫描 UI → 输出差异表与拟改清单 → **禁止**未确认前改文档
+3. 用户回复 **「确认回写」/「执行落盘」/「apply」** 后 → **apply** 落盘
+4. **模式**：全量 → `full`；改完某页 → `scoped`；G2-A 反馈 → `post-walkthrough`；步骤 5 联调 → `post-dev`
+5. **落盘**：`04-AI治理与审计/界面文档同步报告.md`
+6. **禁止**代签 G2-A、自动冻结 PRD、擅自改 SDD；**禁止**改 UI 后自动触发本 Skill（可提示用户人工发起）
+
+**未说回写/同步文档时**：Agent 只改代码，不自动回写。
+
+## 横切：PRD 页面标注（自动 Read）
+
+当用户要求 **PRD标注 / 页面标注 / 功能点标注 / 标注更新 / 浮窗编辑** 时：
+
+1. **立即 Read** `.cursor/skills/prd-page-annotation/SKILL.md`
+2. 复用 `sample-app/components/PrdAnnotation/`；数据落盘 `annotations/*.js` + 同步 `03-PRD`
+3. **按功能点** 四段式标注；同页可多角标
+4. 开发态支持浮窗内编辑；正式落盘须写回 `annotations/*.js` 并 Git 提交
 
 ## 横切：界面验收审核（自动 Read）
 

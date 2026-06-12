@@ -70,7 +70,7 @@ metadata:
 |------|------|
 | **Rules**（`.cursor/rules/*.mdc`） | 自动加载时机、禁止人工 sync |
 | **Skill** | 步骤细则、模板、脚本、门禁 |
-| **npm 脚本** | 可验证真值（infer / validate:sdd / build） |
+| **npm 脚本** | 可验证真值（infer / validate:sdd / validate:doc-template / build） |
 
 Skill 写「做什么」；Rules 写「何时自动做」。
 

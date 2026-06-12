@@ -1,5 +1,7 @@
 # Skills 总目录（统一检索）
 
+> **框架文档索引**：`核心文档/框架核心文档/文档清单.md` §5（Agent Skills 清单）。本节为**操作级真值**（步骤映射、调用顺序、落盘文件）；新增或废止 Skill 时须与 §5 **双向登记**。
+
 本目录用于快速查找当前仓库可用 skills。
 
 - `主线`：全流程默认强制使用
@@ -47,7 +49,6 @@
 | `ui-ux-pro-max` | web-mobile-h5（推荐） | `.cursor/skills/ui-ux-pro-max/SKILL.md` |
 | `mobile-android-design` | native-android | `.cursor/skills/mobile-android-design/SKILL.md` |
 | `mobile-ios-design` | native-ios | `.cursor/skills/mobile-ios-design/SKILL.md` |
-| `prd-page-annotation` | 可选 | **`.cursor/skills/prd-page-annotation/SKILL.md`** |
 
 ## 三-B、工作流 Skill（借鉴 Axhub Make，步骤 3～6）
 
@@ -58,16 +59,24 @@
 | **`ui-acceptance-review`** | **4 / 5** | **`.cursor/skills/ui-acceptance-review/SKILL.md`** · [checklist](../../.cursor/skills/ui-acceptance-review/references/checklist.md) · [模板](../../.cursor/skills/ui-acceptance-review/references/report-template.md) |
 | `project-memory` | 启动 + 3/4 | `.cursor/skills/project-memory/SKILL.md` |
 | **`release-readiness-review`** | **6** | **`.cursor/skills/release-readiness-review/SKILL.md`** · [checklist](../../.cursor/skills/release-readiness-review/references/checklist.md) · [模板](../../.cursor/skills/release-readiness-review/references/report-template.md) |
+| **`ui-docs-reverse-sync`** | **横切**（步骤 3～6，**仅人工触发**） | **`.cursor/skills/ui-docs-reverse-sync/SKILL.md`** · [manual-trigger](../../.cursor/skills/ui-docs-reverse-sync/references/manual-trigger.md) · [doc-matrix](../../.cursor/skills/ui-docs-reverse-sync/references/doc-matrix.md) |
+| **`prd-page-annotation`** | **横切** | **`.cursor/skills/prd-page-annotation/SKILL.md`** |
 
 规范：`核心文档/AI+产品落地/01-AI全流程设计/子应用资源库规范.md`
 
 ## 四、专项技能（Web / Stitch）
 
-| Skill | 路径 | 阶段 |
-|-------|------|------|
+| Skill | 路径 | 阶段 / 标签 |
+|-------|------|-------------|
 | `stitch-design` | `AIEP-WEB/src/skills/stitch-design/SKILL.md` | 3 |
 | `design-md` | `AIEP-WEB/src/skills/design-md/SKILL.md` | 3 |
 | `enhance-prompt` | `AIEP-WEB/src/skills/enhance-prompt/SKILL.md` | 3 |
+| `stitch-loop` | `AIEP-WEB/src/skills/stitch-loop/SKILL.md` | 实验 |
+| `react-components` | `AIEP-WEB/src/skills/react-components/SKILL.md` | 实验 |
+| `shadcn-ui` | `AIEP-WEB/src/skills/shadcn-ui/SKILL.md` | 实验 |
+| `taste-design` | `AIEP-WEB/src/skills/taste-design/SKILL.md` | 实验 |
+| `remotion` | `AIEP-WEB/src/skills/remotion/SKILL.md` | 实验 |
+| `ui-styling` | `.cursor/skills/ui-styling/SKILL.md` | 可选 |
 
 ## 五、推荐调用顺序
 

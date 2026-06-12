@@ -12,6 +12,11 @@
 - 包管理器：**npm**（根与 `AIEP-SERVER/` 各有 `package-lock.json`，勿混用 pnpm/yarn）。
 - 默认端口：主前端 **5173** · sample-app 独立 dev **5174** · 后端 **3001**。
 - 子应用示例：`sample-app`、`ai-smart-crm-admin`、`marketing-demo`（各有 `dev:*` / `build:*`）。
+- **appCode vs folder**（治理脚本 `--app` 用 appCode，build/dev 脚本用 folder）：
+  - `sample-app` / `sample-app`
+  - `ai-smart-crm` / `ai-smart-crm-admin`（build:`ai-smart-crm-admin`）
+  - `marketing-demo` / `marketing-demo`
+- AI 协作工具：**Cursor 或 TRAE 二选一**（均打开仓库根；Skills 由 `npm install` 的 postinstall 自动同步，勿手工 sync）。
 
 【交接目标】
 1. 能在本机完成依赖安装、启动、构建（主应用 + 至少一个子应用 + 可选后端）。
@@ -21,6 +26,7 @@
 【文档冲突处理（强制）】
 - 执行命令与路径：**根 `README.md` > 本文件 > `安装指南.md` / 打包指南**。
 - 若指南与 `package.json` scripts 不一致，以 **`package.json` 为准**，并在报告中标注「文档待同步」。
+- `framework-baseline.json`：部分文档引用；若根目录不存在，以 `框架基线.md` + `package-lock.json` 为准并标注「基线文件缺失」。
 
 【执行顺序（必须按顺序）】
 
@@ -31,10 +37,14 @@
   - 根 `README.md`、`package.json`、`package-lock.json`
   - `AIEP-WEB/`、`AIEP-SERVER/`、`核心文档/`
   - `AIEP-WEB/src/config/subApps.js`（子应用注册表）
+  - `scripts/`（根级脚本，含 `sync-skills.mjs`）
+  - `.cursor/`（Agent Rules + Skills 源）、`.trae/`（TRAE Skills 同步目标，安装后生成）
+  - `.github/`（CI `workflows/sdd-gate.yml`、PR 模板、CODEOWNERS）
+  - `platform/access/`（多团队 Git 权限与 teams 配置，团队交接必查）
 - 其他类型项目才需查：Docker / Python / Java 等（本仓库非必需）。
 
 ### 第2阶段：环境与依赖安装
-- 先读：根 `README.md` → `核心文档/框架核心文档/安装指南.md`。
+- 先读：根 `README.md` → `核心文档/框架核心文档/安装指南.md`（含 §10 Cursor/TRAE 协作）。
 - 检查并记录：Node **>= 18**、npm **>= 8**、Git。
 - 推荐安装（前后端一并）：
   ```powershell
@@ -43,6 +53,13 @@
   ```
   或仅前端：`npm install`；仅后端：`npm run server:install`。
 - 备选：`npm run install-deps`（自动检测缺失依赖，见安装指南 §6.1）。
+- **安装后必确认（AI 协作，Cursor 或 TRAE 择一）**：
+  - IDE 打开 **仓库根目录**（非仅 `AIEP-WEB/`）。
+  - `postinstall` 已执行 `scripts/sync-skills.mjs`（安装日志无报错）。
+  - **Cursor 用户**：Skills 同步至 `~/.cursor/skills/`；Rules 由 `.cursor/rules/agent-skills-auto-exec.mdc` 自动加载。
+  - **TRAE 用户**：Skills 同步至仓库 `.trae/skills/`（postinstall 同脚本写入）。
+  - **禁止**要求用户手工 `npm run sync:cursor-skills` / `sync:trae-skills` 或输入 `/ai-full-process-design`。
+  - 验证方式：对 Agent 说「推进 sample-app」，应能自动加载总编排 Skill（无需人工 sync）。
 - 若安装失败，记录：失败命令、关键报错、可能原因、建议修复步骤。
 - **AI+ 全流程新手**：环境就绪后读 `核心文档/框架核心文档/新手入门.md`（Cursor/TRAE 即可，无需自选 LLM）。
 
@@ -56,13 +73,25 @@
   2. `npm run build` — 主应用构建成功
   3. `npm run build:sample-app` — 至少一个子应用构建成功
   4. `npm test` — 单元测试通过
+  5. `npm run validate:sub-app-registry` — 子应用注册表与主应用四处登记一致
 - **建议验证**（接手子应用/产品文档时）：
+  - `npm run dev:sample-app` — 子应用独立 dev（5174）
   - `npm run server:dev` — 后端启动（3001）
+  - `npm run server:test` — 后端测试（若启用后端）
   - `npm run build:ai-smart-crm-admin` 或 `npm run build:marketing-demo`
+  - 接手具体子应用时，对应 `npm run dev:{folder}` / `build:{folder}`
 - **可选治理脚本**（判断文档/门禁是否齐）：
   - `npm run infer:process-step -- --app <app-code>`
-  - `npm run validate:sdd -- --app <app-code> --gate G3`
+  - `npm run validate:sdd -- --app <app-code> --gate G2` 或 `--gate G3`
   - `npm run coverage:acceptance -- --app <app-code>`
+- **横切脚本**（子应用交付/协作场景，按需跑并记录）：
+  - `npm run scaffold:sub-app -- --app <app-code>` — 新建子应用脚手架
+  - `npm run pack:sub-app -- --app <app-code>` — 独立静态演示包
+  - `npm run export:sub-app -- --app <app-code>` / `import:sub-app` — 源码交接（无 Git）
+  - `npm run validate:sub-app-pack -- --app <app-code>` — 打包产物校验
+  - `npm run apply:prd-annotations -- --app <app-code>` — PRD 标注落盘（开发态编辑后）
+- **更新包**（若收到离线更新包，勿与 `npm run update` Git pull 混用）：
+  - 先 `node <更新包>/update.js --dry-run`，确认后再由用户本地执行 `--yes`（见 `更新分发方案.md`）。
 - 必须给出验证结论：
   - 成功：命令、产物位置（如 `AIEP-WEB/dist/`）、关键日志摘要。
   - 失败：失败节点、阻塞级别（高/中/低）、临时绕过方案。
@@ -73,7 +102,14 @@
   - 入口：根 scripts → `AIEP-WEB/vite.config.js`、各子应用 `build/vite.*.config.js`
   - 核心模块：`AIEP-WEB/src/apps/`、`AIEP-SERVER/src/`、`subApps.js`
   - 关键配置：路由、子应用注册、gate-config（在子应用文档 `04-AI治理与审计/`）
-  - 文档根：`AIEP-WEB/src/docs/子应用文档/{app-code}/`
+  - 文档根：`AIEP-WEB/src/docs/子应用文档/{app-code}/`（四段式目录，禁止根目录平铺）
+  - Skill 索引：`AIEP-WEB/src/skills/SKILLS-DIRECTORY.md`
+- **designSystem / 域规范**（见 `subApps.js`）：
+  - `arco` → `系统设计规范.md` + `arco-admin-design` Skill
+  - `marketing` → `营销设计规范.md` + `marketing-design-yxui` Skill
+- **PRD 页面标注**（步骤 3/4 相关）：`src/apps/{folder}/components/PrdAnnotation/` + `annotations/*.js`。
+- **CI 门禁**：PR 改动子应用文档 / `subApps.js` 时，`.github/workflows/sdd-gate.yml` 自动跑 registry + G2 校验。
+- **团队协作**（多人 Monorepo）：读 `platform/access/README.md`，MR Reviewer 对照 `teams/*.yaml` 与 `.github/CODEOWNERS`。
 - 梳理 2~3 条核心流程：主应用启动、子应用嵌入/独立打包、SDD 门禁校验。
 
 ### 第5阶段：风险与后续建议
@@ -84,24 +120,33 @@
 【文档优先级（先读高优先级）】
 - 高优先级（必须）：
   0. `README.md`（仓库根 · 命令与目录 SOT）
-  1. `核心文档/框架核心文档/安装指南.md`
+  1. `核心文档/框架核心文档/安装指南.md`（含 §10 Cursor/TRAE）
   2. `核心文档/AI+产品落地/README.md`（AI+ 六步与 Skill 入口）
-  3. `.cursor/rules/agent-skills-auto-exec.mdc`（Agent Skill **自动**同步与加载；勿人工 sync）
-  4. `.cursor/skills/ai-full-process-design/SKILL.md`（六步总编排细则）
-  5. `核心文档/框架核心文档/主应用子应用接入规范.md`（注册表与嵌入路由）
-  6. `核心文档/框架核心文档/系统设计规范.md`
-  7. `核心文档/框架核心文档/创建指南.md`
-  8. `核心文档/框架核心文档/主应用打包指南.md`
-  9. `核心文档/框架核心文档/子应用打包指南.md`
-  10. `核心文档/框架核心文档/一键更新指南.md`
-  11. `核心文档/框架核心文档/过程规范文档.md`（治理分工与交活检查）
+  3. `.cursor/rules/agent-skills-auto-exec.mdc`（Agent Skill 自动加载；勿人工 sync）
+  4. `.cursor/rules/ai-full-process-design.mdc`（六步路径与 Gate 约束）
+  5. `.cursor/skills/ai-full-process-design/SKILL.md`（六步总编排细则）
+  6. `AIEP-WEB/src/skills/SKILLS-DIRECTORY.md`（Skill 操作级索引与落盘路径）
+  7. `核心文档/框架核心文档/主应用子应用接入规范.md`（注册表与嵌入路由）
+  8. `核心文档/框架核心文档/系统设计规范.md`
+  9. `核心文档/框架核心文档/创建指南.md`
+  10. `核心文档/框架核心文档/主应用打包指南.md`
+  11. `核心文档/框架核心文档/子应用打包指南.md`
+  12. `核心文档/框架核心文档/一键更新指南.md`
+  13. `核心文档/框架核心文档/过程规范文档.md`（治理分工与交活检查）
+  14. `核心文档/框架核心文档/平台化方案.md`（多团队 Git 协作）
+  15. `platform/access/README.md`（权限落地与 MR Reviewer 对照）
 - 中优先级（建议）：
   1. `核心文档/框架核心文档/框架基线.md`
   2. `核心文档/框架核心文档/更新分发方案.md`
-  3. `核心文档/框架核心文档/文档对齐清单.md`
-  4. `核心文档/框架核心文档/文档清单.md`
-  5. `AIEP-WEB/src/skills/stitch-readme.md`
-  6. `AIEP-WEB/src/docs/系统文档/目录结构说明.md`
+  3. `核心文档/框架核心文档/文档联动更新规范.md`
+  4. `核心文档/框架核心文档/文档对齐清单.md`
+  5. `核心文档/框架核心文档/文档清单.md`
+  6. `核心文档/AI+产品落地/01-AI全流程设计/AI+产品全流程执行手册-执行版.md`
+  7. `AIEP-WEB/src/docs/系统文档/目录结构说明.md`
+  8. `.cursor/rules/sub-app-doc-structure.mdc`（子应用四段式文档约束）
+- 按需（接手对应域时）：
+  1. `核心文档/框架核心文档/营销设计规范.md`（marketing-demo）
+  2. `AIEP-WEB/src/skills/stitch-readme.md`（Stitch 设计接入）
 
 【输出模板（交接版）】
 # 项目交接执行报告
@@ -110,36 +155,44 @@
 - 项目名称：AIEP-DEV
 - 执行时间：
 - 执行人：
+- AI 协作工具：Cursor / TRAE / 未使用
 - 结论：可直接接手 / 条件性可接手 / 暂不可接手
 
 ## 2. 环境与依赖结果
 - Node / npm / Git 版本：
 - 安装命令与结果（install:all 或等价）：
+- postinstall Skills 同步：成功 / 失败（Cursor 全局 或 TRAE `.trae/skills/`）
+- IDE 打开路径：仓库根 / 仅子目录（应為根）
 - 关键问题：
 
 ## 3. 启动与编译结果
 - 主前端 dev（5173）：
 - 主应用 build：
-- 子应用 build（注明 app）：
+- 子应用 build（注明 app / folder）：
+- 子应用独立 dev（5174，可选）：
 - npm test：
-- 后端 server:dev（可选，3001）：
+- validate:sub-app-registry：
+- 后端 server:dev / server:test（可选，3001）：
 - 治理脚本（可选）：infer / validate:sdd / coverage
+- 横切脚本（可选）：pack / export / import / scaffold
 - 产物位置与验证结果：
 
 ## 4. 项目结构与核心模块
-- 根目录结构摘要（AIEP-WEB / AIEP-SERVER / 核心文档）：
+- 根目录结构摘要（AIEP-WEB / AIEP-SERVER / 核心文档 / platform / .github）：
 - 入口与关键配置：
-- 子应用列表（subApps.js）：
+- 子应用列表（subApps.js · appCode / folder / designSystem 对照）：
 - 核心模块职责：
 
 ## 5. 核心流程理解
 - 流程一：主应用启动与路由
 - 流程二：子应用嵌入 / 独立打包
-- 流程三（可选）：SDD 门禁与文档路径
+- 流程三：SDD 门禁与文档路径
+- 流程四（可选）：Git MR / CI 与 platform/access 协作
 
 ## 6. 风险清单
 - [高/中/低] 风险描述 -> 影响 -> 建议处理
 - 文档与代码不一致项（标注「待确认」）：
+- framework-baseline.json 缺失（若有）：
 
 ## 7. 下一步最小行动清单
 - [ ] 行动1
@@ -154,7 +207,7 @@
 - 报告使用中文，术语可保留英文。
 
 【一句话主执行（优先使用）】
-- 在 `<repo-root>` 依次执行：**安装 → 主应用 dev/build → 子应用 build → test**；失败即记录报错并按 README / 安装指南排障。
+- 在 `<repo-root>` 依次执行：**安装 → 主应用 dev/build → 子应用 build → registry 校验 → test**；失败即记录报错并按 README / 安装指南排障。
 - Windows PowerShell 请**分行执行**（旧版不支持 `&&`）；Git Bash / macOS / Linux 可用 `&&` 链接。
 
 【本仓库最小命令（推荐）】
@@ -165,13 +218,14 @@ npm run install:all
 npm run dev
 npm run build
 npm run build:sample-app
+npm run validate:sub-app-registry
 npm test
 ```
 
 ### B. Git Bash / macOS / Linux
 ```bash
 cd <repo-root>
-npm run install:all && npm run build && npm run build:sample-app && npm test
+npm run install:all && npm run dev && npm run build && npm run build:sample-app && npm run validate:sub-app-registry && npm test
 ```
 
 ### C. 包管理器识别（其他 fork 仓库时）

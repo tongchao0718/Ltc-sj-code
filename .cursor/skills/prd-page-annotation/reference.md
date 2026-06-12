@@ -1,176 +1,148 @@
 # PRD 页面标注 — 技术参考
 
-## 浮窗信息架构
+## 浮窗四段式 UI
 
 ```text
 ┌─────────────────────────────────────────────┐
-│ [1]  需求描述：筛选模块                      │  ← 编号样式 = 角标样式
-│ ─────────────────────────────────────────── │  ← 浅灰分割线
-│                                             │
-│  （Markdown 正文：段落、列表、引用、加粗）    │
-│                                             │
-│  显示样式：...                               │
-│  交互与排序：...                             │
-│  业务定义：...                               │
-│  备注：...                                   │
-│                                        [X]  │
+│ [2]  功能点：列表筛选与查询    SA-2          │
+│ ─────────────────────────────────────────── │
+│ 功能说明                                     │
+│   筛选字段、按钮、布局…                       │
+│ 交互逻辑                                     │
+│   查询、重置、分页重置…                       │
+│ 数据模型与标准编码引用                        │
+│   表 sample_list_item；SDD §x；PRD 第七章     │
+│ 其他说明                                     │
+│   AT-02、NFR…                          [X]  │
+│ [编辑] （开发态）                             │
 └─────────────────────────────────────────────┘
 ```
 
-## Markdown 渲染（浮窗正文）
+## annotations 数据结构
 
-| 规则 | 值 |
-|------|-----|
-| 行高 | `line-height: 1.6` |
-| 段间距 | `margin-bottom: 12px` |
-| 加粗/斜体 | 与 `prd.md` 原文 1:1 |
-| 列表 | 保留 `-` / `1.` 嵌套缩进 |
-| 引用 `>` | `border-left: 3px solid #d9d9d9; padding-left: 12px; color: #666` |
+```javascript
+// AIEP-WEB/src/apps/{app}/annotations/{app}Annotations.js
+export const APP_ANNOTATIONS = {
+  2: {
+    featureId: 'SA-2',           // 与 01-需求说明书一致
+    featureName: '列表筛选与查询', // 功能点短名（浮窗标题）
+    moduleName: 'M02 列表查询',   // PRD 模块（可选）
+    pageRoute: '/app/list/search-table',
+    sections: {
+      functional: '…',   // 功能说明
+      interaction: '…',  // 交互逻辑
+      dataModel: '…',    // 数据模型 + SDD/标准编码引用
+      other: '…'         // 其他说明
+    }
+  }
+}
+```
 
-状态色圆点（文字前）：
+旧版仅 `markdown` 字段时，`annotationFormat.js` 会按标题拆入四段。
 
-| 语义 | 圆点色 |
-|------|--------|
-| 成功/通过/绿色 | `#52c41a` |
-| 失败/危险/红色 | `#ff4d4f` |
-| 警告/橙色 | `#faad14` |
-| 默认/灰色 | `#8c8c8c` |
+### 人工编辑：纯文本（非 Markdown）
+
+| 场景 | 约定 |
+|------|------|
+| 浮窗编辑 | 四段式字段写**纯文本**；换行分段；条目用 `1. ` / `- ` / `1、` |
+| 查看渲染 | `renderPrdMarkdown.js` 自动排版（段落、列表）；兼容历史 `##`、`**` 存量 |
+| 进入编辑 | `sectionTextForEdit()` 去掉标题/加粗等符号，避免人工看到 Markdown 语法 |
+| Agent 初始化 | `sections` 字段同样用纯文本，勿写 `### 功能说明` 等结构 |
+
+```javascript
+sections: {
+  functional: '筛选区含名称、状态、日期三个字段。\n表格展示编号、名称、状态列。',
+  interaction: '1. 点击查询刷新列表\n2. 重置清空条件',
+  dataModel: '表 sample_list_item；详见 SDD 第 3 章',
+  other: '验收 AT-02'
+}
+```
+
+## 本地编辑与落盘
+
+| 操作 | 存储 | 正式落盘 |
+|------|------|----------|
+| 保存到本地 | `localStorage`（`annotationStore.js`） | 否 |
+| 复制代码片段 | 剪贴板（含 `app-code` 注释头，UI 不展示） | 按 `target` 路径粘贴进对应子应用 `*.js` 后 Git 提交 |
+| Agent Workflow A/B | 直接改 `annotations/*.js` + 01/03 | 是 |
+
+环境变量（`vite`）：
+
+| 变量 | 默认（dev） | 说明 |
+|------|-------------|------|
+| `VITE_PRD_ANNOTATION` | 开启 | 显示角标 |
+| `VITE_PRD_ANNOTATION_EDIT` | 开启 | 浮窗内编辑 |
 
 ## 设计系统（CSS 常量）
 
 ### 角标 `.prd-badge`
 
-```css
-.prd-badge {
-  display: inline-block;
-  vertical-align: top;
-  position: absolute;
-  top: -8px;
-  right: -4px;
-  z-index: 9998;
-  background: rgb(250, 173, 20);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 14px;
-  padding: 0 4px;
-  border-radius: 2px;
-  border: none;
-  cursor: pointer;
-  user-select: none;
-}
-```
+宽 450px 浮窗；角标 `rgb(250, 173, 20)`、10px 粗体、`top: -8px; right: -4px`；浮窗 `z-index: 9999`。
 
-### 浮窗 `.prd-tooltip`
-
-```css
-.prd-tooltip {
-  position: fixed;
-  z-index: 9999;
-  width: 450px;
-  max-height: 70vh;
-  overflow: auto;
-  background: #f0efef;
-  border-radius: 4px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  padding: 12px 14px 14px;
-  pointer-events: auto;
-}
-.prd-tooltip__close {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  cursor: pointer;
-  line-height: 1;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  color: #666;
-}
-.prd-tooltip__divider {
-  height: 1px;
-  background: #e8e8e8;
-  margin: 8px 0 12px;
-}
-```
-
-### 锚点容器
-
-```css
-.prd-anchor {
-  position: relative;
-}
-```
+完整 CSS 见 `sample-app/components/PrdAnnotation/prd-annotation.css`。
 
 ## 定位与 Teleport
 
-1. 默认：角标作为 `.prd-anchor` 子元素，`position: absolute`。
-2. 当祖先存在 `overflow: hidden` / `clip`：角标与浮窗均 `Teleport` 到 `document.body`，用 `getBoundingClientRect()` + `scrollX/scrollY` 计算 `fixed` 坐标。
-3. 浮窗默认：角标左下角，偏移 `left = badgeRight - tooltipWidth`，`top = badgeBottom + 8px`。
-4. 视口溢出：检测 `left/top/right/bottom`，翻转至角标另一侧。
+1. 默认：角标作为 `.prd-anchor` 子元素。
+2. 祖先 `overflow: hidden`：角标 `Teleport` + `fixed` 坐标。
+3. 浮窗默认角标左下方，视口溢出自动翻转。
 
 ## 多浮窗交互
 
 | 行为 | 要求 |
 |------|------|
-| 打开 | 鼠标 `mouseenter` 角标 |
-| 关闭 | 仅点击右上角 X |
-| 唯一性 | 同一 `badgeId` 只保留一个 DOM 实例 |
-| 并发 | 不同 `badgeId` 可同时打开 |
-| 拖拽 | 标题栏 `mousedown` → `mousemove` 更新 `left/top` |
-| 隔离 | 浮窗内 `@mousedown.stop` `@click.stop` `@wheel.stop` |
+| 打开 | `mouseenter` 角标 |
+| 关闭 | 仅右上角 X |
+| 拖拽 | 标题栏（编辑模式禁用拖拽） |
+| 隔离 | `@mousedown.stop` `@click.stop` |
 
-## prd.md 反向写入
+## 一键复制片段格式（含子应用标识）
 
-- 在对应需求段落**起始处**插入编号标记：`[n]`（n 为 1–999）。
-- 页面角标数字与文档 `[n]` 必须一致。
-- Workflow B 删除需求时，同步删除文档中的 `[n]` 并重新核对连续性（是否重排由用户指令决定；默认保持原编号空洞，新增项用下一个可用号）。
+复制内容**不在角标/浮窗展示**，仅写入剪贴板供 Cursor / Agent 落盘：
 
-示例：
+```javascript
+// @aiep-prd-annotation app-code=sample-app annotation-id=2 feature-id=SA-2
+// target: AIEP-WEB/src/apps/sample-app/annotations/sampleAppAnnotations.js
+// action: 搜索「  2: {」整段替换（含本行尾逗号）
+  2: {
+    featureId: 'SA-2',
+    featureName: '列表筛选与查询',
+    sections: { … }
+  },
+```
+
+| 字段 | 用途 |
+|------|------|
+| `app-code` | 防止多子应用间 `id` 重复时写错文件 |
+| `annotation-id` | 与角标 `id`、文档 `[n]` 一致 |
+| `feature-id` | 与 01 需求说明书 `SA-xx` 一致 |
+| `target` | 落盘文件完整相对路径 |
+
+元数据配置：`annotations/annotationAppMeta.js`（复制 PrdAnnotation 到新子应用时必改）。
+
+## 反向写入文档
+
+在 `01-需求说明书.md` / `03-PRD设计评审文档.md` 表格中：
 
 ```markdown
-[3] ## 筛选区
-
-- 支持按协议类型、状态查询...
+| [2] SA-2 | 列表筛选 | SearchTablePage 筛选区 | … |
 ```
 
-## Vue 3 实现骨架（参考）
+角标 `id`、文档 `[n]`、`SA-xx` 三者可追溯。人工从浮窗复制落盘时，以复制头 `app-code` + `target` 为准，勿仅凭 `id` 或 `SA-xx` 猜测子应用。
 
-```vue
-<template>
-  <div ref="anchorRef" class="prd-anchor">
-    <slot />
-    <span
-      v-if="useTeleport"
-      class="prd-badge"
-      :style="badgeStyle"
-      @mouseenter="open"
-    >{{ id }}</span>
-    <span v-else class="prd-badge" @mouseenter="open">{{ id }}</span>
-  </div>
-  <Teleport to="body">
-    <div
-      v-show="visible"
-      ref="tipRef"
-      class="prd-tooltip"
-      :style="tipStyle"
-      @mousedown.stop
-      @click.stop
-    >
-      <button class="prd-tooltip__close" @click="close">×</button>
-      <header><!-- 编号 + 需求描述 --></header>
-      <div class="prd-tooltip__divider" />
-      <div class="prd-tooltip__body" v-html="renderedMd" />
-    </div>
-  </Teleport>
-</template>
-```
+## 参考实现文件
 
-Composable 建议导出：`registerAnchor(el, config)`、`openTooltip(id)`、`syncFromPrd(mdPath)`。
+| 文件 | 作用 |
+|------|------|
+| `PrdAnnotationAnchor.vue` | 角标 + 浮窗 + 编辑 |
+| `annotationAppMeta.js` | 子应用标识（复制片段用，UI 不展示） |
+| `annotationStore.js` | 合并基准数据与 localStorage |
+| `annotationFormat.js` | 四段式与 markdown 互转 |
+| `renderPrdMarkdown.js` | 浮窗正文渲染（纯文本 + 兼容 Markdown 存量） |
 
 ## 禁止项
 
-- 不得用 `summary` 替代 PRD 原文
-- 不得在同一模块挂多个角标
-- Workflow B 不得改动颜色、尺寸、偏移、圆角等视觉参数
-- 不得通过点击浮窗外区域或 Esc 关闭浮窗（仅 X）
+- 浮窗编造接口字段（写「详见 SDD §x」）
+- 同一按钮多个角标
+- 生产默认开启编辑
+- 用 summary 替代 PRD 原文

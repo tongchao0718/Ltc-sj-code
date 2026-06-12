@@ -3,11 +3,12 @@ import vue from '@vitejs/plugin-vue'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { createSubAppCopyHtmlPlugin } from './sub-app-copy-html-plugin.mjs'
+import { prdAnnotationDevSyncPlugin } from '../vite-plugins/prd-annotation-dev-sync.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  plugins: [vue(), createSubAppCopyHtmlPlugin('sample-app')],
+  plugins: [vue(), prdAnnotationDevSyncPlugin(), createSubAppCopyHtmlPlugin('sample-app')],
   base: './',
   root: resolve(__dirname, '..'),
   build: {
